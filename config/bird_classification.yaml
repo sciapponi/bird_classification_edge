@@ -1,0 +1,78 @@
+experiment_name: bird_classification_baseline
+
+hydra:
+  run:
+    dir: ./logs/${experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: ${experiment_name}
+
+# Training parameters
+training:
+  batch_size: 64
+  epochs: 50
+  patience: 10  # Early stopping patience
+  min_delta: 0.001  # Minimum improvement for early stopping
+  seed: 42  # Random seed for reproducibility
+  
+# Model configuration
+model:
+  _target_: models.Phi_GRU  # Use the GRU-based model
+  num_classes: 21  # 20 bird species + 1 non-bird
+  n_mel_bins: 64  # Number of mel bands in the spectrogram
+  hidden_dim: 32   # Hidden dimension of the GRU
+  num_layers: 1    # Number of GRU layers
+
+# Optimizer configuration
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-3
+  weight_decay: 1e-4
+
+# Learning rate scheduler
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  verbose: true
+
+# Dataset configuration
+dataset:
+  # Bird sound dataset parameters
+  bird_data_dir: "bird_sound_dataset"  # Path to bird sound data
+  esc50_dir: "ESC-50-master"           # Path to ESC-50 dataset
+  download_datasets: true              # Whether to download datasets if not present
+  
+  # Audio parameters
+  sample_rate: 22050                   # Sample rate for audio processing
+  clip_duration: 3.0                   # Duration of audio clips in seconds
+  lowcut: 2000                         # Low frequency cutoff for bird call detection
+  highcut: 10000                       # High frequency cutoff for bird call detection
+  
+  # Data split and augmentation
+  bird_to_background_ratio: 2.0        # Ratio of bird samples to background samples
+  validation_split: 0.15               # Ratio of data to use for validation
+  test_split: 0.15                     # Ratio of data to use for testing
+  
+  # Bird call extraction parameters
+  extract_calls: true                  # Whether to extract bird calls from audio
+  min_peak_distance: 1.0               # Minimum distance between detected peaks
+  height_percentile: 75                # Percentile threshold for peak detection
+  
+  # Augmentation parameters
+  augmentation:
+    enabled: true                      # Whether to use augmentation
+    noise_level: 0.005                 # Level of noise to add for noise augmentation
+    time_mask_param: 20                # Max length of time masking
+    freq_mask_param: 10                # Max length of frequency masking
+    time_shift_limit: 0.2              # Max shift as a fraction of audio length
+    speed_perturb_rate_min: 0.9        # Min rate for speed perturbation
+    speed_perturb_rate_max: 1.1        # Max rate for speed perturbation
+    
+  # Bird species to include (example, replace with actual species)
+  allowed_bird_classes: [
+    "species_1", "species_2", "species_3", "species_4", "species_5",
+    "species_6", "species_7", "species_8", "species_9", "species_10",
+    "species_11", "species_12", "species_13", "species_14", "species_15",
+    "species_16", "species_17", "species_18", "species_19", "species_20"
+  ] 
