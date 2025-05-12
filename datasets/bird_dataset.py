@@ -14,13 +14,16 @@ import torchaudio.sox_effects as sox_effects
 import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import Dataset
+import math # Import math for floor/ceil
 
 from .audio_utils import extract_call_segments
 
 class BirdSoundDataset(Dataset):
     """Dataset class for bird sound classification."""
     
-    def __init__(self, root_dir, transform=None, allowed_classes=[], subset="training", augment=False, preload=False,
+    def __init__(self, root_dir, transform=None, allowed_classes=[], subset="training", 
+                 validation_split=0.15, test_split=0.15, split_seed=42, # Added split parameters
+                 augment=False, preload=False,
                  extract_calls=True, clip_duration=3.0, sr=22050, lowcut=2000, highcut=10000,
                  background_dataset=None, custom_file_dict=None):
         """
@@ -31,6 +34,9 @@ class BirdSoundDataset(Dataset):
             transform (callable, optional): Optional transform to be applied on a sample
             allowed_classes (list): List of bird classes (folder names) to include
             subset (string): Which subset to use ('training', 'validation', 'testing')
+            validation_split (float): Proportion of data for the validation set (0.0-1.0)
+            test_split (float): Proportion of data for the test set (0.0-1.0)
+            split_seed (int): Random seed for reproducible data splitting
             augment (bool): Whether to apply augmentation to the data
             preload (bool): If True, preload all audio files into memory
             extract_calls (bool): If True, extract bird calls from audio files
@@ -46,6 +52,9 @@ class BirdSoundDataset(Dataset):
         self.root_dir = root_dir
         self.transform = transform
         self.subset = subset
+        self.validation_split = validation_split # Store split parameters
+        self.test_split = test_split
+        self.split_seed = split_seed
         self.augment = augment and subset == "training"  # Only augment training data
         self.preload = preload
         self.file_list = []
@@ -64,13 +73,13 @@ class BirdSoundDataset(Dataset):
         
         # Initialize dataset
         self._initialize_dataset()
-        print(f"Dataset initialized with {len(self.file_list)} audio files")
+        print(f"Dataset initialized for subset '{self.subset}' with {len(self.file_list)} audio files")
     
     def _initialize_dataset(self):
         """
-        Initialize the dataset by finding all audio files and their labels.
-        This method populates file_list and labels based on the directory structure
-        or from custom_file_dict if provided.
+        Initialize the dataset by finding all audio files, splitting them according 
+        to the subset, and assigning labels.
+        This method populates file_list and labels.
         """
         print(f"Looking for audio files in {self.root_dir}")
         print(f"Allowed classes: {self.allowed_classes}")
@@ -78,20 +87,21 @@ class BirdSoundDataset(Dataset):
         # If allowed_classes is empty, use all folders as classes
         if not self.allowed_classes:
             self.allowed_classes = [d for d in os.listdir(self.root_dir) 
-                                  if os.path.isdir(os.path.join(self.root_dir, d))]
+                                  if os.path.isdir(os.path.join(self.root_dir, d)) and not d.startswith('.')] # Avoid hidden folders
             print(f"No classes specified, using all folders: {self.allowed_classes}")
-        
+            
         self.class_to_idx = {cls_name: i for i, cls_name in enumerate(self.allowed_classes)}
         
-        # If custom file dictionary is provided, use that instead of scanning directories
+        # --- Collect all files per class first ---
+        files_per_class = {cls_name: [] for cls_name in self.allowed_classes}
+        
+        # If custom file dictionary is provided, use that
         if self.custom_file_dict is not None:
-            print(f"Using custom file dictionary with {sum(len(files) for files in self.custom_file_dict.values())} files")
+            print(f"Using custom file dictionary...")
             for class_name, file_paths in self.custom_file_dict.items():
                 if class_name in self.class_to_idx:
-                    for file_path in file_paths:
-                        self.file_list.append(file_path)
-                        self.labels.append(self.class_to_idx[class_name])
-                    print(f"  Added {len(file_paths)} files for class {class_name}")
+                    files_per_class[class_name].extend(file_paths)
+                    print(f"  Collected {len(file_paths)} files for class {class_name} from dict")
                 else:
                     print(f"WARNING: Class {class_name} in custom_file_dict not in allowed_classes, skipping")
         else:
@@ -100,15 +110,65 @@ class BirdSoundDataset(Dataset):
                 class_dir = os.path.join(self.root_dir, class_name)
                 if os.path.isdir(class_dir):
                     print(f"Scanning folder: {class_dir}")
-                    audio_files = []
+                    count = 0
                     for file in os.listdir(class_dir):
                         if file.endswith(('.wav', '.mp3', '.ogg', '.flac')):
-                            audio_files.append(file)
-                            self.file_list.append(os.path.join(class_dir, file))
-                            self.labels.append(self.class_to_idx[class_name])
-                    print(f"  Found {len(audio_files)} audio files in {class_name}")
+                            files_per_class[class_name].append(os.path.join(class_dir, file))
+                            count += 1
+                    print(f"  Collected {count} audio files in {class_name}")
                 else:
                     print(f"WARNING: Folder {class_dir} does not exist!")
+
+        # --- Split files per class and select subset ---
+        print(f"Splitting data using seed {self.split_seed}, val_split={self.validation_split}, test_split={self.test_split}")
+        self.file_list = [] # Reset file list
+        self.labels = []    # Reset labels
+        
+        rng = random.Random(self.split_seed) # Use a seeded random number generator for shuffling
+
+        for class_name, all_files in files_per_class.items():
+            if not all_files:
+                print(f"WARNING: No files found for class {class_name}, skipping.")
+                continue
+
+            num_files = len(all_files)
+            print(f"  Processing class '{class_name}' with {num_files} files.")
+            
+            # Shuffle the files for this class reproducibly
+            rng.shuffle(all_files) 
+            
+            # Calculate split indices
+            num_val = math.floor(self.validation_split * num_files)
+            num_test = math.floor(self.test_split * num_files)
+            num_train = num_files - num_val - num_test
+
+            if num_train <= 0 or num_val < 0 or num_test < 0:
+                 print(f"WARNING: Invalid split sizes for class {class_name} (train={num_train}, val={num_val}, test={num_test}). Check split percentages.")
+                 # Assign all to train as a fallback? Or raise error? For now, continue.
+                 if self.subset == 'training':
+                     selected_files = all_files
+                 else:
+                     selected_files = [] # No files for val/test if split is invalid
+            else:
+                print(f"    Split counts: Train={num_train}, Val={num_val}, Test={num_test}")
+                
+                # Select files based on the subset
+                if self.subset == 'training':
+                    selected_files = all_files[:num_train]
+                elif self.subset == 'validation':
+                    selected_files = all_files[num_train : num_train + num_val]
+                elif self.subset == 'testing':
+                    selected_files = all_files[num_train + num_val :]
+                else:
+                    raise ValueError(f"Invalid subset value: {self.subset}. Must be 'training', 'validation', or 'testing'.")
+
+            # Add selected files and labels to the final lists
+            self.file_list.extend(selected_files)
+            self.labels.extend([self.class_to_idx[class_name]] * len(selected_files))
+            print(f"    Added {len(selected_files)} files for subset '{self.subset}'")
+
+        if not self.file_list:
+             print(f"WARNING: No files selected for the subset '{self.subset}'. Check configuration and data.")
 
     def __len__(self):
         """Returns the total number of samples."""
@@ -129,12 +189,14 @@ class BirdSoundDataset(Dataset):
         
         print(f"Loading sample {idx}: {audio_path}")
         
+        loaded_from_cache = False
         if self.preload and audio_path in self.preloaded_data:
             print("Using preloaded data")
             waveform = self.preloaded_data[audio_path]
-        else:
+            loaded_from_cache = True # ensure_length already applied if preloaded
+        
+        if not loaded_from_cache:
             if self.extract_calls:
-                # Use the bird call extraction to get meaningful segments
                 print("Extracting calls...")
                 call_intervals, segments, _, _, _ = extract_call_segments(
                     audio_path, 
@@ -145,31 +207,37 @@ class BirdSoundDataset(Dataset):
                 )
                 
                 if segments and len(segments) > 0:
-                    # Use the first extracted call segment
                     print(f"Using the first of {len(segments)} extracted segments")
-                    audio_data = segments[0]
-                    waveform = torch.from_numpy(audio_data).float().unsqueeze(0)
+                    audio_data = segments[0] # numpy array
+                    waveform = torch.from_numpy(audio_data).float() # Potrebbe essere 1D o 2D
+                    
+                    # Standardize to [channels, time], preferibilmente [1, time]
+                    if waveform.ndim == 1: # [time]
+                        waveform = waveform.unsqueeze(0) # -> [1, time]
+                    # Se audio_data fosse già [channels, time] (es. stereo da extract_call_segments, improbabile), va bene
+                    
+                    # ESSENZIALE: Assicurare la lunghezza DOPO l'estrazione
+                    waveform = self.ensure_length(waveform)
+
                 else:
-                    # Fallback to standard loading if no calls detected
                     print("No calls detected, using standard loading")
-                    waveform = self.load_audio(audio_path)
+                    waveform = self.load_audio(audio_path) # load_audio chiama ensure_length
             else:
-                # Standard audio loading without call extraction
                 print("Standard audio loading (without call extraction)")
-                waveform = self.load_audio(audio_path)
+                waveform = self.load_audio(audio_path) # load_audio chiama ensure_length
             
-            if self.preload:
-                self.preloaded_data[audio_path] = waveform
+            if self.preload and not loaded_from_cache: # Salva solo se non era già precaricato
+                self.preloaded_data[audio_path] = waveform # waveform qui ha già la lunghezza corretta
         
         # Apply augmentation if enabled
         if self.augment:
             print("Applying augmentation...")
-            waveform = self.apply_augmentation(waveform)
+            waveform = self.apply_augmentation(waveform) 
         
-        # Apply additional transform if provided
+        # Applicare un transform aggiuntivo se fornito (es. per spectrogramma nel modello)
         if self.transform:
             print("Applying transform...")
-            waveform = self.transform(waveform)
+            waveform = self.transform(waveform) # Il modello si aspetta audio, non spectrogramma diretto qui
         
         print(f"Sample ready: shape={waveform.shape}, label={label}")
         return waveform, label
@@ -248,26 +316,60 @@ class BirdSoundDataset(Dataset):
         Ensure the waveform is exactly the target length by padding or trimming.
         
         Args:
-            waveform (torch.Tensor): Input audio waveform
-            target_length (int, optional): Desired length in samples. 
-                                         If None, uses sr * clip_duration.
+            waveform (torch.Tensor): Input audio waveform.
+                                     Expected shapes: [channels, time], [1, channels, time], or [time].
+            target_length (int, optional): The target length in samples. 
+                                         If None, uses self.sr * self.clip_duration.
         
         Returns:
-            torch.Tensor: Waveform of exactly target_length samples
+            torch.Tensor: Waveform of the target length, shape [channels, target_length].
+                          Returns a silent clip [1, target_length] on error.
         """
         if target_length is None:
             target_length = int(self.sr * self.clip_duration)
-            
-        num_samples = waveform.shape[1]
+
+        # Standardize waveform shape to [channels, time]
+        if waveform.ndim == 3:
+            if waveform.shape[0] == 1: # Shape [1, channels, time] -> [channels, time]
+                waveform = waveform.squeeze(0)
+            elif waveform.shape[1] == 1: # Shape [channels, 1, time] -> [channels, time] (improbabile ma gestito)
+                waveform = waveform.squeeze(1)
+            else: # Forma 3D non riconosciuta (es. [batch>1, canali, tempo])
+                print(f"WARNING in ensure_length: Unhandled 3D waveform shape {waveform.shape}. Using first element if batch-like or returning zeros.")
+                # Se sembra un batch, proviamo a prendere il primo elemento
+                if waveform.shape[0] > 1 and waveform.ndim == 3 : # Esempio [batch, channels, time]
+                     print(f"Assuming batch-like shape, taking waveform[0]...")
+                     waveform = waveform[0] 
+                     if waveform.ndim == 1: # Se diventa [time]
+                          waveform = waveform.unsqueeze(0) # -> [1, time]
+                else:
+                    print(f"ERROR in ensure_length: Could not standardize 3D shape {waveform.shape} to [channels, time]. Returning zeros.")
+                    return torch.zeros(1, target_length)
         
-        # Pad if shorter than the target length
-        if num_samples < target_length:
-            waveform = F.pad(waveform, (0, target_length - num_samples))
-        # Trim if longer than the target length
-        elif num_samples > target_length:
-            waveform = waveform[:, :target_length]
+        if waveform.ndim == 1: # Shape [time] -> [1, time]
+            waveform = waveform.unsqueeze(0)
         
-        return waveform
+        # At this point, waveform should be [channels, time]
+        if waveform.ndim != 2:
+            print(f"ERROR in ensure_length: Waveform shape {waveform.shape} is not 2D after standardization. Returning zeros.")
+            return torch.zeros(1, target_length)
+
+        # Proceed with trimming or padding
+        num_channels = waveform.shape[0]
+        current_length = waveform.shape[1]
+        
+        if current_length == target_length:
+            return waveform
+        elif current_length > target_length:
+            # Trim
+            return waveform[:, :target_length]
+        else: # current_length < target_length
+            # Pad
+            padding_needed = target_length - current_length
+            # Pad on the right (at the end of the clip)
+            # F.pad expects (pad_left, pad_right, pad_top, pad_bottom, ...)
+            # For a 2D tensor [channels, time], we only pad the last dimension (time)
+            return F.pad(waveform, (0, padding_needed))
     
     def add_noise(self, waveform, noise_level=0.005):
         """

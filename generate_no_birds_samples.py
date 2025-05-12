@@ -62,8 +62,7 @@ def save_no_birds_samples(bird_data_dir, esc50_dir, output_dir,
     print(f"- {num_esc50_samples} samples from ESC-50 environmental sounds")
     print(f"- {num_empty_samples} samples from empty segments in bird recordings")
     
-    # Create output directory
-    output_dir = os.path.join(output_dir, "no_birds")
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
     
     # --- Get ESC-50 samples ---

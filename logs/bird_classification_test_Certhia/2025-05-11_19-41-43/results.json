@@ -1,0 +1,7 @@
+{
+  "experiment_name": "bird_classification_test_Certhia",
+  "best_val_acc": 99.02840059790732,
+  "test_acc": 99.02840059790732,
+  "total_params": 37379,
+  "trainable_params": 37379
+}

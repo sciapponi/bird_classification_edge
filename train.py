@@ -1,8 +1,33 @@
-from datasets import BirdSoundDataset, ESC50Dataset, create_combined_dataset, download_and_extract_bird_dataset, download_and_extract_esc50
+from datasets import BirdSoundDataset, ESC50Dataset, create_combined_dataset, download_and_extract_esc50
 from torch.utils.data import DataLoader
 import torch
 from tqdm import tqdm
 from utils import check_model, check_forward_pass, count_precise_macs
+import torch.nn as nn
+
+# TEST IMPORT DIRETTO
+try:
+    from models import Improved_Phi_GRU_ATT
+    print("!!! TEST: Improved_Phi_GRU_ATT importata con successo da models !!!")
+    test_model_params = {
+        'num_classes': 2,
+        'n_mel_bins': 64,
+        'hidden_dim': 32,
+        'n_fft': 400,
+        'hop_length': 160,
+        'matchbox': {'base_filters': 32} 
+    }
+    test_model = Improved_Phi_GRU_ATT(**test_model_params)
+    print("!!! TEST: Improved_Phi_GRU_ATT istanziata con successo !!!")
+    # print(test_model) # Commentato per brevità output
+except ImportError as e:
+    print(f"!!! TEST FALLITO: ImportError durante 'from models import Improved_Phi_GRU_ATT': {e} !!!")
+    import sys
+    print("DEBUG sys.path durante test import:", sys.path)
+except Exception as e:
+    print(f"!!! TEST FALLITO: Altra Eccezione durante test import/istanza: {e} !!!")
+# FINE TEST IMPORT DIRETTO
+
 import hydra 
 from hydra.utils import instantiate
 from hydra.core.hydra_config import HydraConfig
@@ -47,45 +72,77 @@ def train(cfg: DictConfig):
     if cfg.dataset.get("download_datasets", False):
         log.info("Checking for datasets...")
         if not os.path.exists(cfg.dataset.bird_data_dir):
-            log.info("Bird dataset not found. Please download and organize bird sound data manually.")
+            log.info("Bird dataset not found. Please download and organize bird sound data manually as specified in bird_data_dir.")
         
         # Download ESC-50 dataset
-        esc50_dir = download_and_extract_esc50()
-        cfg.dataset.esc50_dir = esc50_dir
+        if not os.path.exists(cfg.dataset.esc50_dir) or not any(os.scandir(cfg.dataset.esc50_dir)):
+            log.info("ESC-50 dataset not found or empty. Downloading...")
+            esc50_dir = download_and_extract_esc50()
+            if esc50_dir and os.path.exists(esc50_dir):
+                 cfg.dataset.esc50_dir = esc50_dir
+            else:
+                log.error(f"Failed to download or locate ESC-50 dataset. Please check a_utils.py or download manually to {cfg.dataset.esc50_dir}.")
+        else:
+            log.info(f"ESC-50 dataset found at: {cfg.dataset.esc50_dir}")
     
     # Create combined datasets
     log.info("Creating datasets...")
+    
+    # Retrieve split parameters from config
+    validation_split = cfg.dataset.get('validation_split', 0.15)
+    test_split = cfg.dataset.get('test_split', 0.15)
+    split_seed = cfg.training.get('seed', 42) # Use the general training seed for splitting
+    log.info(f"Dataset split parameters: val={validation_split}, test={test_split}, seed={split_seed}")
+    
     train_dataset = create_combined_dataset(
         bird_data_dir=cfg.dataset.bird_data_dir,
         esc50_dir=cfg.dataset.esc50_dir,
         allowed_bird_classes=cfg.dataset.allowed_bird_classes,
-        bird_to_background_ratio=cfg.dataset.bird_to_background_ratio,
         use_augmentation=cfg.dataset.augmentation.enabled,
         target_sr=cfg.dataset.sample_rate,
         clip_duration=cfg.dataset.clip_duration,
-        subset="training"
+        subset="training",
+        num_no_bird_samples=cfg.dataset.get("num_no_bird_samples", 100),
+        esc50_no_bird_ratio=cfg.dataset.get("esc50_no_bird_ratio", 0.5),
+        load_pregenerated_no_birds=cfg.dataset.get("load_pregenerated_no_birds", False),
+        pregenerated_no_birds_dir=cfg.dataset.get("pregenerated_no_birds_dir", "augmented_dataset/no_birds/"),
+        validation_split=validation_split, # Pass split info
+        test_split=test_split,             # Pass split info
+        split_seed=split_seed              # Pass split seed
     )
     
     val_dataset = create_combined_dataset(
         bird_data_dir=cfg.dataset.bird_data_dir,
         esc50_dir=cfg.dataset.esc50_dir,
         allowed_bird_classes=cfg.dataset.allowed_bird_classes,
-        bird_to_background_ratio=cfg.dataset.bird_to_background_ratio,
         use_augmentation=False,  # No augmentation for validation
         target_sr=cfg.dataset.sample_rate,
         clip_duration=cfg.dataset.clip_duration,
-        subset="validation"
+        subset="validation",
+        num_no_bird_samples=cfg.dataset.get("num_no_bird_samples_val", cfg.dataset.get("num_no_bird_samples", 0)),
+        esc50_no_bird_ratio=cfg.dataset.get("esc50_no_bird_ratio", 0.5),
+        load_pregenerated_no_birds=cfg.dataset.get("load_pregenerated_no_birds_val", cfg.dataset.get("load_pregenerated_no_birds", True)),
+        pregenerated_no_birds_dir=cfg.dataset.get("pregenerated_no_birds_dir", "augmented_dataset/no_birds/"),
+        validation_split=validation_split, # Pass split info
+        test_split=test_split,             # Pass split info
+        split_seed=split_seed              # Pass split seed
     )
     
     test_dataset = create_combined_dataset(
         bird_data_dir=cfg.dataset.bird_data_dir,
         esc50_dir=cfg.dataset.esc50_dir,
         allowed_bird_classes=cfg.dataset.allowed_bird_classes,
-        bird_to_background_ratio=cfg.dataset.bird_to_background_ratio,
         use_augmentation=False,  # No augmentation for testing
         target_sr=cfg.dataset.sample_rate,
         clip_duration=cfg.dataset.clip_duration,
-        subset="testing"
+        subset="testing",
+        num_no_bird_samples=cfg.dataset.get("num_no_bird_samples_test", cfg.dataset.get("num_no_bird_samples", 0)),
+        esc50_no_bird_ratio=cfg.dataset.get("esc50_no_bird_ratio", 0.5),
+        load_pregenerated_no_birds=cfg.dataset.get("load_pregenerated_no_birds_test", cfg.dataset.get("load_pregenerated_no_birds", True)),
+        pregenerated_no_birds_dir=cfg.dataset.get("pregenerated_no_birds_dir", "augmented_dataset/no_birds/"),
+        validation_split=validation_split, # Pass split info
+        test_split=test_split,             # Pass split info
+        split_seed=split_seed              # Pass split seed
     )
     
     log.info(f"Training samples: {len(train_dataset)}")

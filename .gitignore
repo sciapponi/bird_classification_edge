@@ -3,3 +3,6 @@ esc-50/
 .env
 birdenv
 augmented_dataset/
+show.md
+venv/
+__pycache__/

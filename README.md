@@ -16,29 +16,52 @@ The codebase is organized into a modular structure:
 │   ├── esc50_dataset.py     # ESC-50 environmental sound dataset
 │   ├── dataset_factory.py   # Combined dataset creation
 │   └── test_datasets.py     # Testing functionality
-├── generate_no_birds_samples.py  # Script to generate "no_birds" class samples
+├── generate_no_birds_samples.py  # Script to generate "no_birds" class samples (offline mode)
+├── train.py                 # Main training script
 ├── config/                  # Configuration files
 │   └── bird_classification.yaml  # Main configuration
 └── [other project files]
 ```
 
-## Data Augmentation Workflow
+## Data Augmentation and "No Birds" Class Workflow
 
-### 1. Generate "No Birds" Class Samples
+The system supports two main approaches for handling the "no_birds" class samples, controlled via `config/bird_classification.yaml`:
 
-The first step is to generate samples for the "no_birds" class:
+### Mode 1: Offline Generation of "No Birds" Samples (Recommended for Reproducibility and Speed)
 
-```bash
-python generate_no_birds_samples.py --bird_dir path/to/birds --energy_threshold 2.0 --files_per_class 10
-```
+1.  **Generate "No Birds" Class Samples (Offline):**
+    This step uses `generate_no_birds_samples.py` to create and save audio files for the "no_birds" class.
+    ```bash
+    python generate_no_birds_samples.py --bird_dir path/to/birds --output_dir augmented_dataset/no_birds --energy_threshold 2.0
+    ```
+    This script:
+    - Creates a balanced set of "no_birds" samples from two sources:
+        - **ESC-50 environmental sounds** (rain, footsteps, engines, etc.)
+        - **Empty/silent segments** extracted from your bird recordings
+    - Saves these to the specified output directory (e.g., `augmented_dataset/no_birds/`).
 
-This script:
-- Creates a balanced set of "no_birds" samples from two sources:
-  - **ESC-50 environmental sounds** (rain, footsteps, engines, etc.)
-  - **Empty/silent segments** extracted from bird recordings
-- Saves these to `augmented_dataset/no_birds/`
+2.  **Configure Training to Load Pre-generated Samples:**
+    In `config/bird_classification.yaml`, set:
+    ```yaml
+    dataset:
+      load_pregenerated_no_birds: true
+      pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # Or your custom path
+      # num_no_bird_samples: 100 # Optionally, specify how many to load if fewer than available
+    ```
 
-### 2. Dataset Structure After Generation
+### Mode 2: On-the-Fly Generation of "No Birds" Samples
+
+1.  **Configure Training for On-the-Fly Generation:**
+    In `config/bird_classification.yaml`, set:
+    ```yaml
+    dataset:
+      load_pregenerated_no_birds: false
+      num_no_bird_samples: 100 # Desired total number of "no_birds" samples per epoch/dataset creation
+      esc50_no_bird_ratio: 0.5   # Proportion from ESC-50 vs. empty segments
+    ```
+    In this mode, `train.py` (via `datasets/dataset_factory.py`) will dynamically generate "no_birds" samples during dataset setup using ESC-50 sounds and by extracting silent segments from your bird recordings. No prior execution of `generate_no_birds_samples.py` is strictly needed for the "no_birds" class itself, though you still need your base bird recordings and the ESC-50 dataset.
+
+### Dataset Structure (Example after Offline Generation)
 
 ```
 bird_sound_dataset/         # Original dataset
@@ -48,57 +71,68 @@ bird_sound_dataset/         # Original dataset
   └── species2/
       └── ...
 
-augmented_dataset/          # Generated data
-  └── no_birds/             # The "no birds" class
+augmented_dataset/          # Directory for pre-generated data (if using offline mode)
+  └── no_birds/             # The "no birds" class samples
       ├── esc50_0000.wav    # Environmental sounds
       ├── ...
       ├── empty_0000.wav    # Silent segments
       └── ...
 ```
 
-### 3. Dataset Loading for Training
+### Common Augmentations Applied During Training (Both Modes)
 
-During model training, the system:
-1. Loads bird sounds from each species folder
-2. Loads the "no_birds" samples
-3. Applies augmentations during training:
-   - Bird call extraction
-   - Background mixing with controlled SNR
-   - Time/frequency masking
-   - Speed perturbation
-   - Time shifting
+Once the base bird sounds and "no_birds" samples (either loaded or generated on-the-fly) are ready, `train.py` applies further augmentations in real-time if enabled in the configuration (`dataset.augmentation.enabled: true`):
+- Bird call extraction (if `dataset.extract_calls: true`)
+- Background mixing with controlled SNR (using ESC-50 sounds as background)
+- Time/frequency masking
+- Speed perturbation
+- Time shifting
 
 ## Key Components
 
-### EmptySegmentDataset
+### `generate_no_birds_samples.py`
+Script to generate and save "no_birds" class samples offline. Useful for creating a fixed set of negative samples.
 
-A dataset class that finds and extracts segments with low energy (likely no bird calls) from audio recordings:
+### `datasets/dataset_factory.py` (`create_combined_dataset` function)
+This is the core function called by `train.py` to prepare the training, validation, and test datasets. It now supports:
+- Loading pre-generated "no_birds" samples from disk.
+- Generating "no_birds" samples on-the-fly from ESC-50 and silent segments of bird recordings.
+The choice is controlled by `load_pregenerated_no_birds` in the configuration.
 
-```python
-empty_dataset = EmptySegmentDataset(
-    bird_data_dir="bird_recordings/",
-    allowed_bird_classes=["species1", "species2"],
-    no_birds_label=0,  # Label index for "no birds" class
-    energy_threshold_factor=1.5  # Higher values detect more segments
-)
-```
+### `datasets/empty_segment_dataset.py` (`EmptySegmentDataset` class)
+A dataset class that finds and extracts segments with low energy (likely no bird calls) from audio recordings. Used by both `generate_no_birds_samples.py` (offline) and `dataset_factory.py` (if generating on-the-fly).
 
-### BirdSoundDataset
+## Key Configuration Parameters (`config/bird_classification.yaml`)
 
-Handles loading, processing, and augmentation of bird sound recordings:
+Below are some important parameters in `config/bird_classification.yaml` related to dataset handling and the "no_birds" class:
 
-```python
-bird_dataset = BirdSoundDataset(
-    root_dir="bird_recordings/",
-    allowed_classes=["species1", "species2"],
-    extract_calls=True,  # Automatically find bird calls in recordings
-    augment=True  # Apply augmentations during training
-)
+```yaml
+dataset:
+  # Bird sound dataset parameters
+  bird_data_dir: "bird_sound_dataset"  # Path to bird sound data
+  esc50_dir: "ESC-50-master"           # Path to ESC-50 dataset
+  
+  # "No Birds" class handling
+  load_pregenerated_no_birds: false    # true: Load from disk; false: Generate on-the-fly
+  pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # Path if loading from disk
+  num_no_bird_samples: 100             # Target number for "no_birds" samples (used in both modes)
+                                       # For pre-generated, if available samples < this, all are used.
+                                       # If 0 when loading pre-generated, all available samples are used.
+  esc50_no_bird_ratio: 0.5             # Proportion from ESC-50 (vs. empty) if generating on-the-fly
+
+  # Augmentation parameters (applied in real-time by BirdSoundDataset)
+  augmentation:
+    enabled: true                      # Whether to use real-time augmentation
+    # ... other augmentation params (noise_level, time_mask_param, etc.)
+
+  # Bird call extraction parameters
+  extract_calls: true                  # Whether to extract bird calls from audio
+  # ... other params (min_peak_distance, etc.)
 ```
 
 ## Script Parameters
 
-### generate_no_birds_samples.py
+### `generate_no_birds_samples.py` (for Offline Mode)
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -123,32 +157,97 @@ bird_dataset = BirdSoundDataset(
 
 ## Installation and Setup
 
-1. Clone this repository
-2. Install dependencies:
+1. Clone this repository:
+   ```bash
+   git clone <repository_url>
+   cd bird_classification_edge
+   ```
+
+2. Create and Activate a Virtual Environment (Recommended):
+   It is highly recommended to use a virtual environment to manage project dependencies and avoid conflicts with other Python projects or your system's Python installation.
+
+   *   **Create the virtual environment (e.g., named `venv`):
+       ```bash
+       python3 -m venv venv
+       ```
+
+   *   **Activate the virtual environment:**
+       *   On macOS/Linux (bash/zsh):
+           ```bash
+           source venv/bin/activate
+           ```
+       *   On Windows (Command Prompt):
+           ```bash
+           venv\Scripts\activate.bat
+           ```
+       *   On Windows (PowerShell):
+           ```bash
+           venv\Scripts\Activate.ps1
+           ```
+       (Your terminal prompt should change to indicate the active environment, e.g., `(venv)`).
+
+3. Install dependencies:
+   Once the virtual environment is activated, install the required packages using the `requirements.txt` file (if available and up-to-date) or install them manually.
    ```bash
    pip install -r requirements.txt
    ```
-3. Download bird recordings or use your own dataset
-4. Generate the "no_birds" class samples
-5. Configure training parameters in `config/bird_classification.yaml`
-6. Run training (see training documentation)
+   If `requirements.txt` is missing or outdated, you can install common packages like:
+   ```bash
+   pip install torch torchaudio torchvision numpy pandas matplotlib seaborn scikit-learn hydra-core omegaconf tqdm
+   ```
+
+4. Download bird recordings or use your own dataset. Ensure your bird sounds are organized into subdirectories by species within a main data directory (e.g., `bird_sound_dataset/species_A/sound1.wav`).
+
+5. **Decide on "No Birds" Sample Strategy:**
+    a. **Offline Mode (Recommended Start):** Run `generate_no_birds_samples.py` to create them (e.g., into `augmented_dataset/no_birds/`). Then, ensure `load_pregenerated_no_birds: true` and `pregenerated_no_birds_dir` is correctly set in your `config/bird_classification.yaml`.
+    b. **On-the-Fly Mode:** Ensure `load_pregenerated_no_birds: false` in your config. The script will generate them during setup using ESC-50 and silent segments from your bird data.
+
+6. Configure training parameters in `config/bird_classification.yaml` (especially the `dataset` section reflecting your choice above, and paths like `bird_data_dir`, `esc50_dir`).
+
+7. Run training:
+   ```bash
+   python train.py # Add any Hydra command-line overrides if needed
+   ```
 
 ## Usage Examples
 
-### Generate "No Birds" Samples
+### Generate "No Birds" Samples (Offline Mode Step)
 
 ```bash
-# Basic usage
+# Basic usage, saves to augmented_dataset/no_birds/
 python generate_no_birds_samples.py --bird_dir bird_sound_dataset
 
 # With custom parameters
 python generate_no_birds_samples.py \
   --bird_dir bird_sound_dataset \
-  --output_dir custom_dataset \
+  --output_dir custom_no_birds_set \
   --num_samples 200 \
   --energy_threshold 2.0 \
   --files_per_class 15
 ```
+
+### Running Training
+
+- **To use pre-generated "no_birds" samples:**
+  1. Ensure `generate_no_birds_samples.py` has been run and samples exist (e.g., in `augmented_dataset/no_birds/`).
+  2. In `config/bird_classification.yaml`, set:
+     ```yaml
+     dataset:
+       load_pregenerated_no_birds: true
+       pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # or your custom path
+       # Optionally adjust num_no_bird_samples if you want to load a specific subset
+     ```
+  3. Run: `python train.py`
+
+- **To generate "no_birds" samples on-the-fly:**
+  1. In `config/bird_classification.yaml`, set:
+     ```yaml
+     dataset:
+       load_pregenerated_no_birds: false
+       num_no_bird_samples: 100 # Adjust as needed
+       esc50_no_bird_ratio: 0.5   # Adjust as needed
+     ```
+  2. Run: `python train.py`
 
 ### Pre-Training Dataset Inspection
 

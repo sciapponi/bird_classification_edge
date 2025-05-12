@@ -1,0 +1,26 @@
+[2025-05-11 19:23:52,992][__main__][INFO] - Experiment: bird_classification_test_Certhia
+[2025-05-11 19:23:52,993][__main__][INFO] - Using device: cpu
+[2025-05-11 19:23:52,993][__main__][INFO] - Checking for datasets...
+[2025-05-11 19:23:52,994][__main__][INFO] - ESC-50 dataset not found or empty. Downloading...
+[2025-05-11 19:23:52,994][__main__][INFO] - Creating datasets...
+[2025-05-11 19:23:53,037][__main__][INFO] - Training samples: 1338
+[2025-05-11 19:23:53,037][__main__][INFO] - Validation samples: 1338
+[2025-05-11 19:23:53,037][__main__][INFO] - Testing samples: 1338
+[2025-05-11 19:23:53,041][__main__][INFO] - Model architecture:
+[2025-05-11 19:23:53,041][__main__][INFO] - Improved_Phi_GRU_ATT(
+  (mel_spec): MelSpectrogram(
+    (spectrogram): Spectrogram()
+    (mel_scale): MelScale()
+  )
+  (amplitude_to_db): AmplitudeToDB()
+  (phi): Identity()
+  (gru): GRU(64, 32, batch_first=True)
+  (projection): Linear(in_features=32, out_features=32, bias=True)
+  (keyword_attention): Identity()
+  (fc): Linear(in_features=32, out_features=2, bias=True)
+)
+[2025-05-11 19:23:53,041][__main__][INFO] - Total parameters: 10,530
+[2025-05-11 19:23:53,041][__main__][INFO] - Trainable parameters: 10,530
+[2025-05-11 19:23:53,041][__main__][INFO] - Computing model complexity...
+[2025-05-11 19:24:19,215][__main__][WARNING] - Could not compute MACs: unsupported format string passed to NoneType.__format__
+[2025-05-11 19:24:21,284][__main__][INFO] - Starting training...
