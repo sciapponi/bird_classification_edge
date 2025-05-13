@@ -1,0 +1,7 @@
+{
+  "experiment_name": "4birds_linear_stft_run1",
+  "best_val_acc": 80.85642317380352,
+  "test_acc": 77.58186397984886,
+  "total_params": 400890,
+  "trainable_params": 400890
+}

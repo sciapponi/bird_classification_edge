@@ -568,7 +568,7 @@ class MatchboxNetSkip(nn.Module):
 
         matchbox_cfg = cfg # cfg is expected to be the 'matchbox' sub-config
 
-        input_channels = matchbox_cfg.get('input_channels', 64) # Default if not in cfg
+        input_channels = matchbox_cfg.get('input_features', 64) # Changed 'input_channels' to 'input_features'
         base_filters = matchbox_cfg.get('base_filters', 64)
         block_filters_list = matchbox_cfg.get('block_filters_list', [32, 32, 32]) # Filters for each block
         dropout_rate = matchbox_cfg.get('dropout_rate', 0.3)

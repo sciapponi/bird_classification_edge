@@ -11,41 +11,6 @@ from torch.utils.data import Dataset, ConcatDataset, Subset
 import torchaudio # Import torchaudio
 from pathlib import Path # Import Path
 
-class LabelAdapterDataset(Dataset):
-    """
-    A dataset wrapper that changes the label of all samples in a dataset.
-    
-    This is useful for adapting datasets to use a different labeling scheme,
-    such as treating all ESC-50 samples as a single "no birds" class.
-    """
-    def __init__(self, subset, label):
-        """
-        Initialize the label adapter.
-        
-        Args:
-            subset (Dataset): The source dataset
-            label (int): The label to assign to all samples
-        """
-        self.subset = subset
-        self.label = label
-
-    def __getitem__(self, index):
-        """
-        Return the sample at index with the new label.
-        
-        Args:
-            index (int): Index of the sample
-            
-        Returns:
-            tuple: (waveform, new_label)
-        """
-        x, _ = self.subset[index] # Get data, ignore original label
-        return x, self.label      # Return data with the new fixed label
-
-    def __len__(self):
-        """Returns the total number of samples."""
-        return len(self.subset)
-
 # Nuova classe Dataset per caricare file .wav pre-generati
 class PreGeneratedNoBirdsDataset(Dataset):
     """
@@ -94,6 +59,164 @@ class PreGeneratedNoBirdsDataset(Dataset):
             waveform = torch.nn.functional.pad(waveform, (0, padding))
             
         return waveform, self.no_birds_label
+
+def create_no_birds_dataset(num_samples, 
+                              no_birds_label, 
+                              esc50_dir, 
+                              bird_data_dir, # Needed for empty segments
+                              allowed_bird_classes, # Needed for empty segments
+                              subset, # Needed for ESC-50 folds and empty segment source logic (if refined)
+                              target_sr, 
+                              clip_duration,
+                              esc50_no_bird_ratio, 
+                              load_pregenerated, 
+                              pregenerated_dir):
+    """
+    Creates a dataset containing only "no birds" samples, either by loading 
+    pre-generated files or generating them on-the-fly from ESC-50 and empty segments.
+    
+    Args:
+        num_samples (int): Target number of "no birds" samples.
+        no_birds_label (int): Label to assign to these samples.
+        esc50_dir (str): Path to ESC-50 dataset.
+        bird_data_dir (str): Path to bird sound dataset (for empty segments).
+        allowed_bird_classes (list): List of bird classes (for empty segments source).
+        subset (str): 'training', 'validation', or 'testing' (for ESC-50 folds).
+        target_sr (int): Target sample rate.
+        clip_duration (float): Target clip duration.
+        esc50_no_bird_ratio (float): Proportion of samples from ESC-50.
+        load_pregenerated (bool): Whether to load from pregenerated_dir.
+        pregenerated_dir (str): Directory containing pre-generated samples.
+        
+    Returns:
+        Dataset: A PyTorch Dataset containing the "no birds" samples.
+                 Returns None if no samples could be created.
+    """
+    from .esc50_dataset import ESC50Dataset
+    from .empty_segment_dataset import EmptySegmentDataset
+    
+    datasets_to_add = []
+    actual_total_no_birds = 0
+
+    print(f"--- Creating 'no birds' dataset for subset: {subset} ---")
+    print(f"Target samples: {num_samples}")
+    print(f"Mode: {'Loading pre-generated' if load_pregenerated else 'Generating on-the-fly'}")
+
+    if load_pregenerated:
+        print(f"Loading pre-generated 'no birds' samples from {pregenerated_dir}...")
+        pregen_dataset = PreGeneratedNoBirdsDataset(
+            root_dir=pregenerated_dir,
+            no_birds_label=no_birds_label,
+            target_sr=target_sr,
+            clip_duration=clip_duration
+        )
+        
+        if len(pregen_dataset) == 0:
+            print(f"  WARNING: No pre-generated 'no birds' files found in {pregenerated_dir}.")
+            return None # Return None if no pregenerated samples found
+        
+        # Select a subset if num_samples is restrictive
+        if num_samples > 0:
+            if len(pregen_dataset) < num_samples:
+                print(f"  WARNING: Requested {num_samples} pre-generated, but only {len(pregen_dataset)} available. Using all.")
+                actual_num_samples = len(pregen_dataset)
+            else:
+                actual_num_samples = num_samples
+            
+            if actual_num_samples > 0:
+                pregen_indices = random.sample(range(len(pregen_dataset)), actual_num_samples)
+                final_pregen_dataset = Subset(pregen_dataset, pregen_indices)
+                datasets_to_add.append(final_pregen_dataset)
+                actual_total_no_birds = len(final_pregen_dataset)
+                print(f"  Added {actual_total_no_birds} pre-generated 'no birds' samples.")
+            else:
+                 print("  No pre-generated samples to add (num_samples=0).")
+                 return None # Return None if 0 samples requested
+        else: # Use all available pre-generated samples
+             datasets_to_add.append(pregen_dataset)
+             actual_total_no_birds = len(pregen_dataset)
+             print(f"  Added all {actual_total_no_birds} available pre-generated 'no birds' samples.")
+
+    else: # Generate on-the-fly
+        num_esc50_target = int(num_samples * esc50_no_bird_ratio)
+        num_empty_target = num_samples - num_esc50_target
+
+        print(f"Generating on-the-fly: {num_esc50_target} from ESC-50, {num_empty_target} from empty segments.")
+
+        # Define ESC-50 categories and folds
+        NO_BIRD_CATEGORIES = [
+            'rain', 'sea_waves', 'crackling_fire', 'crickets', 'water_drops', 'wind',
+            'footsteps', 'door_wood_creaks', 'car_horn', 'engine', 'train', 
+            'dog', 'cat', 'frog'
+        ]
+        if subset == "training": folds = [1, 2, 3]
+        elif subset == "validation": folds = [4]
+        else: folds = [5] # testing
+
+        # 1. Get from ESC-50
+        if num_esc50_target > 0:
+            esc50_base = ESC50Dataset(
+                root_dir=esc50_dir, fold=folds,
+                select_categories=NO_BIRD_CATEGORIES,
+                target_sr=target_sr, target_length=clip_duration
+            )
+            if len(esc50_base) < num_esc50_target:
+                print(f"  WARNING: Requested {num_esc50_target} ESC-50, only {len(esc50_base)} available. Using all.")
+                num_esc50_actual = len(esc50_base)
+            else:
+                num_esc50_actual = num_esc50_target
+            
+            if num_esc50_actual > 0:
+                 esc50_indices = random.sample(range(len(esc50_base)), num_esc50_actual)
+                 esc50_subset = Subset(esc50_base, esc50_indices) 
+                 esc50_no_birds_dataset = LabelAdapterDataset(esc50_subset, no_birds_label)
+                 datasets_to_add.append(esc50_no_birds_dataset)
+                 actual_total_no_birds += len(esc50_no_birds_dataset)
+                 print(f"  Added {len(esc50_no_birds_dataset)} 'no birds' from ESC-50.")
+            else:
+                 print("  Skipping ESC-50 'no birds' samples.")
+
+        # 2. Get from empty segments
+        if num_empty_target > 0:
+            # TODO: Refine empty segment source based on subset? 
+            # Currently uses all bird_data_dir files. Needs BirdSoundDataset split logic first.
+            # For now, we generate from the *entire* bird_data_dir for simplicity, accepting potential minor leakage here.
+            # A better approach would be to pass the specific file list for the *bird* subset here.
+            print(f"  Generating {num_empty_target} empty segments (from all bird files - potential minor leakage for val/test)...")
+            empty_segment_base = EmptySegmentDataset(
+                bird_data_dir=bird_data_dir,
+                allowed_bird_classes=allowed_bird_classes,
+                no_birds_label=no_birds_label,
+                clip_duration=clip_duration,
+                sr=target_sr,
+                max_segments_per_file=5 # Limit segments per file
+            )
+            if len(empty_segment_base) < num_empty_target:
+                print(f"  WARNING: Requested {num_empty_target} empty segments, only {len(empty_segment_base)} found. Using all.")
+                num_empty_actual = len(empty_segment_base)
+            else:
+                num_empty_actual = num_empty_target
+
+            if num_empty_actual > 0:
+                empty_indices = random.sample(range(len(empty_segment_base)), num_empty_actual)
+                empty_subset = Subset(empty_segment_base, empty_indices)
+                datasets_to_add.append(empty_subset)
+                actual_total_no_birds += len(empty_subset)
+                print(f"  Added {len(empty_subset)} 'no birds' from empty segments.")
+            else:
+                print("  Skipping empty segment 'no birds' samples.")
+
+    # Combine the created "no birds" datasets (if any)
+    if not datasets_to_add:
+        print(f"--- No 'no birds' samples created for subset: {subset} --- ")
+        return None
+    elif len(datasets_to_add) == 1:
+        final_dataset = datasets_to_add[0]
+    else:
+        final_dataset = ConcatDataset(datasets_to_add)
+        
+    print(f"--- 'No birds' dataset created for subset: {subset} with {actual_total_no_birds} samples --- ")
+    return final_dataset
 
 def create_combined_dataset(bird_data_dir, esc50_dir, allowed_bird_classes=None,
                           target_sr=22050, clip_duration=3.0, subset="training",

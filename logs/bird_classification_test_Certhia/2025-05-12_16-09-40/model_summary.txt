@@ -1,6 +1,0 @@
-Model: models.Improved_Phi_GRU_ATT
-Total parameters: 37,445
-Trainable parameters: 37,445
-
-Best validation accuracy: 39.21%
-Test accuracy: 39.21%

@@ -1,0 +1,7 @@
+{
+  "experiment_name": "4birds_CF_linear_triangular_run1",
+  "best_val_acc": 80.47858942065491,
+  "test_acc": 79.84886649874055,
+  "total_params": 37478,
+  "trainable_params": 37478
+}

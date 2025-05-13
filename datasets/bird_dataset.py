@@ -89,7 +89,7 @@ class BirdSoundDataset(Dataset):
             self.allowed_classes = [d for d in os.listdir(self.root_dir) 
                                   if os.path.isdir(os.path.join(self.root_dir, d)) and not d.startswith('.')] # Avoid hidden folders
             print(f"No classes specified, using all folders: {self.allowed_classes}")
-            
+        
         self.class_to_idx = {cls_name: i for i, cls_name in enumerate(self.allowed_classes)}
         
         # --- Collect all files per class first ---
@@ -545,3 +545,21 @@ class BirdSoundDataset(Dataset):
         ]
         waveform_processed, _ = sox_effects.apply_effects_tensor(waveform, sample_rate, effects)
         return waveform_processed 
+
+    # Helper methods for inspection
+    def get_class_counts(self):
+        """Returns a dictionary mapping class index to sample count."""
+        counts = {}
+        # Ensure labels are integers if they are not already
+        int_labels = [int(label) for label in self.labels]
+        for label in int_labels:
+            counts[label] = counts.get(label, 0) + 1
+        return counts
+
+    def get_num_classes(self):
+        """Returns the number of bird classes managed by this dataset instance."""
+        return len(self.class_to_idx)
+
+    def get_class_to_idx(self):
+        """Returns the class_to_idx mapping."""
+        return self.class_to_idx 

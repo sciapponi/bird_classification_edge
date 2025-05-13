@@ -1,9 +1,10 @@
-from datasets import BirdSoundDataset, ESC50Dataset, create_combined_dataset, download_and_extract_esc50
-from torch.utils.data import DataLoader
+from datasets import BirdSoundDataset, ESC50Dataset, download_and_extract_esc50
+from torch.utils.data import DataLoader, ConcatDataset
 import torch
 from tqdm import tqdm
 from utils import check_model, check_forward_pass, count_precise_macs
 import torch.nn as nn
+from datasets.dataset_factory import create_no_birds_dataset
 
 # TEST IMPORT DIRETTO
 try:
@@ -85,69 +86,157 @@ def train(cfg: DictConfig):
         else:
             log.info(f"ESC-50 dataset found at: {cfg.dataset.esc50_dir}")
     
-    # Create combined datasets
-    log.info("Creating datasets...")
+    # --- Create Bird Sound Datasets Only First ---
+    log.info("Creating initial bird sound datasets (train/val/test)...")
     
     # Retrieve split parameters from config
     validation_split = cfg.dataset.get('validation_split', 0.15)
     test_split = cfg.dataset.get('test_split', 0.15)
     split_seed = cfg.training.get('seed', 42) # Use the general training seed for splitting
-    log.info(f"Dataset split parameters: val={validation_split}, test={test_split}, seed={split_seed}")
-    
-    train_dataset = create_combined_dataset(
-        bird_data_dir=cfg.dataset.bird_data_dir,
-        esc50_dir=cfg.dataset.esc50_dir,
-        allowed_bird_classes=cfg.dataset.allowed_bird_classes,
-        use_augmentation=cfg.dataset.augmentation.enabled,
-        target_sr=cfg.dataset.sample_rate,
-        clip_duration=cfg.dataset.clip_duration,
+    log.info(f"Using dataset split parameters: val={validation_split}, test={test_split}, seed={split_seed}")
+
+    # Instantiate BirdSoundDataset for each subset
+    # NOTE: Now create_combined_dataset is replaced by direct instantiation + later combining
+    train_bird_dataset = BirdSoundDataset(
+        root_dir=cfg.dataset.bird_data_dir,
+        allowed_classes=cfg.dataset.allowed_bird_classes,
         subset="training",
-        num_no_bird_samples=cfg.dataset.get("num_no_bird_samples", 100),
-        esc50_no_bird_ratio=cfg.dataset.get("esc50_no_bird_ratio", 0.5),
-        load_pregenerated_no_birds=cfg.dataset.get("load_pregenerated_no_birds", False),
-        pregenerated_no_birds_dir=cfg.dataset.get("pregenerated_no_birds_dir", "augmented_dataset/no_birds/"),
-        validation_split=validation_split, # Pass split info
-        test_split=test_split,             # Pass split info
-        split_seed=split_seed              # Pass split seed
-    )
-    
-    val_dataset = create_combined_dataset(
-        bird_data_dir=cfg.dataset.bird_data_dir,
-        esc50_dir=cfg.dataset.esc50_dir,
-        allowed_bird_classes=cfg.dataset.allowed_bird_classes,
-        use_augmentation=False,  # No augmentation for validation
-        target_sr=cfg.dataset.sample_rate,
+        validation_split=validation_split, 
+        test_split=test_split,             
+        split_seed=split_seed,             
+        augment=cfg.dataset.augmentation.enabled,
+        sr=cfg.dataset.sample_rate,
         clip_duration=cfg.dataset.clip_duration,
+        extract_calls=cfg.dataset.get('extract_calls', True),
+        background_dataset=None # Background dataset for augmentation needs separate handling if used
+                                # For simplicity, let's assume background mixing is handled inside if augment=True
+                                # Or pass ESC-50 data subset here if needed for augmentation.
+    )
+
+    val_bird_dataset = BirdSoundDataset(
+        root_dir=cfg.dataset.bird_data_dir,
+        allowed_classes=cfg.dataset.allowed_bird_classes,
         subset="validation",
-        num_no_bird_samples=cfg.dataset.get("num_no_bird_samples_val", cfg.dataset.get("num_no_bird_samples", 0)),
-        esc50_no_bird_ratio=cfg.dataset.get("esc50_no_bird_ratio", 0.5),
-        load_pregenerated_no_birds=cfg.dataset.get("load_pregenerated_no_birds_val", cfg.dataset.get("load_pregenerated_no_birds", True)),
-        pregenerated_no_birds_dir=cfg.dataset.get("pregenerated_no_birds_dir", "augmented_dataset/no_birds/"),
-        validation_split=validation_split, # Pass split info
-        test_split=test_split,             # Pass split info
-        split_seed=split_seed              # Pass split seed
+        validation_split=validation_split, 
+        test_split=test_split,             
+        split_seed=split_seed,             
+        augment=False, # No augmentation for validation
+        sr=cfg.dataset.sample_rate,
+        clip_duration=cfg.dataset.clip_duration,
+        extract_calls=cfg.dataset.get('extract_calls', True),
+        background_dataset=None
     )
-    
-    test_dataset = create_combined_dataset(
-        bird_data_dir=cfg.dataset.bird_data_dir,
+
+    test_bird_dataset = BirdSoundDataset(
+        root_dir=cfg.dataset.bird_data_dir,
+        allowed_classes=cfg.dataset.allowed_bird_classes,
+        subset="testing",
+        validation_split=validation_split, 
+        test_split=test_split,             
+        split_seed=split_seed,             
+        augment=False, # No augmentation for testing
+        sr=cfg.dataset.sample_rate,
+        clip_duration=cfg.dataset.clip_duration,
+        extract_calls=cfg.dataset.get('extract_calls', True),
+        background_dataset=None
+    )
+
+    log.info(f"Initial bird samples: Train={len(train_bird_dataset)}, Val={len(val_bird_dataset)}, Test={len(test_bird_dataset)}")
+
+    # --- Dynamically Calculate and Create "No Birds" Datasets ---
+    log.info("Calculating target number of 'no birds' samples...")
+
+    # Determine the label for the 'no birds' class
+    num_bird_classes = train_bird_dataset.get_num_classes()
+    no_birds_label = num_bird_classes 
+    log.info(f"Number of bird classes: {num_bird_classes}. 'No Birds' label index: {no_birds_label}")
+
+    # Calculate average bird samples in the training set
+    train_bird_counts = train_bird_dataset.get_class_counts()
+    if not train_bird_counts:
+        log.warning("Training bird dataset is empty! Cannot calculate average. Setting no_birds target to 0.")
+        avg_train_bird_samples = 0
+    else:
+        avg_train_bird_samples = np.mean(list(train_bird_counts.values()))
+        log.info(f"Average samples per bird class in training set: {avg_train_bird_samples:.2f}")
+
+    # Target number for training is the average
+    target_num_no_birds_train = int(round(avg_train_bird_samples))
+    log.info(f"Target 'no birds' samples for training: {target_num_no_birds_train}")
+
+    # Calculate target for val/test proportionally
+    if len(train_bird_dataset) > 0:
+        no_birds_ratio = target_num_no_birds_train / len(train_bird_dataset)
+        target_num_no_birds_val = int(round(len(val_bird_dataset) * no_birds_ratio))
+        target_num_no_birds_test = int(round(len(test_bird_dataset) * no_birds_ratio))
+    else:
+        log.warning("Training bird dataset is empty! Setting val/test 'no birds' target to 0.")
+        target_num_no_birds_val = 0
+        target_num_no_birds_test = 0
+        
+    log.info(f"Target 'no birds' samples for validation: {target_num_no_birds_val}")
+    log.info(f"Target 'no birds' samples for testing: {target_num_no_birds_test}")
+
+    # Read 'no birds' generation parameters from config
+    load_pregen = cfg.dataset.get('load_pregenerated_no_birds', False)
+    pregen_dir = cfg.dataset.get('pregenerated_no_birds_dir', 'augmented_dataset/no_birds/')
+    esc50_ratio = cfg.dataset.get('esc50_no_bird_ratio', 0.5)
+
+    # Create 'no birds' datasets using the new function
+    train_no_birds_dataset = create_no_birds_dataset(
+        num_samples=target_num_no_birds_train,
+        no_birds_label=no_birds_label,
         esc50_dir=cfg.dataset.esc50_dir,
+        bird_data_dir=cfg.dataset.bird_data_dir,
         allowed_bird_classes=cfg.dataset.allowed_bird_classes,
-        use_augmentation=False,  # No augmentation for testing
+        subset="training",
         target_sr=cfg.dataset.sample_rate,
         clip_duration=cfg.dataset.clip_duration,
-        subset="testing",
-        num_no_bird_samples=cfg.dataset.get("num_no_bird_samples_test", cfg.dataset.get("num_no_bird_samples", 0)),
-        esc50_no_bird_ratio=cfg.dataset.get("esc50_no_bird_ratio", 0.5),
-        load_pregenerated_no_birds=cfg.dataset.get("load_pregenerated_no_birds_test", cfg.dataset.get("load_pregenerated_no_birds", True)),
-        pregenerated_no_birds_dir=cfg.dataset.get("pregenerated_no_birds_dir", "augmented_dataset/no_birds/"),
-        validation_split=validation_split, # Pass split info
-        test_split=test_split,             # Pass split info
-        split_seed=split_seed              # Pass split seed
+        esc50_no_bird_ratio=esc50_ratio,
+        load_pregenerated=load_pregen,
+        pregenerated_dir=pregen_dir
     )
     
-    log.info(f"Training samples: {len(train_dataset)}")
-    log.info(f"Validation samples: {len(val_dataset)}")
-    log.info(f"Testing samples: {len(test_dataset)}")
+    val_no_birds_dataset = create_no_birds_dataset(
+        num_samples=target_num_no_birds_val,
+        no_birds_label=no_birds_label,
+        esc50_dir=cfg.dataset.esc50_dir,
+        bird_data_dir=cfg.dataset.bird_data_dir, # Note: Using full bird dir for empty seg. source
+        allowed_bird_classes=cfg.dataset.allowed_bird_classes,
+        subset="validation", 
+        target_sr=cfg.dataset.sample_rate,
+        clip_duration=cfg.dataset.clip_duration,
+        esc50_no_bird_ratio=esc50_ratio,
+        load_pregenerated=load_pregen,
+        pregenerated_dir=pregen_dir
+    )
+    
+    test_no_birds_dataset = create_no_birds_dataset(
+        num_samples=target_num_no_birds_test,
+        no_birds_label=no_birds_label,
+        esc50_dir=cfg.dataset.esc50_dir,
+        bird_data_dir=cfg.dataset.bird_data_dir, # Note: Using full bird dir for empty seg. source
+        allowed_bird_classes=cfg.dataset.allowed_bird_classes,
+        subset="testing", 
+        target_sr=cfg.dataset.sample_rate,
+        clip_duration=cfg.dataset.clip_duration,
+        esc50_no_bird_ratio=esc50_ratio,
+        load_pregenerated=load_pregen,
+        pregenerated_dir=pregen_dir
+    )
+
+    # --- Combine Bird and No Birds Datasets ---
+    log.info("Combining bird and 'no birds' datasets...")
+
+    # Use ConcatDataset to combine bird and non-bird datasets
+    # Handle cases where no_birds_dataset might be None
+    train_dataset = ConcatDataset([train_bird_dataset, train_no_birds_dataset]) if train_no_birds_dataset else train_bird_dataset
+    val_dataset = ConcatDataset([val_bird_dataset, val_no_birds_dataset]) if val_no_birds_dataset else val_bird_dataset
+    test_dataset = ConcatDataset([test_bird_dataset, test_no_birds_dataset]) if test_no_birds_dataset else test_bird_dataset
+    
+    log.info(f"Final training samples: {len(train_dataset)}")
+    log.info(f"Final validation samples: {len(val_dataset)}")
+    log.info(f"Final testing samples: {len(test_dataset)}")
     
     # Create DataLoaders
     batch_size = cfg.training.get('batch_size', 64)
@@ -359,10 +448,15 @@ def train(cfg: DictConfig):
     # Compute and save confusion matrix
     try:
         # Get class names (combine bird classes and "non-bird")
-        class_names = cfg.dataset.allowed_bird_classes + ["non-bird"]
+        # Ensure cfg.dataset.allowed_bird_classes is a list, even if empty
+        allowed_bird_classes = cfg.dataset.get('allowed_bird_classes', [])
+        if not isinstance(allowed_bird_classes, list):\
+            # Convert from OmegaConf ListConfig to Python list if necessary
+            allowed_bird_classes = list(allowed_bird_classes)
+        class_names = allowed_bird_classes + ["non-bird"]
         
         # Compute confusion matrix
-        cm = confusion_matrix(all_labels, all_preds)
+        cm = confusion_matrix(all_labels, all_preds, labels=range(cfg.model.num_classes))
         cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)
         
         # Save confusion matrix as CSV
