@@ -1,0 +1,19 @@
+[2025-05-17 09:35:19,281][__main__][INFO] - Experiment: 4birds_CF_linear_triangular_10epochs
+[2025-05-17 09:35:19,342][__main__][INFO] - Using device: cuda
+[2025-05-17 09:35:19,342][__main__][INFO] - Checking for datasets...
+[2025-05-17 09:35:19,342][__main__][INFO] - Bird dataset not found. Please download and organize bird sound data manually as specified in bird_data_dir.
+[2025-05-17 09:35:19,342][__main__][INFO] - ESC-50 dataset not found or empty. Downloading...
+[2025-05-17 09:35:19,343][__main__][INFO] - Creating initial bird sound datasets (train/val/test)...
+[2025-05-17 09:35:19,343][__main__][INFO] - Using dataset split parameters: val=0.15, test=0.15, seed=42
+[2025-05-17 09:35:19,344][__main__][INFO] - Initial bird samples: Train=0, Val=0, Test=0
+[2025-05-17 09:35:19,344][__main__][INFO] - Calculating target number of 'no birds' samples...
+[2025-05-17 09:35:19,344][__main__][INFO] - Number of bird classes: 4. 'No Birds' label index: 4
+[2025-05-17 09:35:19,344][__main__][WARNING] - Training bird dataset is empty! Cannot calculate average. Setting no_birds target to 0.
+[2025-05-17 09:35:19,344][__main__][INFO] - Target 'no birds' samples for training: 0
+[2025-05-17 09:35:19,344][__main__][WARNING] - Training bird dataset is empty! Setting val/test 'no birds' target to 0.
+[2025-05-17 09:35:19,344][__main__][INFO] - Target 'no birds' samples for validation: 0
+[2025-05-17 09:35:19,344][__main__][INFO] - Target 'no birds' samples for testing: 0
+[2025-05-17 09:35:19,344][__main__][INFO] - Combining bird and 'no birds' datasets...
+[2025-05-17 09:35:19,345][__main__][INFO] - Final training samples: 0
+[2025-05-17 09:35:19,345][__main__][INFO] - Final validation samples: 0
+[2025-05-17 09:35:19,345][__main__][INFO] - Final testing samples: 0
