@@ -132,7 +132,7 @@ class Improved_Phi_GRU_ATT(nn.Module):
         self.fc = nn.Linear(self.hidden_dim, num_classes)
 
     def forward(self, x):
-        if x.dim() == 2:
+            if x.dim() == 2:
             x = x.unsqueeze(1)
 
         if x.size(1) == 1:

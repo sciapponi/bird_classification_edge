@@ -195,29 +195,34 @@ def create_no_birds_dataset(num_samples,
             # Currently uses all bird_data_dir files. Needs BirdSoundDataset split logic first.
             # For now, we generate from the *entire* bird_data_dir for simplicity, accepting potential minor leakage here.
             # A better approach would be to pass the specific file list for the *bird* subset here.
-            print(f"  Generating {num_empty_target} empty segments (from all bird files - potential minor leakage for val/test)...")
+            # print(f"  Generating {num_empty_target} empty segments (from all bird files - potential minor leakage for val/test)...")
+            # The EmptySegmentDataset now handles its own printing regarding master pool etc.
+            
+            # Get the global seed from hydra config if possible, or use a default
+            # This assumes hydra config is accessible or a fixed seed is okay here.
+            # For now, let's use a fixed seed or pass one in. We'll use 42 for consistency for now.
+            # In a more integrated setup, this seed would come from the main config.
+            current_seed = 42 # Placeholder, ideally from main config.cfg.training.seed
+            
             empty_segment_base = EmptySegmentDataset(
                 bird_data_dir=bird_data_dir,
                 allowed_bird_classes=allowed_bird_classes,
                 no_birds_label=no_birds_label,
+                num_target_segments=num_empty_target, # Pass the target for this instance
                 clip_duration=clip_duration,
                 sr=target_sr,
-                max_segments_per_file=5 # Limit segments per file
+                max_segments_per_file=5, # This is max per file during initial scan
+                energy_threshold_factor=0.5, # Default, can be configured
+                custom_audio_files=None, # For now, master pool scans all bird_data_dir
+                seed=current_seed
             )
-            if len(empty_segment_base) < num_empty_target:
-                print(f"  WARNING: Requested {num_empty_target} empty segments, only {len(empty_segment_base)} found. Using all.")
-                num_empty_actual = len(empty_segment_base)
+            if len(empty_segment_base) > 0:
+                # No need to sample further with Subset, EmptySegmentDataset instance already has its target segments
+                datasets_to_add.append(empty_segment_base)
+                actual_total_no_birds += len(empty_segment_base)
+                print(f"  Added {len(empty_segment_base)} 'no birds' from empty segments pool.")
             else:
-                num_empty_actual = num_empty_target
-
-            if num_empty_actual > 0:
-                empty_indices = random.sample(range(len(empty_segment_base)), num_empty_actual)
-                empty_subset = Subset(empty_segment_base, empty_indices)
-                datasets_to_add.append(empty_subset)
-                actual_total_no_birds += len(empty_subset)
-                print(f"  Added {len(empty_subset)} 'no birds' from empty segments.")
-            else:
-                print("  Skipping empty segment 'no birds' samples.")
+                print(f"  WARNING: EmptySegmentDataset provided 0 segments for the target of {num_empty_target}.")
 
     # Combine the created "no birds" datasets (if any)
     if not datasets_to_add:
