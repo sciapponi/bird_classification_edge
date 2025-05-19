@@ -11,3 +11,20 @@ get_bird_images.py
 table
 visualize_model.py
 present.md
+
+# Python cache files
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
