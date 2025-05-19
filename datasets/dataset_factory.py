@@ -11,6 +11,19 @@ from torch.utils.data import Dataset, ConcatDataset, Subset
 import torchaudio # Import torchaudio
 from pathlib import Path # Import Path
 
+# Definition for LabelAdapterDataset
+class LabelAdapterDataset(Dataset):
+    def __init__(self, wrapped_dataset, new_label):
+        self.wrapped_dataset = wrapped_dataset
+        self.new_label = new_label
+
+    def __len__(self):
+        return len(self.wrapped_dataset)
+
+    def __getitem__(self, idx):
+        data, _ = self.wrapped_dataset[idx] # Original label is ignored
+        return data, self.new_label
+
 # Nuova classe Dataset per caricare file .wav pre-generati
 class PreGeneratedNoBirdsDataset(Dataset):
     """

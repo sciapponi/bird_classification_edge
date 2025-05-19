@@ -64,7 +64,7 @@ dataset:
   bird_to_background_ratio: 2.0 # Ratio for mixing with background noise (SNR is main control)
   validation_split: 0.15 # Proportion for validation set
   test_split: 0.15 # Proportion for test set
-  load_pregenerated_no_birds: true # Load "no birds" from disk or generate on-the-fly
+  load_pregenerated_no_birds: false # Load "no birds" from disk or generate on-the-fly
   pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # Directory for pre-generated "no birds"
   num_no_bird_samples: 800 # Target for "no birds" if generated, or max to load if pregenerated & dynamic balancing active
   esc50_no_bird_ratio: 0.5 # Proportion of on-the-fly "no birds" from ESC-50
