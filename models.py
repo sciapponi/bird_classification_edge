@@ -3,6 +3,9 @@ import torch
 import torch.nn as nn
 import torchaudio
 import numpy as np # Added for linspace in filterbank
+import sys
+sys.path.append('.')
+from differentiable_spec_torch import DifferentiableSpectrogram
 
 # Helper function for Linear Triangular Filterbank (Hz-based)
 def _create_triangular_filterbank_hz(num_filters, n_fft, sample_rate, min_freq_hz=0.0, max_freq_hz=None):
@@ -43,7 +46,7 @@ class Improved_Phi_GRU_ATT(nn.Module):
                  n_mel_bins=64, n_linear_filters=64, # Added n_linear_filters
                  f_min=0.0, f_max=None,  # mel/dataset specific
                  hidden_dim=32, n_fft=400, hop_length=160, matchbox={}, 
-                 **kwargs):
+                 breakpoint=4000, transition_width=100, **kwargs):
         super(Improved_Phi_GRU_ATT, self).__init__()
 
         self.spectrogram_type = spectrogram_type
@@ -55,11 +58,15 @@ class Improved_Phi_GRU_ATT(nn.Module):
         self.n_linear_filters = n_linear_filters # Store n_linear_filters
         self.f_min = f_min
         self.f_max = f_max if f_max is not None else self.sample_rate / 2.0
+        self.breakpoint = breakpoint
+        self.transition_width = transition_width
 
         current_n_input_features = 0
         self.mel_transform = None
         self.stft_transform = None
         self.linear_filterbank = None
+        self.differentiable_spec = None
+        self.combined_log_linear_spec = None
 
         if self.spectrogram_type == "mel":
             self.mel_transform = torchaudio.transforms.MelSpectrogram(
@@ -93,8 +100,20 @@ class Improved_Phi_GRU_ATT(nn.Module):
                 max_freq_hz=self.f_max
             )
             current_n_input_features = self.n_linear_filters
+        elif self.spectrogram_type == "combined_log_linear":
+            # Nuova modalità: filtro log-lineare apprendibile
+            self.combined_log_linear_spec = DifferentiableSpectrogram(
+                n_filters=self.n_linear_filters,
+                f_min=self.f_min,
+                f_max=self.f_max,
+                n_fft=self.n_fft,
+                hop_length=self.hop_length,
+                initial_breakpoint=self.breakpoint,
+                initial_transition_width=self.transition_width
+            )
+            current_n_input_features = self.n_linear_filters
         else:
-            raise ValueError(f"Unsupported spectrogram_type: {self.spectrogram_type}. Choose 'mel', 'linear_stft', or 'linear_triangular'.")
+            raise ValueError(f"Unsupported spectrogram_type: {self.spectrogram_type}. Choose 'mel', 'linear_stft', 'linear_triangular', or 'combined_log_linear'.")
 
         self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype="power", top_db=80)
 
@@ -125,20 +144,22 @@ class Improved_Phi_GRU_ATT(nn.Module):
             x = self.stft_transform(x)
         elif self.spectrogram_type == "linear_triangular":
             x = self.stft_transform(x) # Raw power spectrogram: (batch, freq_raw, time)
-            # Apply linear filterbank
             x = x.permute(0, 2, 1) # -> (batch, time, freq_raw)
-            # (B, T, F_raw) @ (F_filt, F_raw).T = (B, T, F_raw) @ (F_raw, F_filt) -> (B, T, F_filt)
             x = torch.matmul(x, self.linear_filterbank.T.to(x.device))
             x = x.permute(0, 2, 1) # -> (batch, freq_filt, time)
+            x = self.amplitude_to_db(x)
+        elif self.spectrogram_type == "combined_log_linear":
+            # Nuova modalità: usa il filtro log-lineare apprendibile
+            x = self.combined_log_linear_spec(x)
         
-        x = self.amplitude_to_db(x)    
+        x = self.amplitude_to_db(x) if self.spectrogram_type not in ["linear_triangular", "combined_log_linear"] else x
 
         mean = x.mean(dim=(1, 2), keepdim=True) 
         std = x.std(dim=(1, 2), keepdim=True) + 1e-5 
         x = (x - mean) / std
 
-        x = self.phi(x) 
-        x = x.permute(0, 2, 1).contiguous() 
+        x = self.phi(x)
+        x = x.permute(0, 2, 1).contiguous()
         x, _ = self.gru(x)
         x = self.projection(x)
         x, attention_weights = self.keyword_attention(x)
@@ -700,3 +721,5 @@ class Phi_GRU(nn.Module):
         x = self.fc2(x)  # (batch, num_classes)
 
         return x
+
+

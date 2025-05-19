@@ -1,0 +1,453 @@
+[2025-05-13 21:08:37,123][__main__][INFO] - Experiment: 4birds_CF_linear_triangular_10epochs
+[2025-05-13 21:08:37,126][__main__][INFO] - Using device: cpu
+[2025-05-13 21:08:37,126][__main__][INFO] - Checking for datasets...
+[2025-05-13 21:08:37,126][__main__][INFO] - ESC-50 dataset not found or empty. Downloading...
+[2025-05-13 21:08:37,126][__main__][INFO] - Creating initial bird sound datasets (train/val/test)...
+[2025-05-13 21:08:37,126][__main__][INFO] - Using dataset split parameters: val=0.15, test=0.15, seed=42
+[2025-05-13 21:08:37,162][__main__][INFO] - Initial bird samples: Train=2970, Val=635, Test=635
+[2025-05-13 21:08:37,162][__main__][INFO] - Calculating target number of 'no birds' samples...
+[2025-05-13 21:08:37,162][__main__][INFO] - Number of bird classes: 4. 'No Birds' label index: 4
+[2025-05-13 21:08:37,162][__main__][INFO] - Average samples per bird class in training set: 742.50
+[2025-05-13 21:08:37,162][__main__][INFO] - Target 'no birds' samples for training: 742
+[2025-05-13 21:08:37,162][__main__][INFO] - Target 'no birds' samples for validation: 159
+[2025-05-13 21:08:37,162][__main__][INFO] - Target 'no birds' samples for testing: 159
+[2025-05-13 21:08:37,173][__main__][INFO] - Combining bird and 'no birds' datasets...
+[2025-05-13 21:08:37,173][__main__][INFO] - Final training samples: 3712
+[2025-05-13 21:08:37,173][__main__][INFO] - Final validation samples: 794
+[2025-05-13 21:08:37,173][__main__][INFO] - Final testing samples: 794
+[2025-05-13 21:08:37,191][__main__][INFO] - Model architecture:
+[2025-05-13 21:08:37,191][__main__][INFO] - Improved_Phi_GRU_ATT(
+  (stft_transform): Spectrogram()
+  (amplitude_to_db): AmplitudeToDB()
+  (phi): MatchboxNetSkip(
+    (initial_conv_module): Sequential(
+      (0): PhiNetCausalConvBlock(
+        (_layers): ModuleList(
+          (0): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(64, 64, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (1): BatchNorm1d(64, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (2): Hardswish()
+          (3): Dropout1d(p=0.05, inplace=False)
+          (4): DepthwiseCausalConv(
+            (pad): ConstantPad1d(padding=(4, 0), value=0)
+            (conv): Conv1d(64, 64, kernel_size=(5,), stride=(1,), groups=64, bias=False)
+          )
+          (5): BatchNorm1d(64, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (6): Hardswish()
+          (7): SEBlock(
+            (se_conv): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(64, 10, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (se_conv2): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(10, 64, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (activation): Hardswish()
+            (mult): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (8): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(64, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Dropout(p=0.3, inplace=False)
+    )
+    (blocks_modulelist): ModuleList(
+      (0): ModuleList(
+        (0): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(2, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+        (1): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(4, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), dilation=(2,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+      )
+      (1): ModuleList(
+        (0): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(8, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), dilation=(4,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+        (1): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(4, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), dilation=(2,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+      )
+      (2): ModuleList(
+        (0-1): 2 x Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(2, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+      )
+    )
+    (projections_modulelist): ModuleList(
+      (0-2): 3 x Identity()
+    )
+    (final_block_to_conv1_projection): Identity()
+    (final_conv1_module): Sequential(
+      (0): PhiNetCausalConvBlock(
+        (_layers): ModuleList(
+          (0): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (2): Hardswish()
+          (3): Dropout1d(p=0.05, inplace=False)
+          (4): DepthwiseCausalConv(
+            (pad): ConstantPad1d(padding=(8, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(5,), stride=(1,), dilation=(2,), groups=32, bias=False)
+          )
+          (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (6): Hardswish()
+          (7): SEBlock(
+            (se_conv): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (se_conv2): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (activation): Hardswish()
+            (mult): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (8): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Dropout(p=0.3, inplace=False)
+    )
+    (conv1_to_conv2_projection): Identity()
+    (final_conv2_module): Sequential(
+      (0): PhiNetCausalConvBlock(
+        (_layers): ModuleList(
+          (0): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (2): Hardswish()
+          (3): Dropout1d(p=0.05, inplace=False)
+          (4): DepthwiseCausalConv(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), groups=32, bias=False)
+          )
+          (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (6): Hardswish()
+          (7): SEBlock(
+            (se_conv): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (se_conv2): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (activation): Hardswish()
+            (mult): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (8): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Dropout(p=0.3, inplace=False)
+    )
+  )
+  (gru): GRU(32, 32, batch_first=True)
+  (projection): Linear(in_features=32, out_features=32, bias=True)
+  (keyword_attention): AttentionLayer(
+    (attention): Linear(in_features=32, out_features=1, bias=True)
+  )
+  (fc): Linear(in_features=32, out_features=5, bias=True)
+)
+[2025-05-13 21:08:37,194][__main__][INFO] - Total parameters: 37,478
+[2025-05-13 21:08:37,194][__main__][INFO] - Trainable parameters: 37,478
+[2025-05-13 21:08:37,194][__main__][INFO] - Computing model complexity...
+[2025-05-13 21:09:04,823][__main__][WARNING] - Could not compute MACs: unsupported format string passed to NoneType.__format__
+[2025-05-13 21:09:05,491][__main__][INFO] - Starting training...
+[2025-05-13 21:15:23,514][__main__][INFO] - Epoch 1/10
+[2025-05-13 21:15:23,520][__main__][INFO] - Train Loss: 0.8467, Train Acc: 68.94%
+[2025-05-13 21:15:23,520][__main__][INFO] - Val Loss: 0.5449, Val Acc: 80.48%
+[2025-05-13 21:15:23,520][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:15:23,520][__main__][INFO] - Validation loss improved from inf to 0.5449
+[2025-05-13 21:15:23,559][__main__][INFO] - New best model saved with val acc: 80.48%
+[2025-05-13 21:21:18,087][__main__][INFO] - Epoch 2/10
+[2025-05-13 21:21:18,092][__main__][INFO] - Train Loss: 0.5931, Train Acc: 79.66%
+[2025-05-13 21:21:18,092][__main__][INFO] - Val Loss: 0.4887, Val Acc: 84.89%
+[2025-05-13 21:21:18,093][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:21:18,093][__main__][INFO] - Validation loss improved from 0.5449 to 0.4887
+[2025-05-13 21:21:18,154][__main__][INFO] - New best model saved with val acc: 84.89%
+[2025-05-13 21:28:40,262][__main__][INFO] - Epoch 3/10
+[2025-05-13 21:28:40,268][__main__][INFO] - Train Loss: 0.5194, Train Acc: 82.57%
+[2025-05-13 21:28:40,269][__main__][INFO] - Val Loss: 0.4971, Val Acc: 82.49%
+[2025-05-13 21:28:40,269][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:28:40,269][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-13 21:36:30,547][__main__][INFO] - Epoch 4/10
+[2025-05-13 21:36:30,553][__main__][INFO] - Train Loss: 0.4834, Train Acc: 84.46%
+[2025-05-13 21:36:30,554][__main__][INFO] - Val Loss: 0.4620, Val Acc: 83.88%
+[2025-05-13 21:36:30,554][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:36:30,554][__main__][INFO] - Validation loss improved from 0.4887 to 0.4620
+[2025-05-13 21:44:32,220][__main__][INFO] - Epoch 5/10
+[2025-05-13 21:44:32,224][__main__][INFO] - Train Loss: 0.4463, Train Acc: 85.10%
+[2025-05-13 21:44:32,224][__main__][INFO] - Val Loss: 0.5574, Val Acc: 80.73%
+[2025-05-13 21:44:32,224][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:44:32,224][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-13 21:51:23,509][__main__][INFO] - Epoch 6/10
+[2025-05-13 21:51:23,513][__main__][INFO] - Train Loss: 0.4131, Train Acc: 86.53%
+[2025-05-13 21:51:23,513][__main__][INFO] - Val Loss: 0.4302, Val Acc: 85.52%
+[2025-05-13 21:51:23,513][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:51:23,514][__main__][INFO] - Validation loss improved from 0.4620 to 0.4302
+[2025-05-13 21:51:23,543][__main__][INFO] - New best model saved with val acc: 85.52%
+[2025-05-13 21:57:36,996][__main__][INFO] - Epoch 7/10
+[2025-05-13 21:57:37,000][__main__][INFO] - Train Loss: 0.3978, Train Acc: 86.50%
+[2025-05-13 21:57:37,000][__main__][INFO] - Val Loss: 0.6647, Val Acc: 78.59%
+[2025-05-13 21:57:37,000][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 21:57:37,000][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-13 22:06:15,962][__main__][INFO] - Epoch 8/10
+[2025-05-13 22:06:15,967][__main__][INFO] - Train Loss: 0.3757, Train Acc: 87.58%
+[2025-05-13 22:06:15,967][__main__][INFO] - Val Loss: 0.3977, Val Acc: 87.41%
+[2025-05-13 22:06:15,967][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 22:06:15,967][__main__][INFO] - Validation loss improved from 0.4302 to 0.3977
+[2025-05-13 22:06:15,994][__main__][INFO] - New best model saved with val acc: 87.41%
+[2025-05-13 22:15:11,822][__main__][INFO] - Epoch 9/10
+[2025-05-13 22:15:11,828][__main__][INFO] - Train Loss: 0.3807, Train Acc: 87.66%
+[2025-05-13 22:15:11,828][__main__][INFO] - Val Loss: 0.4595, Val Acc: 84.26%
+[2025-05-13 22:15:11,828][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 22:15:11,828][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-13 22:23:35,237][__main__][INFO] - Epoch 10/10
+[2025-05-13 22:23:35,244][__main__][INFO] - Train Loss: 0.3562, Train Acc: 87.77%
+[2025-05-13 22:23:35,244][__main__][INFO] - Val Loss: 0.3514, Val Acc: 87.41%
+[2025-05-13 22:23:35,244][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-13 22:23:35,244][__main__][INFO] - Validation loss improved from 0.3977 to 0.3514
+[2025-05-13 22:23:36,075][__main__][INFO] - Training history plot saved to /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/logs/4birds_CF_linear_triangular_10epochs/2025-05-13_21-08-37/training_history.png
+[2025-05-13 22:23:36,075][__main__][INFO] - 
+Evaluating on test set...
+[2025-05-13 22:25:03,744][__main__][INFO] - Test Loss: 0.4184, Test Acc: 87.78%
+[2025-05-13 22:25:04,134][__main__][INFO] - Confusion matrix saved to /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/logs/4birds_CF_linear_triangular_10epochs/2025-05-13_21-08-37/confusion_matrix.png
+[2025-05-13 22:25:04,135][__main__][INFO] - Training completed! Best validation accuracy: 87.41%
+[2025-05-13 22:25:04,135][__main__][INFO] - Test accuracy: 87.78%
+[2025-05-13 22:25:04,135][__main__][INFO] - Results saved to /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/logs/4birds_CF_linear_triangular_10epochs/2025-05-13_21-08-37
