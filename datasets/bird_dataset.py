@@ -25,7 +25,7 @@ class BirdSoundDataset(Dataset):
                  validation_split=0.15, test_split=0.15, split_seed=42, # Added split parameters
                  augment=False, preload=False,
                  extract_calls=True, clip_duration=3.0, sr=22050, lowcut=2000, highcut=10000,
-                 background_dataset=None, custom_file_dict=None):
+                 background_dataset=None, custom_file_dict=None, verbose=False): # Added verbose
         """
         Initialize the Bird Sound Dataset.
         
@@ -46,16 +46,21 @@ class BirdSoundDataset(Dataset):
             highcut (int): High frequency cutoff for bandpass filter
             background_dataset (Dataset, optional): Dataset providing background noise samples for augmentation
             custom_file_dict (dict, optional): Dictionary mapping class names to lists of file paths to use
+            verbose (bool): If True, print more detailed logs during initialization and item fetching.
         """
-        print(f"Initializing BirdSoundDataset: subset={subset}, augment={augment}, extract_calls={extract_calls}")
+        # print(f"Initializing BirdSoundDataset: subset={subset}, augment={augment}, extract_calls={extract_calls}") # MODIFIED
+        self.verbose = verbose
+        if self.verbose:
+            print(f"Initializing BirdSoundDataset: subset={subset}, augment={augment}, extract_calls={extract_calls}, verbose={self.verbose}")
+
         self.allowed_classes = allowed_classes
         self.root_dir = root_dir
         self.transform = transform
         self.subset = subset
-        self.validation_split = validation_split # Store split parameters
+        self.validation_split = validation_split
         self.test_split = test_split
         self.split_seed = split_seed
-        self.augment = augment and subset == "training"  # Only augment training data
+        self.augment = augment and subset == "training"
         self.preload = preload
         self.file_list = []
         self.labels = []
@@ -63,7 +68,6 @@ class BirdSoundDataset(Dataset):
         self.preloaded_data = {}
         self.custom_file_dict = custom_file_dict
         
-        # Bird call extraction parameters
         self.extract_calls = extract_calls
         self.clip_duration = clip_duration
         self.sr = sr
@@ -71,9 +75,10 @@ class BirdSoundDataset(Dataset):
         self.highcut = highcut
         self.background_dataset = background_dataset
         
-        # Initialize dataset
         self._initialize_dataset()
-        print(f"Dataset initialized for subset '{self.subset}' with {len(self.file_list)} audio files")
+        # print(f"Dataset initialized for subset '{self.subset}' with {len(self.file_list)} audio files") # MODIFIED
+        if self.verbose or len(self.file_list) == 0 : # Print if verbose or if no files (warning)
+             print(f"Dataset initialized for subset '{self.subset}' with {len(self.file_list)} audio files")
     
     def _initialize_dataset(self):
         """
@@ -81,50 +86,56 @@ class BirdSoundDataset(Dataset):
         to the subset, and assigning labels.
         This method populates file_list and labels.
         """
-        print(f"Looking for audio files in {self.root_dir}")
-        print(f"Allowed classes: {self.allowed_classes}")
+        # print(f"Looking for audio files in {self.root_dir}") # MODIFIED
+        # print(f"Allowed classes: {self.allowed_classes}") # MODIFIED
+        if self.verbose:
+            print(f"Looking for audio files in {self.root_dir}")
+            print(f"Allowed classes: {self.allowed_classes}")
         
-        # If allowed_classes is empty, use all folders as classes
         if not self.allowed_classes:
             self.allowed_classes = [d for d in os.listdir(self.root_dir) 
-                                  if os.path.isdir(os.path.join(self.root_dir, d)) and not d.startswith('.')] # Avoid hidden folders
-            print(f"No classes specified, using all folders: {self.allowed_classes}")
+                                  if os.path.isdir(os.path.join(self.root_dir, d)) and not d.startswith('.')]
+            # print(f"No classes specified, using all folders: {self.allowed_classes}") # MODIFIED
+            if self.verbose:
+                 print(f"No classes specified, using all folders: {self.allowed_classes}")
         
         self.class_to_idx = {cls_name: i for i, cls_name in enumerate(self.allowed_classes)}
         
-        # --- Collect all files per class first ---
         files_per_class = {cls_name: [] for cls_name in self.allowed_classes}
         
-        # If custom file dictionary is provided, use that
         if self.custom_file_dict is not None:
-            print(f"Using custom file dictionary...")
+            # print(f"Using custom file dictionary...") # MODIFIED
+            if self.verbose: print(f"Using custom file dictionary...")
             for class_name, file_paths in self.custom_file_dict.items():
                 if class_name in self.class_to_idx:
                     files_per_class[class_name].extend(file_paths)
-                    print(f"  Collected {len(file_paths)} files for class {class_name} from dict")
+                    # print(f"  Collected {len(file_paths)} files for class {class_name} from dict") # MODIFIED
+                    if self.verbose: print(f"  Collected {len(file_paths)} files for class {class_name} from dict")
                 else:
                     print(f"WARNING: Class {class_name} in custom_file_dict not in allowed_classes, skipping")
         else:
-            # Standard directory scanning
             for class_name in self.allowed_classes:
                 class_dir = os.path.join(self.root_dir, class_name)
                 if os.path.isdir(class_dir):
-                    print(f"Scanning folder: {class_dir}")
+                    # print(f"Scanning folder: {class_dir}") # MODIFIED
+                    if self.verbose: print(f"Scanning folder: {class_dir}")
                     count = 0
                     for file in os.listdir(class_dir):
                         if file.endswith(('.wav', '.mp3', '.ogg', '.flac')):
                             files_per_class[class_name].append(os.path.join(class_dir, file))
                             count += 1
-                    print(f"  Collected {count} audio files in {class_name}")
+                    # print(f"  Collected {count} audio files in {class_name}") # MODIFIED
+                    if self.verbose: print(f"  Collected {count} audio files in {class_name}")
                 else:
                     print(f"WARNING: Folder {class_dir} does not exist!")
 
-        # --- Split files per class and select subset ---
-        print(f"Splitting data using seed {self.split_seed}, val_split={self.validation_split}, test_split={self.test_split}")
-        self.file_list = [] # Reset file list
-        self.labels = []    # Reset labels
+        # print(f"Splitting data using seed {self.split_seed}, val_split={self.validation_split}, test_split={self.test_split}") # MODIFIED
+        if self.verbose:
+            print(f"Splitting data using seed {self.split_seed}, val_split={self.validation_split}, test_split={self.test_split}")
+        self.file_list = []
+        self.labels = []    
         
-        rng = random.Random(self.split_seed) # Use a seeded random number generator for shuffling
+        rng = random.Random(self.split_seed)
 
         for class_name, all_files in files_per_class.items():
             if not all_files:
@@ -132,27 +143,25 @@ class BirdSoundDataset(Dataset):
                 continue
 
             num_files = len(all_files)
-            print(f"  Processing class '{class_name}' with {num_files} files.")
+            # print(f"  Processing class '{class_name}' with {num_files} files.") # MODIFIED
+            if self.verbose: print(f"  Processing class '{class_name}' with {num_files} files.")
             
-            # Shuffle the files for this class reproducibly
             rng.shuffle(all_files) 
             
-            # Calculate split indices
             num_val = math.floor(self.validation_split * num_files)
             num_test = math.floor(self.test_split * num_files)
             num_train = num_files - num_val - num_test
 
             if num_train <= 0 or num_val < 0 or num_test < 0:
                  print(f"WARNING: Invalid split sizes for class {class_name} (train={num_train}, val={num_val}, test={num_test}). Check split percentages.")
-                 # Assign all to train as a fallback? Or raise error? For now, continue.
                  if self.subset == 'training':
                      selected_files = all_files
                  else:
-                     selected_files = [] # No files for val/test if split is invalid
+                     selected_files = []
             else:
-                print(f"    Split counts: Train={num_train}, Val={num_val}, Test={num_test}")
+                # print(f"    Split counts: Train={num_train}, Val={num_val}, Test={num_test}") # MODIFIED
+                if self.verbose: print(f"    Split counts: Train={num_train}, Val={num_val}, Test={num_test}")
                 
-                # Select files based on the subset
                 if self.subset == 'training':
                     selected_files = all_files[:num_train]
                 elif self.subset == 'validation':
@@ -162,84 +171,83 @@ class BirdSoundDataset(Dataset):
                 else:
                     raise ValueError(f"Invalid subset value: {self.subset}. Must be 'training', 'validation', or 'testing'.")
 
-            # Add selected files and labels to the final lists
             self.file_list.extend(selected_files)
             self.labels.extend([self.class_to_idx[class_name]] * len(selected_files))
-            print(f"    Added {len(selected_files)} files for subset '{self.subset}'")
+            # print(f"    Added {len(selected_files)} files for subset '{self.subset}'") # MODIFIED
+            if self.verbose: print(f"    Added {len(selected_files)} files for subset '{self.subset}' for class '{class_name}'")
+
 
         if not self.file_list:
              print(f"WARNING: No files selected for the subset '{self.subset}'. Check configuration and data.")
 
     def __len__(self):
-        """Returns the total number of samples."""
         return len(self.file_list)
     
     def __getitem__(self, idx):
-        """
-        Returns the audio sample and its label at the given index.
-        
-        Args:
-            idx (int): Index of the sample
-            
-        Returns:
-            tuple: (waveform, label)
-        """
         audio_path = self.file_list[idx]
         label = self.labels[idx]
         
-        print(f"Loading sample {idx}: {audio_path}")
+        # print(f"Loading sample {idx}: {audio_path}") # REMOVED
         
         loaded_from_cache = False
         if self.preload and audio_path in self.preloaded_data:
-            print("Using preloaded data")
+            # print("Using preloaded data") # REMOVED
             waveform = self.preloaded_data[audio_path]
-            loaded_from_cache = True # ensure_length already applied if preloaded
+            loaded_from_cache = True
         
         if not loaded_from_cache:
             if self.extract_calls:
-                print("Extracting calls...")
+                # print("Extracting calls...") # REMOVED
                 call_intervals, segments, _, _, _ = extract_call_segments(
                     audio_path, 
                     clip_duration=self.clip_duration,
                     sr=self.sr, 
                     lowcut=self.lowcut, 
-                    highcut=self.highcut
+                    highcut=self.highcut,
+                    verbose=self.verbose # Pass verbose to audio_utils
                 )
                 
                 if segments and len(segments) > 0:
-                    print(f"Using the first of {len(segments)} extracted segments")
-                    audio_data = segments[0] # numpy array
-                    waveform = torch.from_numpy(audio_data).float() # Potrebbe essere 1D o 2D
+                    # print(f"Using the first of {len(segments)} extracted segments") # REMOVED
+                    # Randomly select one of the extracted segments if multiple are found
+                    # This introduces more variability during training
+                    # For validation/testing, consistently using the first one might be better for reproducibility
+                    # if self.subset == "training" and len(segments) > 1:
+                    #    selected_segment_idx = random.randint(0, len(segments) - 1)
+                    # else:
+                    #    selected_segment_idx = 0 
+                    # audio_data = segments[selected_segment_idx] 
                     
-                    # Standardize to [channels, time], preferibilmente [1, time]
-                    if waveform.ndim == 1: # [time]
-                        waveform = waveform.unsqueeze(0) # -> [1, time]
-                    # Se audio_data fosse già [channels, time] (es. stereo da extract_call_segments, improbabile), va bene
+                    # For now, let's stick to the first segment for simplicity and consistency
+                    audio_data = segments[0] 
+                    waveform = torch.from_numpy(audio_data).float()
                     
-                    # ESSENZIALE: Assicurare la lunghezza DOPO l'estrazione
+                    if waveform.ndim == 1:
+                        waveform = waveform.unsqueeze(0)
+                    
                     waveform = self.ensure_length(waveform)
 
                 else:
-                    print("No calls detected, using standard loading")
-                    waveform = self.load_audio(audio_path) # load_audio chiama ensure_length
+                    # print("No calls detected, using standard loading") # REMOVED
+                    if self.verbose:
+                        print(f"No calls detected in {audio_path} by __getitem__, using standard loading.")
+                    waveform = self.load_audio(audio_path)
             else:
-                print("Standard audio loading (without call extraction)")
-                waveform = self.load_audio(audio_path) # load_audio chiama ensure_length
+                # print("Standard audio loading (without call extraction)") # REMOVED
+                waveform = self.load_audio(audio_path)
             
-            if self.preload and not loaded_from_cache: # Salva solo se non era già precaricato
-                self.preloaded_data[audio_path] = waveform # waveform qui ha già la lunghezza corretta
+            if self.preload and not loaded_from_cache:
+                self.preloaded_data[audio_path] = waveform
         
-        # Apply augmentation if enabled
         if self.augment:
-            print("Applying augmentation...")
+            # print("Applying augmentation...") # REMOVED
             waveform = self.apply_augmentation(waveform) 
         
-        # Applicare un transform aggiuntivo se fornito (es. per spectrogramma nel modello)
         if self.transform:
-            print("Applying transform...")
-            waveform = self.transform(waveform) # Il modello si aspetta audio, non spectrogramma diretto qui
+            # print("Applying transform...") # REMOVED
+            waveform = self.transform(waveform)
         
-        print(f"Sample ready: shape={waveform.shape}, label={label}")
+        # print(f"Sample ready: shape={waveform.shape}, label={label}") # REMOVED
         return waveform, label
     
     def load_audio(self, audio_path):
@@ -250,32 +258,35 @@ class BirdSoundDataset(Dataset):
             audio_path (str): Path to the audio file
             
         Returns:
-            torch.Tensor: Processed waveform
+            torch.Tensor: Processed audio waveform
         """
         try:
-            waveform, sample_rate = torchaudio.load(audio_path)
-            
-            # Convert stereo to mono if needed
-            if waveform.shape[0] > 1:
-                waveform = waveform.mean(dim=0, keepdim=True)
-            
-            # Resample if needed
-            if sample_rate != self.sr:
-                resampler = torchaudio.transforms.Resample(sample_rate, self.sr)
-                waveform = resampler(waveform)
-            
-            # Ensure standard length
-            waveform = self.ensure_length(waveform, self.sr * self.clip_duration)
-            
-            # Normalize audio
-            if waveform.abs().max() > 0:
-                waveform = waveform / waveform.abs().max()
-                
-            return waveform
+            waveform, sr_orig = torchaudio.load(audio_path)
         except Exception as e:
-            print(f"Error loading audio file {audio_path}: {e}")
-            # Return a silent clip of the proper length as fallback
-            return torch.zeros(1, int(self.sr * self.clip_duration))
+            print(f"ERROR loading audio file {audio_path}: {e}. Returning zeros.")
+            # Return a zero tensor of the expected shape if loading fails
+            # Expected shape is [channels, num_samples]
+            # Assuming mono audio for now, and target_length is sr * clip_duration
+            target_len_samples = int(self.sr * self.clip_duration)
+            return torch.zeros((1, target_len_samples))
+
+        # Resample if necessary
+        if sr_orig != self.sr:
+            # print(f"Resampling {audio_path} from {sr_orig}Hz to {self.sr}Hz") # MODIFIED
+            if self.verbose: print(f"Resampling {audio_path} from {sr_orig}Hz to {self.sr}Hz")
+            resampler = T.Resample(sr_orig, self.sr)
+            waveform = resampler(waveform)
+            
+        # Convert to mono if necessary by averaging channels
+        if waveform.shape[0] > 1:
+            # print(f"Converting {audio_path} to mono.") # MODIFIED
+            if self.verbose: print(f"Converting {audio_path} to mono.")
+            waveform = torch.mean(waveform, dim=0, keepdim=True)
+            
+        # Ensure correct length (padding or truncating)
+        waveform = self.ensure_length(waveform)
+        
+        return waveform
     
     def apply_augmentation(self, waveform):
         """
