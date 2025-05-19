@@ -46,53 +46,56 @@ class EmptySegmentDataset(Dataset):
         self.energy_threshold_factor = energy_threshold_factor
         self.custom_audio_files = custom_audio_files
 
-        self.segment_list = [] # Stores (file_path, start_time, end_time)
-
+        self.segment_list = []
         self._find_empty_segments()
-        print(f"--- EmptySegmentDataset initialized with {len(self.segment_list)} segments ---")
+        # Il messaggio finale verrà stampato alla fine di _find_empty_segments
 
     def _find_empty_segments(self):
-        """Find segments with no bird calls in the audio files."""
+        files_to_process = []
         if self.custom_audio_files is not None:
-            # Use the provided list of audio files directly
-            print(f"Scanning {len(self.custom_audio_files)} custom audio files for empty segments...")
+            print(f"Preparing to scan {len(self.custom_audio_files)} custom audio files for empty segments...")
             for audio_path in self.custom_audio_files:
                 if os.path.exists(audio_path) and audio_path.endswith(('.wav', '.mp3', '.ogg', '.flac')):
-                    empty_intervals = extract_empty_segments(
-                        audio_path,
-                        clip_duration=self.clip_duration,
-                        sr=self.sr,
-                        lowcut=self.lowcut,
-                        highcut=self.highcut,
-                        energy_threshold_factor=self.energy_threshold_factor,
-                        max_segments_per_file=self.max_segments_per_file
-                    )
-                    for start_time, end_time in empty_intervals:
-                        self.segment_list.append((audio_path, start_time, end_time))
+                    files_to_process.append(audio_path)
                 else:
-                    print(f"WARNING: File {audio_path} does not exist or is not a supported audio format")
+                    print(f"WARNING: Custom file {audio_path} does not exist or is not a supported audio format. Skipping.")
         else:
-            # Standard scanning through bird class directories
+            print("Preparing to scan bird dataset directories for empty segments...")
             for class_name in self.allowed_bird_classes:
                 class_dir = os.path.join(self.bird_data_dir, class_name)
                 if os.path.isdir(class_dir):
-                    print(f"Scanning for empty segments in: {class_dir}")
-                    for file in os.listdir(class_dir):
-                        if file.endswith(('.wav', '.mp3', '.ogg', '.flac')):
-                            audio_path = os.path.join(class_dir, file)
-                            empty_intervals = extract_empty_segments(
-                                audio_path,
-                                clip_duration=self.clip_duration,
-                                sr=self.sr,
-                                lowcut=self.lowcut,
-                                highcut=self.highcut,
-                                energy_threshold_factor=self.energy_threshold_factor,
-                                max_segments_per_file=self.max_segments_per_file
-                            )
-                            for start_time, end_time in empty_intervals:
-                                self.segment_list.append((audio_path, start_time, end_time))
+                    for file_name in os.listdir(class_dir):
+                        if file_name.endswith(('.wav', '.mp3', '.ogg', '.flac')):
+                            files_to_process.append(os.path.join(class_dir, file_name))
                 else:
-                    print(f"WARNING: Folder {class_dir} does not exist while scanning for empty segments!")
+                    print(f"WARNING: Class directory {class_dir} does not exist. Skipping for empty segments.")
+        
+        total_files = len(files_to_process)
+        if total_files == 0:
+            print("No audio files found to scan for empty segments.")
+            print(f"--- EmptySegmentDataset initialized with {len(self.segment_list)} segments ---")
+            return
+
+        print(f"Starting empty segment extraction from {total_files} files...")
+        for idx, audio_path in enumerate(files_to_process):
+            # Stampa progresso sulla stessa riga
+            print(f"Processing file {idx + 1}/{total_files}: {os.path.basename(audio_path)[:50]}...", end='\r')
+            
+            empty_intervals = extract_empty_segments(
+                audio_path,
+                clip_duration=self.clip_duration,
+                sr=self.sr,
+                lowcut=self.lowcut,
+                highcut=self.highcut,
+                energy_threshold_factor=self.energy_threshold_factor,
+                max_segments_per_file=self.max_segments_per_file,
+                verbose=False # Disabilita verbose in extract_empty_segments, gestiamo i warning qui
+            )
+            for start_time, end_time in empty_intervals:
+                self.segment_list.append((audio_path, start_time, end_time))
+        
+        print("\n" + " " * 100 + "\r", end='') # Pulisce la riga di progresso
+        print(f"--- EmptySegmentDataset initialized with {len(self.segment_list)} segments from {total_files} files scanned. ---")
 
     def __len__(self):
         """Returns the total number of segments."""

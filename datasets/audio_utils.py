@@ -230,12 +230,9 @@ def extract_empty_segments(audio_path, clip_duration=3.0, sr=22050,
     Returns:
         list: List of empty intervals as (start_time, end_time) tuples
     """
-    print(f"Processing for empty segments: {audio_path}")
-    start_time_proc = time.time()
-
     if not os.path.exists(audio_path):
         if verbose:
-            print(f"File not found: {audio_path}")
+            print(f"WARNING: File not found during empty segment search: {audio_path}")
         return []
 
     try:
@@ -243,55 +240,73 @@ def extract_empty_segments(audio_path, clip_duration=3.0, sr=22050,
         if current_sr != sr:
             y = librosa.resample(y, orig_sr=current_sr, target_sr=sr)
         duration = librosa.get_duration(y=y, sr=sr)
-        print(f"Audio loaded: {duration:.2f} seconds, sr={sr}")
 
         if duration < clip_duration:
              if verbose:
-                  print(f"Skipping {audio_path}, duration shorter than clip duration.")
+                  print(f"Skipping {audio_path}, duration {duration:.2f}s shorter than clip duration {clip_duration:.2f}s.")
              return []
 
-
-        # Filter the audio - helps remove constant noise outside frequency band
-        print(f"Applying bandpass filter {lowcut}-{highcut} Hz...")
         y_filtered = apply_bandpass_filter(y, lowcut, highcut, sr, order=4)
+        
+        frame_length = int(sr * 0.05)  # 50 ms window for envelope
+        hop_length = int(sr * 0.01)    # 10 ms hop
+        
+        # Ensure frame_length is not zero, can happen with very short clips or sr
+        if frame_length == 0:
+            if verbose:
+                print(f"Skipping {audio_path}, frame_length for envelope is zero (sr: {sr}, duration: {duration}).")
+            return []
 
-        # Compute amplitude envelope
-        print("Computing envelope...")
-        frame_length = int(sr * 0.05) # 50ms window
-        hop_length = int(sr * 0.01)   # 10ms hop
         envelope_frames = librosa.util.frame(np.abs(y_filtered), frame_length=frame_length, hop_length=hop_length)
-        envelope = envelope_frames.mean(axis=0)
+        envelope = envelope_frames.mean(axis=0) # Mean of absolute values in each frame
 
-        # Define a threshold for silence based on the median envelope value
+        if len(envelope) == 0:
+            if verbose:
+                print(f"Skipping {audio_path}, envelope is empty.")
+            return []
+
         median_env = np.median(envelope)
         silence_threshold = median_env * energy_threshold_factor
-        print(f"Median envelope: {median_env:.4f}, Silence threshold: {silence_threshold:.4f}")
 
+        # Find segments where envelope is below the silence threshold
+        silent_frames = np.where(envelope < silence_threshold)[0]
+        
+        if len(silent_frames) == 0:
+            return []
 
-        # Find segments below the threshold
-        clip_duration_frames = int(clip_duration / (hop_length / sr))
+        # Group consecutive silent frames
+        grouped_silent_frames = np.split(silent_frames, np.where(np.diff(silent_frames) != 1)[0] + 1)
+        
         empty_intervals = []
-        current_frame = 0
-        while current_frame <= len(envelope) - clip_duration_frames and len(empty_intervals) < max_segments_per_file:
-            segment_env = envelope[current_frame : current_frame + clip_duration_frames]
-            # Check if the maximum energy in this potential segment is below the threshold
-            if np.max(segment_env) < silence_threshold:
-                start_time_sec = librosa.frames_to_time(current_frame, sr=sr, hop_length=hop_length)
-                end_time_sec = start_time_sec + clip_duration
-                empty_intervals.append((start_time_sec, end_time_sec))
-                print(f"  Found empty segment: {start_time_sec:.2f}s - {end_time_sec:.2f}s")
-                # Jump ahead to avoid overlapping segments
-                current_frame += clip_duration_frames
-            else:
-                # Move to the next frame
-                current_frame += 1
+        samples_per_clip = int(clip_duration * sr)
+        
+        for group in grouped_silent_frames:
+            if len(group) * hop_length >= samples_per_clip: # Check if group is long enough in samples
+                start_frame = group[0]
+                end_frame = group[-1]
+                
+                start_time_sec = librosa.frames_to_time(start_frame, sr=sr, hop_length=hop_length)
+                end_time_sec = librosa.frames_to_time(end_frame, sr=sr, hop_length=hop_length)
 
-        processing_time = time.time() - start_time_proc
-        print(f"Found {len(empty_intervals)} empty segments in {processing_time:.2f} seconds")
+                # Extract multiple non-overlapping clips from this long silent segment
+                current_segment_start = start_time_sec
+                while current_segment_start + clip_duration <= end_time_sec and len(empty_intervals) < max_segments_per_file:
+                    empty_intervals.append((current_segment_start, current_segment_start + clip_duration))
+                    current_segment_start += clip_duration # Move to the start of the next potential clip
+            if len(empty_intervals) >= max_segments_per_file:
+                break 
+        
         return empty_intervals
 
     except Exception as e:
-        print(f"ERROR processing {audio_path} for empty segments: {str(e)}")
-        if verbose:
-            print(f"Error processing {audio_path}: {str(e)}")
-        return [] 
+        print(f"ERROR processing for empty segments {audio_path}: {str(e)}")
+        return []
+
+# Utility to count total audio files for progress bar in dataset factory
+def count_audio_files(directory, allowed_extensions=('.wav', '.mp3', '.ogg', '.flac')):
+    count = 0
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(tuple(allowed_extensions)):
+                count += 1
+    return count 
