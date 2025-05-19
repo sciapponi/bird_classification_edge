@@ -107,108 +107,94 @@ def extract_call_segments(audio_path, output_folder=None, clip_duration=3.0, sr=
     Returns:
         tuple: (call_intervals, segments, original_audio, sample_rate, duration)
     """
-    print(f"Processing file: {audio_path}")
-    start_time = time.time()
-    
-    # Create output folder if needed
     if save_clips and output_folder:
         os.makedirs(output_folder, exist_ok=True)
     
-    # Check if file exists
     if not os.path.exists(audio_path):
         if verbose:
-            print(f"File not found: {audio_path}")
+            print(f"File not found during call extraction: {audio_path}")
         return [], None, None, None, 0
     
     try:
-        # Load audio with downsampling if needed
-        print(f"Loading audio with librosa...")
-        y, sr = librosa.load(audio_path, sr=sr)
-        duration = librosa.get_duration(y=y, sr=sr)
-        print(f"Audio loaded: {duration:.2f} seconds, sr={sr}")
+        y, sr_loaded = librosa.load(audio_path, sr=sr)
+        duration = librosa.get_duration(y=y, sr=sr_loaded)
     
-        # Get the filename without extension for naming saved clips
         base_filename = os.path.splitext(os.path.basename(audio_path))[0]
         
-        # Compute adaptive parameters for detection
-        print("Calculating adaptive parameters...")
-        adaptive_prominence, _ = compute_adaptive_parameters(y, sr, lowcut, highcut)
+        adaptive_prominence, _ = compute_adaptive_parameters(y, sr_loaded, lowcut, highcut)
         
-        # Filter the full audio for detection
-        print(f"Applying bandpass filter {lowcut}-{highcut} Hz...")
-        y_filtered = apply_bandpass_filter(y, lowcut, highcut, sr, order=4)
+        y_filtered = apply_bandpass_filter(y, lowcut, highcut, sr_loaded, order=4)
         
-        # Compute amplitude envelope from the filtered signal
-        print("Computing envelope...")
-        frame_length = int(sr * 0.05)
-        hop_length = int(sr * 0.01)
+        frame_length = int(sr_loaded * 0.05)
+        hop_length = int(sr_loaded * 0.01)
+
+        if frame_length == 0:
+            if verbose:
+                print(f"Skipping peak detection for {audio_path}, frame_length is zero (sr: {sr_loaded}, duration: {duration}).")
+            return [], [], y, sr_loaded, duration
+
         envelope_frames = librosa.util.frame(np.abs(y_filtered), frame_length=frame_length, hop_length=hop_length)
         envelope = envelope_frames.mean(axis=0)
         
-        # Calculate minimum distance between peaks in frames
-        min_peak_distance_frames = int(min_peak_distance / (hop_length / sr))
+        if len(envelope) == 0:
+            if verbose:
+                print(f"Skipping peak detection for {audio_path}, envelope is empty.")
+            return [], [], y, sr_loaded, duration
+
+        min_peak_distance_frames = int(min_peak_distance / (hop_length / sr_loaded))
         
-        # Detect peaks using the adaptive prominence and minimum distance
-        print("Detecting peaks...")
         peaks, properties = find_peaks(envelope, 
                                     prominence=adaptive_prominence,
                                     distance=min_peak_distance_frames)
         
-        # Handle case with no peaks detected
         if len(peaks) == 0:
-            print("No peaks detected!")
             if verbose:
-                print(f"No peaks detected in {audio_path}. Try adjusting detection parameters.")
-            return [], [], y, sr, duration
+                print(f"No peaks detected in {audio_path} by extract_call_segments.")
+            return [], [], y, sr_loaded, duration
         
-        print(f"Detected {len(peaks)} raw peaks")
-        
-        # Sort peaks by prominence (highest first)
         sorted_indices = np.argsort(-properties['prominences'])
         sorted_peaks = peaks[sorted_indices]
-        sorted_prominences = properties['prominences'][sorted_indices]
         
-        # Keep only the top percentile of peaks based on height/amplitude
-        if len(sorted_peaks) > 0:  # Check if any peaks were found
+        if len(sorted_peaks) > 0:
             height_threshold = np.percentile(envelope[sorted_peaks], height_percentile)
             selected_peaks = [p for i, p in enumerate(sorted_peaks) if envelope[p] >= height_threshold]
         else:
             selected_peaks = []
         
-        # Convert peaks to time
-        peak_times = librosa.frames_to_time(selected_peaks, sr=sr, hop_length=hop_length)
+        peak_times = librosa.frames_to_time(selected_peaks, sr=sr_loaded, hop_length=hop_length)
         
-        print(f"Selected {len(peak_times)} significant peaks")
-        if verbose:
-            print(f"Detected {len(peak_times)} significant bird calls in {audio_path}")
-
         call_intervals = []
         segments = []
         for i, t in enumerate(peak_times):
-            start_time_sec = max(0, t - clip_duration / 2)  # Ensure we don't go below 0
-            end_time_sec = min(duration, t + clip_duration / 2)  # Ensure we don't exceed audio length
+            start_time_sec = max(0, t - clip_duration / 2)
+            end_time_sec = min(duration, t + clip_duration / 2)
 
-            start_sample = int(start_time_sec * sr)
-            end_sample = int(end_time_sec * sr)
+            start_sample = int(start_time_sec * sr_loaded)
+            end_sample = int(end_time_sec * sr_loaded)
+            
+            if start_sample >= end_sample or end_sample > len(y):
+                if verbose:
+                    print(f"Skipping invalid segment in {audio_path}: start={start_sample}, end={end_sample}, y_len={len(y)}")
+                continue
+            
             segment = y[start_sample:end_sample]
+
+            if len(segment) < (clip_duration * sr_loaded) / 2 and len(segment) < sr_loaded * 0.5:
+                if verbose:
+                    print(f"Skipping very short segment in {audio_path} of length {len(segment)/sr_loaded:.2f}s")
+                continue
+
             segments.append(segment)
 
-            # Save the clip if requested
             if save_clips and output_folder:
                 filename = os.path.join(output_folder, f"{base_filename}_call_{i+1:03d}.wav")
-                sf.write(filename, segment, sr)
-                if verbose:
-                    print(f"Saved call clip: {filename}")
+                sf.write(filename, segment, sr_loaded)
 
             call_intervals.append((start_time_sec, end_time_sec))
         
-        processing_time = time.time() - start_time
-        print(f"Extracted {len(segments)} audio segments in {processing_time:.2f} seconds")
-        return call_intervals, segments, y, sr, duration
+        return call_intervals, segments, y, sr_loaded, duration
     except Exception as e:
-        print(f"ERROR processing {audio_path}: {str(e)}")
-        if verbose:
-            print(f"Error processing {audio_path}: {str(e)}")
+        print(f"ERROR processing call extraction for {audio_path}: {str(e)}")
         return [], [], None, None, 0
 
 def extract_empty_segments(audio_path, clip_duration=3.0, sr=22050,
