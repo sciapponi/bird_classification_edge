@@ -290,45 +290,60 @@ class DifferentiableSpectrogram(nn.Module):
         
     def _create_filter_bank(self):
         """Create the filter bank based on current parameters"""
+        # Determine the target device from one of the module's parameters
+        target_device = self.breakpoint.device
+
         # Create parameter space
-        x = torch.linspace(0, 1, steps=self.n_filters)
+        x = torch.linspace(0, 1, steps=self.n_filters).to(target_device)
         
         # Compute in log domain directly
-        log_min = torch.log(torch.tensor(self.f_min))
-        log_max = torch.log(torch.tensor(self.f_max))
-        log_break = torch.log(self.breakpoint)
+        log_min = torch.log(torch.tensor(self.f_min, device=target_device))
+        log_max = torch.log(torch.tensor(self.f_max, device=target_device))
+        # self.breakpoint is already a tensor on the target_device (it's an nn.Parameter)
+        log_break = torch.log(self.breakpoint) 
         
         # Compute log-spaced frequencies
         log_freqs = torch.exp(log_min + x * (log_max - log_min))
         
         # Compute linear-spaced frequencies
-        lin_freqs = self.f_min + x * (self.f_max - self.f_min)
+        lin_freqs = self.f_min + x * (self.f_max - self.f_min) # self.f_min and self.f_max are scalars, result will be on x's device
         
         # Create a smoother transition using sigmoid
+        # Ensure normalized_break is on the correct device, or its components are
+        # (log_break - log_min) will be on target_device
+        # (log_max - log_min) will be on target_device
         normalized_break = (log_break - log_min) / (log_max - log_min)
+        
+        # self.transition_width is an nn.Parameter, already on target_device
+        # x is on target_device, normalized_break is on target_device
         S = torch.sigmoid((x - normalized_break) * self.transition_width)
         
         # Combine log and linear parts
         differentiable_center_freqs = (1 - S) * log_freqs + S * lin_freqs
         
         # Convert to FFT bins
-        differentiable_fft_bins = torch.round((differentiable_center_freqs / (self.f_max / 2)) * (self.n_fft // 2)).long()
+        # Ensure calculations leading to fft_bins are on the correct device
+        # Example: (self.f_max / 2) could be problematic if self.f_max is a Python float
+        # However, the tensor operations should keep things on target_device if inputs are there.
+        differentiable_fft_bins = torch.round((differentiable_center_freqs / (torch.tensor(self.f_max, device=target_device) / 2)) * (self.n_fft // 2)).long()
         differentiable_fft_bins = torch.clamp(differentiable_fft_bins, 1, (self.n_fft // 2) - 2)
         
-        return self._generate_filter_bank(differentiable_fft_bins)
+        # _generate_filter_bank will also need to use target_device
+        return self._generate_filter_bank(differentiable_fft_bins, target_device)
     
-    def _generate_filter_bank(self, fft_bins):
+    def _generate_filter_bank(self, fft_bins, device):
         """Generate triangular filter bank"""
-        filter_bank = torch.zeros((self.n_filters, self.n_fft // 2 + 1))
+        filter_bank = torch.zeros((self.n_filters, self.n_fft // 2 + 1), device=device)
         for i in range(self.n_filters):
             left = fft_bins[i - 1] if i > 0 else 0
             center = fft_bins[i]
             right = fft_bins[i + 1] if i < self.n_filters - 1 else (self.n_fft // 2)
 
+            # Ensure linspace is created on the correct device
             if center > left and center - left > 1:
-                filter_bank[i, left:center] = torch.linspace(0, 1, steps=center - left)
+                filter_bank[i, left:center] = torch.linspace(0, 1, steps=center - left, device=device)
             if right > center and right - center > 1:
-                filter_bank[i, center:right] = torch.linspace(1, 0, steps=right - center)
+                filter_bank[i, center:right] = torch.linspace(1, 0, steps=right - center, device=device)
         return filter_bank
     
     def forward(self, waveform):
