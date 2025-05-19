@@ -133,39 +133,55 @@ class Improved_Phi_GRU_ATT(nn.Module):
 
     def forward(self, x):
             if x.dim() == 2:
-            x = x.unsqueeze(1)
+                x = x.unsqueeze(1)
 
-        if x.size(1) == 1:
-            x = x.squeeze(1) 
+            # Assicuriamoci che se l'input era [batch, 1, time_samples], diventi [batch, time_samples]
+            # Questo è importante prima di passarlo ai trasformatori di spettrogrammi
+            if x.dim() == 3 and x.size(1) == 1: # Controlla se è [batch, 1, samples]
+                x = x.squeeze(1) 
 
-        if self.spectrogram_type == "mel":
-            x = self.mel_transform(x)
-        elif self.spectrogram_type == "linear_stft":
-            x = self.stft_transform(x)
-        elif self.spectrogram_type == "linear_triangular":
-            x = self.stft_transform(x) # Raw power spectrogram: (batch, freq_raw, time)
-            x = x.permute(0, 2, 1) # -> (batch, time, freq_raw)
-            x = torch.matmul(x, self.linear_filterbank.T.to(x.device))
-            x = x.permute(0, 2, 1) # -> (batch, freq_filt, time)
-            x = self.amplitude_to_db(x)
-        elif self.spectrogram_type == "combined_log_linear":
-            # Nuova modalità: usa il filtro log-lineare apprendibile
-            x = self.combined_log_linear_spec(x)
-        
-        x = self.amplitude_to_db(x) if self.spectrogram_type not in ["linear_triangular", "combined_log_linear"] else x
+            # Ora x dovrebbe essere [batch, time_samples] o [batch, features, time_steps] se già spettrogramma
 
-        mean = x.mean(dim=(1, 2), keepdim=True) 
-        std = x.std(dim=(1, 2), keepdim=True) + 1e-5 
-        x = (x - mean) / std
+            if self.spectrogram_type == "mel":
+                x = self.mel_transform(x)
+            elif self.spectrogram_type == "linear_stft":
+                x = self.stft_transform(x)
+            elif self.spectrogram_type == "linear_triangular":
+                x = self.stft_transform(x) # Raw power spectrogram: (batch, freq_raw, time)
+                x = x.permute(0, 2, 1) # -> (batch, time, freq_raw)
+                x = torch.matmul(x, self.linear_filterbank.T.to(x.device))
+                x = x.permute(0, 2, 1) # -> (batch, freq_filt, time)
+                # self.amplitude_to_db viene applicato dopo, se non è combined_log_linear
+            elif self.spectrogram_type == "combined_log_linear":
+                # Nuova modalità: usa il filtro log-lineare apprendibile
+                x = self.combined_log_linear_spec(x)
+            
+            # Applica AmplitudeToDB solo se non è già stato fatto o se non è uno spettrogramma logaritmico di per sé
+            if self.spectrogram_type not in ["combined_log_linear"]:
+                 # For linear_triangular, amplitude_to_db is applied here after filterbank
+                x = self.amplitude_to_db(x) 
 
-        x = self.phi(x)
-        x = x.permute(0, 2, 1).contiguous()
-        x, _ = self.gru(x)
-        x = self.projection(x)
-        x, attention_weights = self.keyword_attention(x)
-        x = self.fc(x)
+            # Normalizzazione dello spettrogramma
+            # Assicurarsi che x sia uno spettrogramma [batch, freq, time] o [batch, 1, freq, time]
+            if x.dim() == 3: # [batch, freq, time]
+                 mean = x.mean(dim=(1, 2), keepdim=True)
+                 std = x.std(dim=(1, 2), keepdim=True) + 1e-5
+            elif x.dim() == 4 and x.size(1) == 1: # [batch, 1, freq, time]
+                 mean = x.mean(dim=(2, 3), keepdim=True)
+                 std = x.std(dim=(2, 3), keepdim=True) + 1e-5
+                 x = x.squeeze(1) # Rimuovi la dimensione del canale per MatchboxNet
+            else:
+                 raise ValueError(f"Unexpected spectrogram shape for normalization: {x.shape}")
+            x = (x - mean) / std
 
-        return x
+            x = self.phi(x) # Input a MatchboxNet è [batch, features, time]
+            x = x.permute(0, 2, 1).contiguous()
+            x, _ = self.gru(x)
+            x = self.projection(x)
+            x, attention_weights = self.keyword_attention(x)
+            x = self.fc(x)
+
+            return x
 
 
 class Improved_Phi_GRU_ATT_Spec(nn.Module):
