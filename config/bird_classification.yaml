@@ -1,4 +1,4 @@
-experiment_name: 4birds_CF_combined_log_linear_gru64_30epochs # Name for the experiment, used for logging directories
+experiment_name: 4birds_CF_combined_log_linear_gru64_10epochs # Name for the experiment, used for logging directories
 
 hydra:
   run:
