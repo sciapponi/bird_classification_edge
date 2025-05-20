@@ -1,0 +1,18 @@
+[2025-05-20 12:01:36,908][__main__][INFO] - Experiment: 4birds_CF_combined_log_linear_gru64_30epochs
+[2025-05-20 12:01:36,916][__main__][INFO] - Using device: cpu
+[2025-05-20 12:01:36,916][__main__][INFO] - Checking for datasets...
+[2025-05-20 12:01:36,916][__main__][INFO] - ESC-50 dataset not found or empty. Downloading...
+[2025-05-20 12:01:36,917][__main__][INFO] - Creating initial bird sound datasets (train/val/test)...
+[2025-05-20 12:01:36,917][__main__][INFO] - Using dataset split parameters: val=0.15, test=0.15, seed=42
+[2025-05-20 12:01:36,983][__main__][INFO] - Initial bird samples: Train=2970, Val=635, Test=635
+[2025-05-20 12:01:36,983][__main__][INFO] - Calculating target number of 'no birds' samples...
+[2025-05-20 12:01:36,983][__main__][INFO] - Number of bird classes: 4. 'No Birds' label index: 4
+[2025-05-20 12:01:36,984][__main__][INFO] - Average samples per bird class in training set: 742.50
+[2025-05-20 12:01:36,985][__main__][INFO] - Target 'no birds' samples for training: 742
+[2025-05-20 12:01:36,985][__main__][INFO] - Target 'no birds' samples for validation: 159
+[2025-05-20 12:01:36,985][__main__][INFO] - Target 'no birds' samples for testing: 159
+[2025-05-20 12:01:37,007][__main__][INFO] - Combining bird and 'no birds' datasets...
+[2025-05-20 12:01:37,008][__main__][INFO] - Final training samples: 3712
+[2025-05-20 12:01:37,008][__main__][INFO] - Final validation samples: 794
+[2025-05-20 12:01:37,008][__main__][INFO] - Final testing samples: 794
+[2025-05-20 12:01:37,029][__main__][INFO] - Using separate learning rate for filter parameters: 0.01

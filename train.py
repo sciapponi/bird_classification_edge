@@ -44,6 +44,7 @@ from sklearn.metrics import confusion_matrix
 
 # Aggiunto per verificare la presenza di actual_model in DataParallel/DDP
 from torch.nn.parallel import DataParallel, DistributedDataParallel
+from torch.optim import AdamW # Import AdamW directly
 
 @hydra.main(version_base=None, config_path='./config', config_name='bird_classification')
 def train(cfg: DictConfig):
@@ -281,40 +282,78 @@ def train(cfg: DictConfig):
     # cfg.model contiene già gli altri parametri statici del modello.
     model = instantiate(cfg.model, **model_instantiate_overrides).to(device)
     
-    # Separate parameters for the differentiable filter
-    if cfg.model.spectrogram_type == "combined_log_linear" and hasattr(model, 'combined_log_linear_spec'):
-        filter_params = []
-        other_params = []
-        for name, param in model.named_parameters():
-            if 'combined_log_linear_spec.breakpoint' in name or 'combined_log_linear_spec.transition_width' in name:
-                filter_params.append(param)
-            else:
-                other_params.append(param)
-        
-        if filter_params: # Ensure filter_params is not empty
-            optimizer_params = [
-                {'params': other_params},
-                {'params': filter_params, 'lr': cfg.optimizer.get('filter_lr', cfg.optimizer.lr)} # Use specific LR or fallback
-            ]
-            log.info(f"Using separate learning rate for filter parameters: {cfg.optimizer.get('filter_lr', cfg.optimizer.lr)}")
-        else:
-            log.warning("combined_log_linear_spec found, but no specific parameters (breakpoint/transition_width) for separate LR. Using default optimizer setup.")
-            optimizer_params = model.parameters()
-    else:
-        optimizer_params = model.parameters()
-
-    # Prepare a clean optimizer config for instantiation,
-    # removing custom keys like 'filter_lr' that are not actual AdamW constructor arguments.
-    # The value of 'filter_lr' is used when setting up 'optimizer_params' for parameter groups.
-    optimizer_constructor_args = {
-        k: v for k, v in cfg.optimizer.items() if k not in ['_target_', 'filter_lr']
-    }
+    # Get learning rates and other optimizer hyperparams as Python primitives
+    main_lr = float(cfg.optimizer.lr)
+    filter_lr_config = cfg.optimizer.get('filter_lr') # Get filter_lr, might be None
     
-    # Create a minimal config for instantiate containing only the target,
-    # and pass other args as kwargs.
-    optimizer_target_config = OmegaConf.create({'_target_': cfg.optimizer._target_})
-    optimizer = instantiate(optimizer_target_config, params=optimizer_params, **optimizer_constructor_args)
+    # Use main_lr as fallback for filter_lr if filter_lr is not set or is None
+    f_lr = float(filter_lr_config) if filter_lr_config is not None else main_lr
+    
+    weight_decay = float(cfg.optimizer.get('weight_decay', 0.0)) # Default to 0.0 if not present
 
+    optimizer_params_list = []
+
+    if cfg.model.spectrogram_type == "combined_log_linear" and hasattr(model, 'combined_log_linear_spec'):
+        filter_param_names = ['combined_log_linear_spec.breakpoint', 'combined_log_linear_spec.transition_width']
+        current_filter_params = []
+        current_other_params = []
+        
+        for name, param in model.named_parameters():
+            if not param.requires_grad:
+                continue
+            if any(fp_name in name for fp_name in filter_param_names):
+                current_filter_params.append(param)
+            else:
+                current_other_params.append(param)
+        
+        if current_filter_params:
+            # Add group for other parameters
+            if current_other_params: # Only add if there are other params
+                 optimizer_params_list.append({'params': current_other_params, 'lr': main_lr})
+            # Add group for filter parameters
+            optimizer_params_list.append({'params': current_filter_params, 'lr': f_lr})
+            log.info(f"Using specific LR for filter parameters: {f_lr}. Main LR for others: {main_lr}.")
+            # Check if all params were sorted into a group
+            num_total_model_params = sum(1 for p in model.parameters() if p.requires_grad)
+            num_grouped_params = len(current_other_params) + len(current_filter_params)
+            if num_total_model_params != num_grouped_params:
+                log.warning(f"Parameter count mismatch: Total trainable = {num_total_model_params}, Grouped = {num_grouped_params}. Some params might be missed!")
+
+        else:
+            log.warning("combined_log_linear_spec specified, but no filter parameters found or they don't require grad. Using main_lr for all parameters.")
+            # Fallback: all parameters in one group with main_lr
+            all_trainable_params = [p for p in model.parameters() if p.requires_grad]
+            if all_trainable_params:
+                 optimizer_params_list.append({'params': all_trainable_params, 'lr': main_lr})
+    else:
+        # Default: all parameters in one group with main_lr
+        all_trainable_params = [p for p in model.parameters() if p.requires_grad]
+        if all_trainable_params:
+            optimizer_params_list.append({'params': all_trainable_params, 'lr': main_lr})
+
+    if not optimizer_params_list:
+        log.error("No trainable parameters found for the optimizer. Check model parameters and requires_grad settings.")
+        # Handle this case, e.g., by raising an error or exiting, as AdamW needs params.
+        # For now, we'll let it potentially fail in AdamW constructor if list is empty.
+        # Or, provide a dummy parameter if that's a valid way to handle it (unlikely for real training)
+        # For example, if the model truly has no trainable params, this list would be empty.
+        # AdamW([]) would raise ValueError:optimizer got an empty parameter list
+        # So, if optimizer_params_list is empty, we might need to skip optimizer creation or raise a clearer error.
+        # However, a model should typically have trainable parameters.
+        if not list(model.parameters()): # Check if model has any parameters at all
+            log.warning("Model has no parameters at all.")
+            # If the model is empty, then optimizer_params_list will be empty.
+            # AdamW constructor will fail. This indicates a problem with the model itself.
+        else: # Model has parameters, but none are trainable / not added to groups
+             log.error("Model has parameters, but none were added to optimizer groups (e.g. all require_grad=False or logic error).")
+        # Let's ensure AdamW gets a non-empty list if there are params, otherwise it's a model issue.
+        # If optimizer_params_list is truly empty due to no trainable params, AdamW will raise an error.
+
+    # Instantiate AdamW directly
+    # AdamW requires a learning rate at the top level, even if groups override it.
+    # This top-level LR acts as a default. We'll use main_lr.
+    optimizer = AdamW(optimizer_params_list, lr=main_lr, weight_decay=weight_decay)
+    
     scheduler = instantiate(cfg.scheduler, optimizer=optimizer)
     criterion = nn.CrossEntropyLoss()
 
