@@ -102,14 +102,29 @@ class Improved_Phi_GRU_ATT(nn.Module):
             current_n_input_features = self.n_linear_filters
         elif self.spectrogram_type == "combined_log_linear":
             # Nuova modalità: filtro log-lineare apprendibile
+            # Assicurati che i parametri passati a DifferentiableSpectrogram siano corretti
+            # initial_breakpoint e initial_transition_width dovrebbero venire dalla configurazione del modello,
+            # non da self.breakpoint e self.transition_width della classe Improved_Phi_GRU_ATT,
+            # a meno che non siano stati specificamente passati e memorizzati per questo scopo.
+            # Se breakpoint e transition_width sono in cfg.model.matchbox, usali.
+            # Altrimenti, usa i valori di default di DifferentiableSpectrogram o i valori passati a Improved_Phi_GRU_ATT.
+
+            # Cerca i valori di breakpoint e transition_width nella config passata, es. dentro matchbox
+            # Il costruttore di Improved_Phi_GRU_ATT riceve `matchbox` come dict e `breakpoint`, `transition_width` come argomenti separati.
+            # Usiamo gli argomenti `breakpoint` e `transition_width` passati a Improved_Phi_GRU_ATT.
+            
             self.combined_log_linear_spec = DifferentiableSpectrogram(
-                n_filters=self.n_linear_filters,
+                sr=self.sample_rate, # Passa sample_rate
+                n_filters=self.n_linear_filters, # n_linear_filters è il numero di filtri per combined
                 f_min=self.f_min,
                 f_max=self.f_max,
                 n_fft=self.n_fft,
                 hop_length=self.hop_length,
-                initial_breakpoint=self.breakpoint,
-                initial_transition_width=self.transition_width
+                initial_breakpoint=self.breakpoint, # Questo è il valore passato a Improved_Phi_GRU_ATT
+                initial_transition_width=self.transition_width, # Questo è il valore passato a Improved_Phi_GRU_ATT
+                trainable_filterbank=True, # Abilita l'apprendimento per questa modalità
+                spec_type="combined_log_linear", # Specifica il tipo di spettrogramma
+                debug=False # Imposta a True per debug prints da DifferentiableSpectrogram
             )
             current_n_input_features = self.n_linear_filters
         else:
@@ -153,14 +168,15 @@ class Improved_Phi_GRU_ATT(nn.Module):
                 x = x.permute(0, 2, 1) # -> (batch, freq_filt, time)
                 # self.amplitude_to_db viene applicato dopo, se non è combined_log_linear
             elif self.spectrogram_type == "combined_log_linear":
-                # Nuova modalità: usa il filtro log-lineare apprendibile
-                x = self.combined_log_linear_spec(x)
+                # DifferentiableSpectrogram restituisce la magnitudine filtrata
+                x_mag_filt = self.combined_log_linear_spec(x)
+                # Converti magnitudine filtrata a dB
+                # Se AmplitudeToDB si aspetta potenza, dobbiamo fare x_mag_filt**2
+                # Ma AmplitudeToDB ha stype='magnitude' o stype='power'. Se è 'magnitude', va bene così.
+                # Il nostro AmplitudeToDB è stype="power", top_db=80.
+                # Quindi dobbiamo passare potenza: x_mag_filt**2
+                x = self.amplitude_to_db(x_mag_filt**2) 
             
-            # Applica AmplitudeToDB solo se non è già stato fatto o se non è uno spettrogramma logaritmico di per sé
-            if self.spectrogram_type not in ["combined_log_linear"]:
-                 # For linear_triangular, amplitude_to_db is applied here after filterbank
-                x = self.amplitude_to_db(x) 
-
             # Normalizzazione dello spettrogramma
             # Assicurarsi che x sia uno spettrogramma [batch, freq, time] o [batch, 1, freq, time]
             if x.dim() == 3: # [batch, freq, time]

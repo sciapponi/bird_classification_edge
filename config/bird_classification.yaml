@@ -9,7 +9,7 @@ hydra:
 # Training parameters
 training:
   batch_size: 32 # Number of samples per batch during training and evaluation
-  epochs: 30 # Total number of training epochs
+  epochs: 3 # Total number of training epochs
   patience: 10 # Number of epochs with no improvement after which training will be stopped (for early stopping)
   min_delta: 0.001 # Minimum change in the monitored quantity to qualify as an improvement (for early stopping)
   seed: 42 # Random seed for reproducibility
@@ -17,7 +17,7 @@ training:
 # Model configuration
 model:
   _target_: models.Improved_Phi_GRU_ATT # Specifies the model class to instantiate
-  spectrogram_type: "combined_log_linear" # Usa il nuovo filtro log-lineare apprendibile
+  spectrogram_type: "combined_log_linear" # 'mel', 'linear_stft', 'linear_triangular', or 'combined_log_linear', 
   num_classes: 5 # Total number of output classes (bird species + "non-bird" class)
   n_mel_bins: 64 # Number of Mel frequency bins (used if spectrogram_type is "mel")
   n_linear_filters: 64 # Number of linear triangular filters (used if spectrogram_type is "linear_triangular")
@@ -49,22 +49,24 @@ scheduler:
   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau # Scheduler class
   mode: min # "min" for loss, "max" for accuracy
   factor: 0.5 # Factor by which LR is reduced
-  patience: 5 # Epochs to wait for improvement before reducing LR
+  patience: 3 # Epochs to wait for improvement before reducing LR
   verbose: true # Print message when LR is updated
 
 # Dataset configuration
 dataset:
+  bird_dataset_config:
+    _target_: datasets.BirdSoundDataset
   bird_data_dir: "bird_sound_dataset" # Path to bird sound recordings
   esc50_dir: "ESC-50-master" # Path to ESC-50 dataset
   download_datasets: true # Attempt to download ESC-50 if not found
   sample_rate: 32000 # Target sample rate in Hz
   clip_duration: 3.0 # Duration of audio clips in seconds
-  lowcut: 2000 # Lowcut frequency for bandpass filter and f_min for Mel
+  lowcut: 150 # Lowcut frequency for bandpass filter and f_min for Mel
   highcut: 10000 # Highcut frequency for bandpass filter and f_max for Mel
   bird_to_background_ratio: 2.0 # Ratio for mixing with background noise (SNR is main control)
   validation_split: 0.15 # Proportion for validation set
   test_split: 0.15 # Proportion for test set
-  load_pregenerated_no_birds: false # Load "no birds" from disk or generate on-the-fly
+  load_pregenerated_no_birds: true # Load "no birds" from disk or generate on-the-fly
   pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # Directory for pre-generated "no birds"
   num_no_bird_samples: 800 # Target for "no birds" if generated, or max to load if pregenerated & dynamic balancing active
   esc50_no_bird_ratio: 0.5 # Proportion of on-the-fly "no birds" from ESC-50

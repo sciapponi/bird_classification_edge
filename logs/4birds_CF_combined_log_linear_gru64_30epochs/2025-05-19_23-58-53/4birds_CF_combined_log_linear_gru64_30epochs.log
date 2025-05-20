@@ -1,0 +1,566 @@
+[2025-05-19 23:58:53,137][__main__][INFO] - Experiment: 4birds_CF_combined_log_linear_gru64_30epochs
+[2025-05-19 23:58:53,157][__main__][INFO] - Using device: cuda
+[2025-05-19 23:58:53,157][__main__][INFO] - Checking for datasets...
+[2025-05-19 23:58:53,158][__main__][INFO] - ESC-50 dataset not found or empty. Downloading...
+[2025-05-19 23:58:53,158][__main__][INFO] - Creating initial bird sound datasets (train/val/test)...
+[2025-05-19 23:58:53,158][__main__][INFO] - Using dataset split parameters: val=0.15, test=0.15, seed=42
+[2025-05-19 23:58:53,180][__main__][INFO] - Initial bird samples: Train=2970, Val=635, Test=635
+[2025-05-19 23:58:53,181][__main__][INFO] - Calculating target number of 'no birds' samples...
+[2025-05-19 23:58:53,181][__main__][INFO] - Number of bird classes: 4. 'No Birds' label index: 4
+[2025-05-19 23:58:53,181][__main__][INFO] - Average samples per bird class in training set: 742.50
+[2025-05-19 23:58:53,181][__main__][INFO] - Target 'no birds' samples for training: 742
+[2025-05-19 23:58:53,181][__main__][INFO] - Target 'no birds' samples for validation: 159
+[2025-05-19 23:58:53,181][__main__][INFO] - Target 'no birds' samples for testing: 159
+[2025-05-19 23:58:53,195][__main__][INFO] - Combining bird and 'no birds' datasets...
+[2025-05-19 23:58:53,196][__main__][INFO] - Final training samples: 3712
+[2025-05-19 23:58:53,196][__main__][INFO] - Final validation samples: 794
+[2025-05-19 23:58:53,196][__main__][INFO] - Final testing samples: 794
+[2025-05-19 23:58:53,338][__main__][INFO] - Model architecture:
+[2025-05-19 23:58:53,338][__main__][INFO] - Improved_Phi_GRU_ATT(
+  (combined_log_linear_spec): DifferentiableSpectrogram()
+  (amplitude_to_db): AmplitudeToDB()
+  (phi): MatchboxNetSkip(
+    (initial_conv_module): Sequential(
+      (0): PhiNetCausalConvBlock(
+        (_layers): ModuleList(
+          (0): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(64, 64, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (1): BatchNorm1d(64, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (2): Hardswish()
+          (3): Dropout1d(p=0.05, inplace=False)
+          (4): DepthwiseCausalConv(
+            (pad): ConstantPad1d(padding=(4, 0), value=0)
+            (conv): Conv1d(64, 64, kernel_size=(5,), stride=(1,), groups=64, bias=False)
+          )
+          (5): BatchNorm1d(64, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (6): Hardswish()
+          (7): SEBlock(
+            (se_conv): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(64, 10, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (se_conv2): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(10, 64, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (activation): Hardswish()
+            (mult): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (8): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(64, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Dropout(p=0.3, inplace=False)
+    )
+    (blocks_modulelist): ModuleList(
+      (0): ModuleList(
+        (0): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(2, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+        (1): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(4, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), dilation=(2,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+      )
+      (1): ModuleList(
+        (0): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(8, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), dilation=(4,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+        (1): Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(4, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), dilation=(2,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+      )
+      (2): ModuleList(
+        (0-1): 2 x Sequential(
+          (0): PhiNetCausalConvBlock(
+            (_layers): ModuleList(
+              (0): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (2): Hardswish()
+              (3): Dropout1d(p=0.05, inplace=False)
+              (4): DepthwiseCausalConv(
+                (pad): ConstantPad1d(padding=(2, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(3,), stride=(1,), groups=32, bias=False)
+              )
+              (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+              (6): Hardswish()
+              (7): SEBlock(
+                (se_conv): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (se_conv2): CausalConv1d(
+                  (pad): ConstantPad1d(padding=(0, 0), value=0)
+                  (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+                )
+                (activation): Hardswish()
+                (mult): FloatFunctional(
+                  (activation_post_process): Identity()
+                )
+              )
+              (8): CausalConv1d(
+                (pad): ConstantPad1d(padding=(0, 0), value=0)
+                (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+              )
+              (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+            )
+            (op): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+          (3): Dropout(p=0.3, inplace=False)
+        )
+      )
+    )
+    (projections_modulelist): ModuleList(
+      (0-2): 3 x Identity()
+    )
+    (final_block_to_conv1_projection): Identity()
+    (final_conv1_module): Sequential(
+      (0): PhiNetCausalConvBlock(
+        (_layers): ModuleList(
+          (0): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (2): Hardswish()
+          (3): Dropout1d(p=0.05, inplace=False)
+          (4): DepthwiseCausalConv(
+            (pad): ConstantPad1d(padding=(8, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(5,), stride=(1,), dilation=(2,), groups=32, bias=False)
+          )
+          (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (6): Hardswish()
+          (7): SEBlock(
+            (se_conv): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (se_conv2): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (activation): Hardswish()
+            (mult): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (8): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Dropout(p=0.3, inplace=False)
+    )
+    (conv1_to_conv2_projection): Identity()
+    (final_conv2_module): Sequential(
+      (0): PhiNetCausalConvBlock(
+        (_layers): ModuleList(
+          (0): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (1): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (2): Hardswish()
+          (3): Dropout1d(p=0.05, inplace=False)
+          (4): DepthwiseCausalConv(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), groups=32, bias=False)
+          )
+          (5): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+          (6): Hardswish()
+          (7): SEBlock(
+            (se_conv): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(32, 5, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (se_conv2): CausalConv1d(
+              (pad): ConstantPad1d(padding=(0, 0), value=0)
+              (conv): Conv1d(5, 32, kernel_size=(1,), stride=(1,), bias=False)
+            )
+            (activation): Hardswish()
+            (mult): FloatFunctional(
+              (activation_post_process): Identity()
+            )
+          )
+          (8): CausalConv1d(
+            (pad): ConstantPad1d(padding=(0, 0), value=0)
+            (conv): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (9): BatchNorm1d(32, eps=0.001, momentum=0.999, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Dropout(p=0.3, inplace=False)
+    )
+  )
+  (gru): GRU(32, 64, batch_first=True)
+  (projection): Linear(in_features=64, out_features=64, bias=True)
+  (keyword_attention): AttentionLayer(
+    (attention): Linear(in_features=64, out_features=1, bias=True)
+  )
+  (fc): Linear(in_features=64, out_features=5, bias=True)
+)
+[2025-05-19 23:58:53,342][__main__][INFO] - Total parameters: 53,256
+[2025-05-19 23:58:53,342][__main__][INFO] - Trainable parameters: 53,256
+[2025-05-19 23:58:53,342][__main__][INFO] - Computing model complexity...
+[2025-05-19 23:59:06,549][__main__][WARNING] - Could not compute MACs: unsupported format string passed to NoneType.__format__
+[2025-05-19 23:59:07,396][__main__][INFO] - Starting training...
+[2025-05-20 00:03:42,261][__main__][INFO] - Epoch 1/30
+[2025-05-20 00:03:42,261][__main__][INFO] - Train Loss: 1.5173, Train Acc: 31.73%
+[2025-05-20 00:03:42,261][__main__][INFO] - Val Loss: 1.4258, Val Acc: 34.63%
+[2025-05-20 00:03:42,261][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:03:42,261][__main__][INFO] - Validation loss improved from inf to 1.4258
+[2025-05-20 00:03:42,291][__main__][INFO] - New best model saved with val acc: 34.63%
+[2025-05-20 00:08:15,457][__main__][INFO] - Epoch 2/30
+[2025-05-20 00:08:15,457][__main__][INFO] - Train Loss: 1.4234, Train Acc: 38.44%
+[2025-05-20 00:08:15,457][__main__][INFO] - Val Loss: 1.3272, Val Acc: 46.85%
+[2025-05-20 00:08:15,457][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:08:15,457][__main__][INFO] - Validation loss improved from 1.4258 to 1.3272
+[2025-05-20 00:08:15,505][__main__][INFO] - New best model saved with val acc: 46.85%
+[2025-05-20 00:12:41,231][__main__][INFO] - Epoch 3/30
+[2025-05-20 00:12:41,231][__main__][INFO] - Train Loss: 1.3272, Train Acc: 45.66%
+[2025-05-20 00:12:41,231][__main__][INFO] - Val Loss: 1.3480, Val Acc: 45.09%
+[2025-05-20 00:12:41,231][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:12:41,231][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 00:17:14,359][__main__][INFO] - Epoch 4/30
+[2025-05-20 00:17:14,360][__main__][INFO] - Train Loss: 1.2463, Train Acc: 50.27%
+[2025-05-20 00:17:14,360][__main__][INFO] - Val Loss: 1.1571, Val Acc: 56.80%
+[2025-05-20 00:17:14,360][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:17:14,360][__main__][INFO] - Validation loss improved from 1.3272 to 1.1571
+[2025-05-20 00:17:14,383][__main__][INFO] - New best model saved with val acc: 56.80%
+[2025-05-20 00:21:36,951][__main__][INFO] - Epoch 5/30
+[2025-05-20 00:21:36,952][__main__][INFO] - Train Loss: 1.1805, Train Acc: 53.83%
+[2025-05-20 00:21:36,952][__main__][INFO] - Val Loss: 1.0902, Val Acc: 58.69%
+[2025-05-20 00:21:36,952][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:21:36,952][__main__][INFO] - Validation loss improved from 1.1571 to 1.0902
+[2025-05-20 00:21:36,992][__main__][INFO] - New best model saved with val acc: 58.69%
+[2025-05-20 00:25:53,012][__main__][INFO] - Epoch 6/30
+[2025-05-20 00:25:53,012][__main__][INFO] - Train Loss: 1.1424, Train Acc: 55.20%
+[2025-05-20 00:25:53,012][__main__][INFO] - Val Loss: 1.0291, Val Acc: 60.96%
+[2025-05-20 00:25:53,012][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:25:53,012][__main__][INFO] - Validation loss improved from 1.0902 to 1.0291
+[2025-05-20 00:25:53,033][__main__][INFO] - New best model saved with val acc: 60.96%
+[2025-05-20 00:30:20,656][__main__][INFO] - Epoch 7/30
+[2025-05-20 00:30:20,656][__main__][INFO] - Train Loss: 1.1002, Train Acc: 57.38%
+[2025-05-20 00:30:20,656][__main__][INFO] - Val Loss: 1.0118, Val Acc: 61.21%
+[2025-05-20 00:30:20,657][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:30:20,657][__main__][INFO] - Validation loss improved from 1.0291 to 1.0118
+[2025-05-20 00:30:20,673][__main__][INFO] - New best model saved with val acc: 61.21%
+[2025-05-20 00:34:52,883][__main__][INFO] - Epoch 8/30
+[2025-05-20 00:34:52,883][__main__][INFO] - Train Loss: 1.0587, Train Acc: 59.40%
+[2025-05-20 00:34:52,883][__main__][INFO] - Val Loss: 1.1758, Val Acc: 55.04%
+[2025-05-20 00:34:52,883][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:34:52,883][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 00:39:26,211][__main__][INFO] - Epoch 9/30
+[2025-05-20 00:39:26,212][__main__][INFO] - Train Loss: 1.0338, Train Acc: 59.94%
+[2025-05-20 00:39:26,212][__main__][INFO] - Val Loss: 0.9859, Val Acc: 62.85%
+[2025-05-20 00:39:26,212][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:39:26,212][__main__][INFO] - Validation loss improved from 1.0118 to 0.9859
+[2025-05-20 00:39:26,234][__main__][INFO] - New best model saved with val acc: 62.85%
+[2025-05-20 00:43:50,382][__main__][INFO] - Epoch 10/30
+[2025-05-20 00:43:50,383][__main__][INFO] - Train Loss: 1.0245, Train Acc: 60.99%
+[2025-05-20 00:43:50,383][__main__][INFO] - Val Loss: 0.9335, Val Acc: 63.85%
+[2025-05-20 00:43:50,383][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:43:50,383][__main__][INFO] - Validation loss improved from 0.9859 to 0.9335
+[2025-05-20 00:43:50,415][__main__][INFO] - New best model saved with val acc: 63.85%
+[2025-05-20 00:48:18,319][__main__][INFO] - Epoch 11/30
+[2025-05-20 00:48:18,319][__main__][INFO] - Train Loss: 0.9940, Train Acc: 62.12%
+[2025-05-20 00:48:18,319][__main__][INFO] - Val Loss: 0.9418, Val Acc: 64.48%
+[2025-05-20 00:48:18,320][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:48:18,320][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 00:48:18,359][__main__][INFO] - New best model saved with val acc: 64.48%
+[2025-05-20 00:53:01,071][__main__][INFO] - Epoch 12/30
+[2025-05-20 00:53:01,071][__main__][INFO] - Train Loss: 0.9746, Train Acc: 63.25%
+[2025-05-20 00:53:01,071][__main__][INFO] - Val Loss: 0.9726, Val Acc: 64.86%
+[2025-05-20 00:53:01,071][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:53:01,072][__main__][INFO] - No improvement in validation loss for 2/10 epochs
+[2025-05-20 00:53:01,097][__main__][INFO] - New best model saved with val acc: 64.86%
+[2025-05-20 00:57:30,861][__main__][INFO] - Epoch 13/30
+[2025-05-20 00:57:30,861][__main__][INFO] - Train Loss: 0.9596, Train Acc: 63.15%
+[2025-05-20 00:57:30,861][__main__][INFO] - Val Loss: 0.9041, Val Acc: 65.37%
+[2025-05-20 00:57:30,861][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 00:57:30,861][__main__][INFO] - Validation loss improved from 0.9335 to 0.9041
+[2025-05-20 00:57:30,886][__main__][INFO] - New best model saved with val acc: 65.37%
+[2025-05-20 01:01:59,456][__main__][INFO] - Epoch 14/30
+[2025-05-20 01:01:59,456][__main__][INFO] - Train Loss: 0.9371, Train Acc: 64.25%
+[2025-05-20 01:01:59,456][__main__][INFO] - Val Loss: 0.9434, Val Acc: 65.24%
+[2025-05-20 01:01:59,456][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:01:59,456][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 01:06:32,000][__main__][INFO] - Epoch 15/30
+[2025-05-20 01:06:32,000][__main__][INFO] - Train Loss: 0.9272, Train Acc: 64.79%
+[2025-05-20 01:06:32,000][__main__][INFO] - Val Loss: 0.9507, Val Acc: 64.23%
+[2025-05-20 01:06:32,000][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:06:32,000][__main__][INFO] - No improvement in validation loss for 2/10 epochs
+[2025-05-20 01:11:04,255][__main__][INFO] - Epoch 16/30
+[2025-05-20 01:11:04,255][__main__][INFO] - Train Loss: 0.9086, Train Acc: 65.60%
+[2025-05-20 01:11:04,255][__main__][INFO] - Val Loss: 0.9140, Val Acc: 65.99%
+[2025-05-20 01:11:04,255][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:11:04,255][__main__][INFO] - No improvement in validation loss for 3/10 epochs
+[2025-05-20 01:11:04,281][__main__][INFO] - New best model saved with val acc: 65.99%
+[2025-05-20 01:15:28,629][__main__][INFO] - Epoch 17/30
+[2025-05-20 01:15:28,629][__main__][INFO] - Train Loss: 0.9215, Train Acc: 65.89%
+[2025-05-20 01:15:28,629][__main__][INFO] - Val Loss: 0.9331, Val Acc: 64.48%
+[2025-05-20 01:15:28,629][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:15:28,629][__main__][INFO] - No improvement in validation loss for 4/10 epochs
+[2025-05-20 01:20:00,953][__main__][INFO] - Epoch 18/30
+[2025-05-20 01:20:00,953][__main__][INFO] - Train Loss: 0.8924, Train Acc: 66.51%
+[2025-05-20 01:20:00,953][__main__][INFO] - Val Loss: 0.8814, Val Acc: 67.51%
+[2025-05-20 01:20:00,953][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:20:00,954][__main__][INFO] - Validation loss improved from 0.9041 to 0.8814
+[2025-05-20 01:20:00,984][__main__][INFO] - New best model saved with val acc: 67.51%
+[2025-05-20 01:24:25,996][__main__][INFO] - Epoch 19/30
+[2025-05-20 01:24:25,997][__main__][INFO] - Train Loss: 0.8788, Train Acc: 67.08%
+[2025-05-20 01:24:25,997][__main__][INFO] - Val Loss: 0.8945, Val Acc: 66.75%
+[2025-05-20 01:24:25,997][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:24:25,997][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 01:29:01,297][__main__][INFO] - Epoch 20/30
+[2025-05-20 01:29:01,297][__main__][INFO] - Train Loss: 0.8545, Train Acc: 67.70%
+[2025-05-20 01:29:01,297][__main__][INFO] - Val Loss: 0.8794, Val Acc: 67.88%
+[2025-05-20 01:29:01,297][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:29:01,297][__main__][INFO] - Validation loss improved from 0.8814 to 0.8794
+[2025-05-20 01:29:01,314][__main__][INFO] - New best model saved with val acc: 67.88%
+[2025-05-20 01:33:29,771][__main__][INFO] - Epoch 21/30
+[2025-05-20 01:33:29,772][__main__][INFO] - Train Loss: 0.8633, Train Acc: 67.46%
+[2025-05-20 01:33:29,772][__main__][INFO] - Val Loss: 0.9424, Val Acc: 65.11%
+[2025-05-20 01:33:29,772][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:33:29,772][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 01:37:52,122][__main__][INFO] - Epoch 22/30
+[2025-05-20 01:37:52,122][__main__][INFO] - Train Loss: 0.8664, Train Acc: 67.43%
+[2025-05-20 01:37:52,122][__main__][INFO] - Val Loss: 1.0030, Val Acc: 60.71%
+[2025-05-20 01:37:52,123][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:37:52,123][__main__][INFO] - No improvement in validation loss for 2/10 epochs
+[2025-05-20 01:42:12,939][__main__][INFO] - Epoch 23/30
+[2025-05-20 01:42:12,939][__main__][INFO] - Train Loss: 0.8603, Train Acc: 68.64%
+[2025-05-20 01:42:12,939][__main__][INFO] - Val Loss: 0.8786, Val Acc: 65.87%
+[2025-05-20 01:42:12,939][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:42:12,939][__main__][INFO] - No improvement in validation loss for 3/10 epochs
+[2025-05-20 01:46:34,909][__main__][INFO] - Epoch 24/30
+[2025-05-20 01:46:34,909][__main__][INFO] - Train Loss: 0.8366, Train Acc: 68.67%
+[2025-05-20 01:46:34,909][__main__][INFO] - Val Loss: 0.8577, Val Acc: 68.77%
+[2025-05-20 01:46:34,909][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:46:34,909][__main__][INFO] - Validation loss improved from 0.8794 to 0.8577
+[2025-05-20 01:46:34,936][__main__][INFO] - New best model saved with val acc: 68.77%
+[2025-05-20 01:51:03,719][__main__][INFO] - Epoch 25/30
+[2025-05-20 01:51:03,719][__main__][INFO] - Train Loss: 0.8239, Train Acc: 69.18%
+[2025-05-20 01:51:03,719][__main__][INFO] - Val Loss: 0.8513, Val Acc: 69.52%
+[2025-05-20 01:51:03,719][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:51:03,719][__main__][INFO] - Validation loss improved from 0.8577 to 0.8513
+[2025-05-20 01:51:03,746][__main__][INFO] - New best model saved with val acc: 69.52%
+[2025-05-20 01:55:25,573][__main__][INFO] - Epoch 26/30
+[2025-05-20 01:55:25,574][__main__][INFO] - Train Loss: 0.8230, Train Acc: 68.99%
+[2025-05-20 01:55:25,574][__main__][INFO] - Val Loss: 0.8238, Val Acc: 68.77%
+[2025-05-20 01:55:25,574][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:55:25,574][__main__][INFO] - Validation loss improved from 0.8513 to 0.8238
+[2025-05-20 01:59:45,421][__main__][INFO] - Epoch 27/30
+[2025-05-20 01:59:45,421][__main__][INFO] - Train Loss: 0.8093, Train Acc: 69.23%
+[2025-05-20 01:59:45,422][__main__][INFO] - Val Loss: 0.7842, Val Acc: 71.16%
+[2025-05-20 01:59:45,422][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 01:59:45,422][__main__][INFO] - Validation loss improved from 0.8238 to 0.7842
+[2025-05-20 01:59:45,448][__main__][INFO] - New best model saved with val acc: 71.16%
+[2025-05-20 02:04:13,170][__main__][INFO] - Epoch 28/30
+[2025-05-20 02:04:13,170][__main__][INFO] - Train Loss: 0.7871, Train Acc: 70.58%
+[2025-05-20 02:04:13,171][__main__][INFO] - Val Loss: 0.8120, Val Acc: 69.90%
+[2025-05-20 02:04:13,171][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 02:04:13,171][__main__][INFO] - No improvement in validation loss for 1/10 epochs
+[2025-05-20 02:08:49,653][__main__][INFO] - Epoch 29/30
+[2025-05-20 02:08:49,654][__main__][INFO] - Train Loss: 0.8011, Train Acc: 70.39%
+[2025-05-20 02:08:49,654][__main__][INFO] - Val Loss: 0.8238, Val Acc: 69.52%
+[2025-05-20 02:08:49,654][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 02:08:49,654][__main__][INFO] - No improvement in validation loss for 2/10 epochs
+[2025-05-20 02:13:20,817][__main__][INFO] - Epoch 30/30
+[2025-05-20 02:13:20,817][__main__][INFO] - Train Loss: 0.7840, Train Acc: 70.18%
+[2025-05-20 02:13:20,817][__main__][INFO] - Val Loss: 0.8006, Val Acc: 70.53%
+[2025-05-20 02:13:20,817][__main__][INFO] - Learning Rate: 0.001000
+[2025-05-20 02:13:20,817][__main__][INFO] - No improvement in validation loss for 3/10 epochs
+[2025-05-20 02:13:21,340][__main__][INFO] - Training history plot saved to /raid/home/e3da/interns/lmannini/bird_classification_edge/logs/4birds_CF_combined_log_linear_gru64_30epochs/2025-05-19_23-58-53/training_history.png
+[2025-05-20 02:13:21,340][__main__][INFO] - 
+Evaluating on test set...
+[2025-05-20 02:14:05,759][__main__][INFO] - Test Loss: 0.7946, Test Acc: 70.40%
+[2025-05-20 02:14:06,382][__main__][INFO] - Confusion matrix saved to /raid/home/e3da/interns/lmannini/bird_classification_edge/logs/4birds_CF_combined_log_linear_gru64_30epochs/2025-05-19_23-58-53/confusion_matrix.png
+[2025-05-20 02:14:06,383][__main__][INFO] - Training completed! Best validation accuracy: 71.16%
+[2025-05-20 02:14:06,383][__main__][INFO] - Test accuracy: 70.40%
+[2025-05-20 02:14:06,383][__main__][INFO] - Results saved to /raid/home/e3da/interns/lmannini/bird_classification_edge/logs/4birds_CF_combined_log_linear_gru64_30epochs/2025-05-19_23-58-53

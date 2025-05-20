@@ -3,6 +3,7 @@ import torchaudio
 import torchaudio.functional as F
 import matplotlib.pyplot as plt
 import torch.nn as nn
+import math # Per pi, cos, etc. se necessario per filtri più avanzati
 
 # Load audio file
 def load_audio(file_path):
@@ -270,232 +271,416 @@ def check_differentiability():
         return False
 
 class DifferentiableSpectrogram(nn.Module):
-    def __init__(self, n_filters=40, f_min=1000, f_max=8000, n_fft=512, 
-                 hop_length=128, initial_breakpoint=500, initial_transition_width=300):
+    def __init__(self, sr=32000, n_filters=64, 
+                 f_min=150.0, f_max=10000.0, 
+                 n_fft=1024, hop_length=320, 
+                 initial_breakpoint=4000.0, 
+                 initial_transition_width=100.0,
+                 trainable_filterbank=True, # Flag per controllare l'apprendimento dei parametri del filtro
+                 spec_type="combined_log_linear", # Aggiunto per selezionare il tipo di filtro
+                 debug=False):
         super().__init__()
-        
-        # Register learnable parameters
-        self.breakpoint = nn.Parameter(torch.tensor(float(initial_breakpoint)))
-        self.transition_width = nn.Parameter(torch.tensor(float(initial_transition_width)))
-        
-        # Store other parameters
+        self.sr = sr
         self.n_filters = n_filters
-        self.f_min = f_min
-        self.f_max = f_max
+        self.f_min_val = float(f_min) # Memorizza come float per usi non-tensoriali
+        self.f_max_val = float(f_max)
         self.n_fft = n_fft
         self.hop_length = hop_length
-        
-        # Initialize filter bank
-        self.register_buffer('filter_bank', self._create_filter_bank())
-        
-    def _create_filter_bank(self):
-        """Create the filter bank based on current parameters"""
-        # Determine the target device from one of the module's parameters
-        target_device = self.breakpoint.device
+        self.trainable_filterbank = trainable_filterbank
+        self.spec_type = spec_type
+        self.debug = debug
 
-        # Create parameter space
-        x = torch.linspace(0, 1, steps=self.n_filters).to(target_device)
+        # Rendi breakpoint e transition_width parametri apprendibili se richiesto
+        if self.trainable_filterbank and self.spec_type == "combined_log_linear":
+            # Inizializza come scalari, ma nn.Parameter li renderà tensori 0-dim
+            self.breakpoint = nn.Parameter(torch.tensor(float(initial_breakpoint)))
+            self.transition_width = nn.Parameter(torch.tensor(float(initial_transition_width)))
+            # Si potrebbe aggiungere un clamp o una trasformazione (es. softplus) per transition_width 
+            # se si vuole che rimanga positivo o in un certo range.
+            # Per breakpoint, potrebbe essere necessario un clamp all'intervallo [f_min, f_max]
+        else:
+            # Mantienili come attributi fissi (float) se non devono essere addestrati o se il tipo di spec è diverso
+            # Registra come buffer se vuoi che siano nello state_dict ma non apprendibili
+            self.register_buffer('breakpoint', torch.tensor(float(initial_breakpoint)))
+            self.register_buffer('transition_width', torch.tensor(float(initial_transition_width)))
         
-        # Compute in log domain directly
-        log_min = torch.log(torch.tensor(self.f_min, device=target_device))
-        log_max = torch.log(torch.tensor(self.f_max, device=target_device))
-        # self.breakpoint is already a tensor on the target_device (it's an nn.Parameter)
-        log_break = torch.log(self.breakpoint) 
-        
-        # Compute log-spaced frequencies
-        log_freqs = torch.exp(log_min + x * (log_max - log_min))
-        
-        # Compute linear-spaced frequencies
-        lin_freqs = self.f_min + x * (self.f_max - self.f_min) # self.f_min and self.f_max are scalars, result will be on x's device
-        
-        # Create a smoother transition using sigmoid
-        # Ensure normalized_break is on the correct device, or its components are
-        # (log_break - log_min) will be on target_device
-        # (log_max - log_min) will be on target_device
-        normalized_break = (log_break - log_min) / (log_max - log_min)
-        
-        # self.transition_width is an nn.Parameter, already on target_device
-        # x is on target_device, normalized_break is on target_device
-        S = torch.sigmoid((x - normalized_break) * self.transition_width)
-        
-        # Combine log and linear parts
-        differentiable_center_freqs = (1 - S) * log_freqs + S * lin_freqs
-        
-        # Convert to FFT bins
-        # Ensure calculations leading to fft_bins are on the correct device
-        # Example: (self.f_max / 2) could be problematic if self.f_max is a Python float
-        # However, the tensor operations should keep things on target_device if inputs are there.
-        differentiable_fft_bins = torch.round((differentiable_center_freqs / (torch.tensor(self.f_max, device=target_device) / 2)) * (self.n_fft // 2)).long()
-        differentiable_fft_bins = torch.clamp(differentiable_fft_bins, 1, (self.n_fft // 2) - 2)
-        
-        # _generate_filter_bank will also need to use target_device
-        return self._generate_filter_bank(differentiable_fft_bins, target_device)
-    
-    def _generate_filter_bank(self, fft_bins, device):
-        """Generate triangular filter bank"""
-        filter_bank = torch.zeros((self.n_filters, self.n_fft // 2 + 1), device=device)
-        for i in range(self.n_filters):
-            left = fft_bins[i - 1] if i > 0 else 0
-            center = fft_bins[i]
-            right = fft_bins[i + 1] if i < self.n_filters - 1 else (self.n_fft // 2)
+        # Registra f_min e f_max come buffer in modo che siano nello state_dict e si spostino con il modello (es. to(device))
+        self.register_buffer('f_min', torch.tensor(float(f_min)))
+        self.register_buffer('f_max', torch.tensor(float(f_max)))
 
-            # Ensure linspace is created on the correct device
-            if center > left and center - left > 1:
-                filter_bank[i, left:center] = torch.linspace(0, 1, steps=center - left, device=device)
-            if right > center and right - center > 1:
-                filter_bank[i, center:right] = torch.linspace(1, 0, steps=right - center, device=device)
-        return filter_bank
-    
+
+    def _get_triangular_filter_centers(self, device):
+        """
+        Calcola le frequenze centrali per i filtri triangolari.
+        Questo metodo determina le posizioni dei centri dei filtri sulla scala delle frequenze.
+        """
+        if self.spec_type == "mel":
+            # Per Mel, le frequenze centrali sono implicitamente definite da melscale_fbanks
+            # Questa funzione restituisce direttamente la filter bank, non solo i centri.
+            # Quindi, se spec_type == "mel", _get_current_filter_bank gestirà questo.
+            # Qui, potremmo restituire None o placeholder se questa funzione è chiamata genericamente.
+            # Per semplicità, la logica Mel sarà in _get_current_filter_bank.
+            return None 
+            
+        elif self.spec_type == "linear_triangular":
+            # Spaziatura lineare dei centri dei filtri
+            return torch.linspace(self.f_min.item(), self.f_max.item(), self.n_filters, device=device)
+
+        elif self.spec_type == "combined_log_linear":
+            # x definisce la posizione normalizzata di ogni filtro [0, 1]
+            x = torch.linspace(0, 1, steps=self.n_filters, device=device)
+
+            # Usa i valori correnti di breakpoint e transition_width (che sono nn.Parameter se trainable)
+            # f_min e f_max sono buffer, quindi già tensori.
+            current_breakpoint = self.breakpoint 
+            current_transition_width = self.transition_width
+            
+            # Clamp del breakpoint per assicurare che rimanga all'interno di [f_min + epsilon, f_max - epsilon]
+            # per evitare problemi numerici e mantenere la validità fisica.
+            # Epsilon piccolo per evitare che f_range diventi zero.
+            epsilon = 1e-2 # Hz, per evitare che f_min == breakpoint o f_max == breakpoint
+            clamped_breakpoint = torch.clamp(current_breakpoint, 
+                                             self.f_min + epsilon, 
+                                             self.f_max - epsilon)
+
+            if self.debug and self.trainable_filterbank:
+                 if not torch.allclose(current_breakpoint, clamped_breakpoint):
+                     print(f"DEBUG Spec: Breakpoint clamped from {current_breakpoint.item():.2f} to {clamped_breakpoint.item():.2f}")
+
+            log_part = self.f_min * (self.f_max / self.f_min) ** x
+            linear_part = self.f_min + x * (self.f_max - self.f_min)
+            
+            f_range = self.f_max - self.f_min
+            # Evita divisione per zero se f_range è troppo piccolo (improbabile con clamp di breakpoint)
+            if torch.abs(f_range) < 1e-6:
+                normalized_breakpoint_pos = torch.full_like(x, 0.5) # Default a metà
+            else:
+                normalized_breakpoint_pos = (clamped_breakpoint - self.f_min) / f_range
+            
+            # Sigmoid per la transizione soft
+            # Aggiungi un clamp a transition_width se necessario, es. > 0
+            # Un transition_width molto grande rende S quasi uno step function.
+            # Un transition_width piccolo la rende molto smooth.
+            # Si potrebbe usare softplus per assicurare che transition_width > 0
+            # current_transition_width = F.softplus(self.transition_width) # Esempio
+            
+            S = torch.sigmoid((x - normalized_breakpoint_pos) * current_transition_width)
+            
+            center_freqs = (1 - S) * log_part + S * linear_part
+            
+            # Assicura che le frequenze centrali siano monotonamente crescenti e all'interno [f_min, f_max]
+            # Il clamp precedente su breakpoint aiuta, ma la combinazione potrebbe uscire.
+            # Un sort + clamp finale potrebbe essere necessario se l'apprendimento le fa divergere troppo.
+            # Per ora, facciamo un clamp finale.
+            center_freqs = torch.clamp(center_freqs, self.f_min.item(), self.f_max.item())
+            
+            # Opzionale: forza monotonicità (questo potrebbe interrompere i gradienti se fatto in modo hard)
+            # if self.trainable_filterbank: # Solo se apprendibili, altrimenti dovrebbero essere già ok
+            #     sorted_freqs, _ = torch.sort(center_freqs)
+            #     if not torch.allclose(center_freqs, sorted_freqs) and self.debug:
+            #         print(f"DEBUG Spec: Center freqs non-monotonic. Before sort: {center_freqs.detach().cpu().numpy().round(1)}")
+            #         # center_freqs = sorted_freqs # Sostituire interrompe i gradienti diretti
+            #         # Invece, si potrebbe aggiungere un piccolo termine di loss che penalizzi la non-monotonicità.
+            
+            return center_freqs
+        else:
+            raise ValueError(f"Unsupported spec_type: {self.spec_type}")
+
+
+    def _generate_triangular_filter_bank_from_centers(self, center_freqs, device):
+        """
+        Genera una filter bank triangolare differenziabile date le frequenze centrali.
+        `center_freqs` sono le posizioni centrali dei filtri (potrebbero essere frazionarie).
+        """
+        n_freq_bins_stft = self.n_fft // 2 + 1 # Numero di bin di frequenza dall'STFT
+
+        # Converti le frequenze centrali (Hz) in bin FFT (potenzialmente frazionari)
+        # La formula è: bin = freq * (n_fft / sr)
+        # O, se normalizzato rispetto a Nyquist: bin = (freq / (sr/2)) * (n_fft/2)
+        center_bins_float = (center_freqs / (self.sr / 2.0)) * (self.n_fft / 2.0)
+
+        # Crea i bin di frequenza dell'asse FFT come un tensore per il broadcasting [1, n_freq_bins_stft]
+        fft_ax_bins = torch.arange(n_freq_bins_stft, device=device, dtype=torch.float32).unsqueeze(0)
+
+        # Definisci i punti di sinistra (f_m_minus_1) e destra (f_m_plus_1) per ogni filtro m
+        # basati sui centri dei filtri adiacenti.
+        # Usa f_min e f_max (convertiti in bin) come boundaries.
+        f_min_bin = (self.f_min / (self.sr / 2.0)) * (self.n_fft / 2.0)
+        f_max_bin = (self.f_max / (self.sr / 2.0)) * (self.n_fft / 2.0)
+        
+        # Sposta su device se f_min_bin o f_max_bin non lo sono già (dovrebbero esserlo se self.f_min è buffer)
+        f_min_bin = f_min_bin.to(device)
+        f_max_bin = f_max_bin.to(device)
+
+        # Punti di sinistra: [f_min_bin, center_0, center_1, ..., center_N-2]
+        # Punti di destra:  [center_1, center_2, ..., center_N-1, f_max_bin]
+        # center_bins_float ha shape [n_filters]
+        
+        left_boundaries = torch.cat((f_min_bin.unsqueeze(0), center_bins_float[:-1]))
+        right_boundaries = torch.cat((center_bins_float[1:], f_max_bin.unsqueeze(0)))
+        
+        # Rendi le shape [n_filters, 1] per broadcasting con fft_ax_bins [1, n_freq_bins_stft]
+        f_m = center_bins_float.unsqueeze(1)      # Centri f[m]
+        f_m_minus_1 = left_boundaries.unsqueeze(1)  # Sinistra f[m-1]
+        f_m_plus_1 = right_boundaries.unsqueeze(1)  # Destra f[m+1]
+
+        # Calcola le pendenze (come da formula standard dei filtri triangolari/Mel)
+        # H_m(k) = (k - f[m-1]) / (f[m] - f[m-1])  per la rampa ascendente
+        # H_m(k) = (f[m+1] - k) / (f[m+1] - f[m])  per la rampa discendente
+        # (k è fft_ax_bins)
+        
+        # Epsilon per stabilità numerica (evita divisione per zero se i punti coincidono)
+        eps = 1e-8 
+
+        term1_num = fft_ax_bins - f_m_minus_1
+        term1_den = f_m - f_m_minus_1
+        ramp_up = term1_num / (term1_den + eps)
+
+        term2_num = f_m_plus_1 - fft_ax_bins
+        term2_den = f_m_plus_1 - f_m
+        ramp_down = term2_num / (term2_den + eps)
+        
+        # Il filtro è il minimo delle due rampe, clampato a zero.
+        # Questo forma il triangolo: sale con ramp_up, scende con ramp_down.
+        filter_bank = torch.max(torch.zeros_like(ramp_up), torch.min(ramp_up, ramp_down))
+        
+        # Normalizzazione opzionale dei filtri (es. area unitaria)
+        # Le filterbank Mel di torchaudio usano 'slaney' norm che normalizza l'area a 1.
+        # Per farlo in modo differenziabile:
+        # filter_areas = torch.sum(filter_bank, dim=1, keepdim=True) * ( (self.sr / 2.0) / (self.n_fft / 2.0) ) # larghezza di un bin
+        # filter_bank = filter_bank / (filter_areas + eps)
+        # Per ora, omettiamo la normalizzazione Slaney per semplicità, dato che non era nel codice originale esplicitamente
+        # per i filtri custom, ma è presente in torchaudio.functional.melscale_fbanks.
+
+        if self.debug:
+            if torch.isnan(filter_bank).any() or torch.isinf(filter_bank).any():
+                print("DEBUG Spec: NaN/Inf in filter bank!")
+                print(f"  center_freqs (Hz): {center_freqs.detach().cpu().numpy().round(1)}")
+                print(f"  center_bins_float: {center_bins_float.detach().cpu().numpy().round(1)}")
+                print(f"  f_m_minus_1: {f_m_minus_1.squeeze().detach().cpu().numpy().round(1)}")
+                print(f"  f_m: {f_m.squeeze().detach().cpu().numpy().round(1)}")
+                print(f"  f_m_plus_1: {f_m_plus_1.squeeze().detach().cpu().numpy().round(1)}")
+
+
+        return filter_bank # Shape: [n_filters, n_freq_bins_stft]
+
+    def _get_current_filter_bank(self, device):
+        """
+        Restituisce la filter bank corrente in base a spec_type e parametri.
+        """
+        if self.spec_type == "mel":
+            # Usa la filter bank Mel standard da torchaudio
+            # Questa non è apprendibile rispetto a breakpoint/transition_width
+            # ma f_min, f_max, n_filters sono usati.
+            fb = F.melscale_fbanks(
+                n_freqs=self.n_fft // 2 + 1,
+                f_min=self.f_min.item(), # Usa .item() per ottenere float Python
+                f_max=self.f_max.item(),
+                n_mels=self.n_filters,
+                sample_rate=self.sr,
+                norm='slaney', # Opzionale: 'slaney' o None
+                mel_scale='htk'  # o 'slaney'
+            ).to(device)
+            # melscale_fbanks può restituire [n_freqs, n_mels], vogliamo [n_mels, n_freqs]
+            if fb.shape[0] != self.n_filters :
+                fb = fb.T
+            return fb
+
+        elif self.spec_type == "linear_stft":
+            # Per STFT lineare, non c'è una filter bank da applicare qui.
+            # Il risultato dell'STFT viene usato direttamente (o convertito in dB).
+            # Quindi questa funzione restituirebbe None o un segnaposto.
+            # Il forward gestirà questo caso.
+            return None
+            
+        else: # "linear_triangular" o "combined_log_linear"
+            center_freqs = self._get_triangular_filter_centers(device=device)
+            if center_freqs is None: # Dovrebbe accadere solo se c'è un errore di logica
+                raise ValueError("Center frequencies could not be computed.")
+            return self._generate_triangular_filter_bank_from_centers(center_freqs, device=device)
+
+
     def forward(self, waveform):
-        """
-        Forward pass to compute the differentiable spectrogram
-        
-        Args:
-            waveform: [batch_size, n_samples] or [n_samples]
-            
-        Returns:
-            spectrogram: [batch_size, n_filters, n_time] or [n_filters, n_time]
-        """
-        # Ensure waveform is 2D [batch_size, n_samples]
+        # waveform shape: (batch, time) o (time)
         if waveform.dim() == 1:
-            waveform = waveform.unsqueeze(0)
-            
-        # Compute STFT
-        stft = torch.stft(waveform, 
-                         n_fft=self.n_fft, 
-                         hop_length=self.hop_length,
-                         window=torch.hann_window(self.n_fft).to(waveform.device),
-                         return_complex=True)
+            waveform = waveform.unsqueeze(0) # Aggiungi batch dim se manca
         
-        # Get magnitude
-        magnitude = torch.abs(stft)
+        device = waveform.device
+
+        # 1. Calcola STFT
+        # Finestra Hann è comune, assicurati sia sul device corretto
+        window = torch.hann_window(self.n_fft, device=device)
         
-        # Update filter bank if parameters have changed
-        self.filter_bank = self._create_filter_bank().to(waveform.device)
+        stft_complex = torch.stft(waveform, 
+                                   n_fft=self.n_fft, 
+                                   hop_length=self.hop_length,
+                                   window=window,
+                                   return_complex=True) # (batch, n_freq_bins, n_frames)
         
-        # Apply filter bank
-        # [batch_size, n_freq, n_time] -> [batch_size, n_filters, n_time]
-        spectrogram = torch.matmul(self.filter_bank, magnitude)
+        magnitude_stft = torch.abs(stft_complex) # (batch, n_freq_bins, n_frames)
+
+        if self.spec_type == "linear_stft":
+            # Per STFT lineare, usiamo direttamente la magnitudine (o la sua versione in dB)
+            # Non applichiamo un'ulteriore filter bank qui.
+            # La conversione in dB è spesso fatta dopo, nel modello principale.
+            spectrogram = magnitude_stft # Shape: (batch, n_fft // 2 + 1, n_frames)
+        else:
+            # 2. Genera/Ottieni la filter bank corrente
+            # filter_bank ha shape [n_filters, n_freq_bins_stft]
+            filter_bank = self._get_current_filter_bank(device=device) 
+
+            if filter_bank is None:
+                raise ValueError(f"Filter bank could not be created for spec_type {self.spec_type}")
+
+            # 3. Applica la filter bank
+            # magnitude_stft: (batch, n_freq_bins, n_frames)
+            # filter_bank: (n_filters, n_freq_bins)
+            # Risultato desiderato: (batch, n_filters, n_frames)
+            # torch.matmul gestisce il broadcasting: (F,K) @ (B,K,T) -> (B,F,T)
+            spectrogram = torch.matmul(filter_bank, magnitude_stft)
         
-        # Convert to dB scale
-        spectrogram = 20 * torch.log10(torch.clamp(spectrogram, min=1e-10))
+        # La conversione in dB (AmplitudeToDB) è tipicamente un layer separato nel modello principale.
+        # Se volessimo farla qui:
+        # spectrogram = torchaudio.transforms.AmplitudeToDB(stype='magnitude', top_db=80)(spectrogram)
         
         return spectrogram
 
-# Example usage
-def test_differentiable_spectrogram():
-    # Create model
-    model = DifferentiableSpectrogram()
-    
-    # Create dummy input
-    x = torch.randn(1, 16000)  # 1 second of audio at 16kHz
-    
-    # Forward pass
-    spec = model(x)
-    
-    # Check gradients
-    loss = spec.sum()
-    loss.backward()
-    
-    print("Breakpoint gradient:", model.breakpoint.grad)
-    print("Transition width gradient:", model.transition_width.grad)
-    print("Spectrogram shape:", spec.shape)
 
-# Main function
-def analyze_robin_sound(file_path="robin.wav"):
-    # Run differentiability check
-    print("Running differentiability check...")
-    check_differentiability()
-    
-    # Load audio
-    print(f"Loading audio file: {file_path}")
-    y, sr = load_audio(file_path)
-    
-    # Adjust f_max if needed
-    global f_max
-    if sr < 2 * f_max:
-        f_max = sr // 2 - 1000
-    
-    # Compute STFT
-    print("Computing STFT...")
-    stft_magnitude = compute_stft(y, n_fft, hop_length)
-    
-    # Compute filter banks
-    print("Computing filter banks...")
-    mel_filter_bank = get_mel_filter_bank(sr, n_fft, n_filters, f_min, f_max)
-    log_filter_bank = get_log_filter_bank(n_filters, f_min, f_max, n_fft, sr)
-    piecewise_filter_bank = get_piecewise_filter_bank(n_filters, f_min, f_max, breakpoint, n_fft, sr)
-    differentiable_filter_bank = get_differentiable_filter_bank(n_filters, f_min, f_max, breakpoint, transition_width, n_fft, sr)
-    print("DFF.shape: ",differentiable_filter_bank.shape)
-    # Apply filter banks
-    print("Applying filter banks...")
-    mel_spectrogram = apply_filter_bank(mel_filter_bank, stft_magnitude)
-    log_spectrogram = apply_filter_bank(log_filter_bank, stft_magnitude)
-    piecewise_spectrogram = apply_filter_bank(piecewise_filter_bank, stft_magnitude)
-    differentiable_spectrogram = apply_filter_bank(differentiable_filter_bank, stft_magnitude)
-    
-    # Convert to dB
-    stft_db = to_db_scale(stft_magnitude)
-    mel_db = to_db_scale(mel_spectrogram)
-    log_db = to_db_scale(log_spectrogram)
-    piecewise_db = to_db_scale(piecewise_spectrogram)
-    differentiable_db = to_db_scale(differentiable_spectrogram)
-    
-    # Plot results
-    print("Plotting results...")
-    fig, ax = plt.subplots(5, 1, figsize=(12, 15), sharex=True)
-    
-    # STFT Spectrogram
-    img = ax[0].imshow(stft_db.numpy(), aspect='auto', origin='lower', 
-                      extent=[0, stft_db.shape[1] * hop_length / sr, 0, sr // 2])
-    ax[0].set_title('STFT Magnitude Spectrogram')
-    ax[0].set_ylabel('Frequency (Hz)')
-    fig.colorbar(img, ax=ax[0], format='%+2.0f dB')
-    
-    # Time axis
-    time_points = torch.arange(mel_db.shape[1]) * hop_length / sr
-    freq_points = torch.arange(n_filters)
-    
-    # Mel Spectrogram
-    img = ax[1].pcolormesh(time_points.numpy(), freq_points.numpy(), mel_db.numpy(), 
-                          shading='auto', cmap='viridis')
-    ax[1].set_title('Mel Filter Bank Spectrogram')
-    ax[1].set_ylabel('Mel Filter Index')
-    fig.colorbar(img, ax=ax[1], format='%+2.0f dB')
-    
-    # Log Spectrogram
-    img = ax[2].pcolormesh(time_points.numpy(), freq_points.numpy(), log_db.numpy(), 
-                          shading='auto', cmap='viridis')
-    ax[2].set_title('Log-Spaced Filter Bank Spectrogram')
-    ax[2].set_ylabel('Filter Index')
-    fig.colorbar(img, ax=ax[2], format='%+2.0f dB')
-    
-    # Piecewise Spectrogram
-    img = ax[3].pcolormesh(time_points.numpy(), freq_points.numpy(), piecewise_db.numpy(), 
-                          shading='auto', cmap='viridis')
-    ax[3].set_title('Piecewise Log-Linear Filter Bank Spectrogram')
-    ax[3].set_ylabel('Filter Index')
-    fig.colorbar(img, ax=ax[3], format='%+2.0f dB')
-    
-    # Differentiable Spectrogram
-    img = ax[4].pcolormesh(time_points.numpy(), freq_points.numpy(), differentiable_db.numpy(), 
-                          shading='auto', cmap='viridis')
-    ax[4].set_title('Differentiable Piecewise Log-Linear Filter Bank Spectrogram')
-    ax[4].set_xlabel('Time (s)')
-    ax[4].set_ylabel('Filter Index')
-    fig.colorbar(img, ax=ax[4], format='%+2.0f dB')
-    
-    plt.tight_layout()
-    plt.show()
-    
-    print("Analysis complete!")
-    return {
-        'stft': stft_db,
-        'mel': mel_db,
-        'log': log_db,
-        'piecewise': piecewise_db,
-        'differentiable': differentiable_db
-    }
+# --- Funzioni di utilità e test (possono rimanere per debug) ---
 
-if __name__ == "__main__":
-    analyze_robin_sound("toucan.wav")
+# Esempio di come caricare audio (se necessario per test standalone)
+def load_audio_waveform(file_path, target_sr):
+    waveform, sr = torchaudio.load(file_path)
+    if waveform.dim() > 1 and waveform.shape[0] > 1: # Converti a mono
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+    if sr != target_sr: # Resample se necessario
+        waveform = torchaudio.transforms.Resample(sr, target_sr)(waveform)
+    return waveform.squeeze()
+
+
+def test_differentiable_spectrogram_module():
+    print("Testing DifferentiableSpectrogram Module...")
+    sr = 32000
+    duration = 2 # secondi
+    n_samples = sr * duration
+    
+    # Test combined_log_linear (trainable)
+    print("\n--- Test 1: combined_log_linear (trainable) ---")
+    spec_module_trainable = DifferentiableSpectrogram(
+        sr=sr, n_filters=40, f_min=100.0, f_max=10000.0,
+        n_fft=1024, hop_length=320,
+        initial_breakpoint=3000.0, initial_transition_width=200.0,
+        trainable_filterbank=True, spec_type="combined_log_linear", debug=True
+    ).eval() # Metti in eval mode per testare forward
+
+    # Verifica parametri
+    if hasattr(spec_module_trainable, 'breakpoint') and isinstance(spec_module_trainable.breakpoint, nn.Parameter):
+        print(f"  Breakpoint: {spec_module_trainable.breakpoint.item():.2f} (is nn.Parameter)")
+        spec_module_trainable.breakpoint.data.fill_(2000.0) # Modifica per test
+        print(f"  Breakpoint modified to: {spec_module_trainable.breakpoint.item():.2f}")
+
+    if hasattr(spec_module_trainable, 'transition_width') and isinstance(spec_module_trainable.transition_width, nn.Parameter):
+        print(f"  Transition Width: {spec_module_trainable.transition_width.item():.2f} (is nn.Parameter)")
+        spec_module_trainable.transition_width.data.fill_(50.0)
+        print(f"  Transition Width modified to: {spec_module_trainable.transition_width.item():.2f}")
+
+    waveform_test = torch.randn(n_samples) * 0.1 # Batch di 1, o singolo waveform
+    
+    # Test forward pass
+    try:
+        spec_output = spec_module_trainable(waveform_test.unsqueeze(0)) # Aggiungi batch dim
+        print(f"  Output spectrogram shape: {spec_output.shape}") # Expected: [1, n_filters, n_frames]
+        assert spec_output.shape[1] == spec_module_trainable.n_filters
+        # Tentativo di backward pass
+        if spec_module_trainable.trainable_filterbank:
+            spec_output.sum().backward()
+            print(f"  Backward pass successful.")
+            if spec_module_trainable.breakpoint.grad is not None:
+                print(f"    Gradient for breakpoint: {spec_module_trainable.breakpoint.grad.item()}")
+            else:
+                print(f"    WARNING: No gradient for breakpoint.")
+            if spec_module_trainable.transition_width.grad is not None:
+                print(f"    Gradient for transition_width: {spec_module_trainable.transition_width.grad.item()}")
+            else:
+                print(f"    WARNING: No gradient for transition_width.")
+        else:
+            print("  Trainable filterbank is False, skipping gradient check for breakpoint/transition_width.")
+
+    except Exception as e:
+        print(f"  ERROR during trainable combined_log_linear test: {e}")
+        import traceback
+        traceback.print_exc()
+
+    # Test Mel (non trainable breakpoint/TW)
+    print("\n--- Test 2: mel (non-trainable breakpoint/TW) ---")
+    spec_module_mel = DifferentiableSpectrogram(
+        sr=sr, n_filters=64, f_min=50.0, f_max=12000.0,
+        n_fft=1024, hop_length=320,
+        spec_type="mel", trainable_filterbank=False, debug=True # trainable_filterbank non ha effetto su Mel qui
+    ).eval()
+    try:
+        spec_output_mel = spec_module_mel(waveform_test.unsqueeze(0))
+        print(f"  Mel Output spectrogram shape: {spec_output_mel.shape}")
+        assert spec_output_mel.shape[1] == spec_module_mel.n_filters
+    except Exception as e:
+        print(f"  ERROR during Mel test: {e}")
+
+    # Test linear_triangular (non trainable breakpoint/TW)
+    print("\n--- Test 3: linear_triangular (non-trainable breakpoint/TW) ---")
+    spec_module_lin = DifferentiableSpectrogram(
+        sr=sr, n_filters=50, f_min=0.0, f_max=16000.0, # f_min=0 per lineare completo
+        n_fft=1024, hop_length=320,
+        spec_type="linear_triangular", trainable_filterbank=False, debug=True
+    ).eval()
+    try:
+        spec_output_lin = spec_module_lin(waveform_test.unsqueeze(0))
+        print(f"  Linear Triangular Output spectrogram shape: {spec_output_lin.shape}")
+        assert spec_output_lin.shape[1] == spec_module_lin.n_filters
+    except Exception as e:
+        print(f"  ERROR during Linear Triangular test: {e}")
+
+    # Test linear_stft (no filterbank applied in this module)
+    print("\n--- Test 4: linear_stft ---")
+    spec_module_stft = DifferentiableSpectrogram(
+        sr=sr, n_fft=1024, hop_length=320,
+        spec_type="linear_stft" 
+        # n_filters, f_min, f_max non sono usati per linear_stft qui
+    ).eval()
+    try:
+        spec_output_stft = spec_module_stft(waveform_test.unsqueeze(0))
+        expected_freq_bins = spec_module_stft.n_fft // 2 + 1
+        print(f"  Linear STFT Output spectrogram shape: {spec_output_stft.shape}") # Expected [1, n_fft/2+1, n_frames]
+        assert spec_output_stft.shape[1] == expected_freq_bins
+    except Exception as e:
+        print(f"  ERROR during Linear STFT test: {e}")
+
+
+if __name__ == '__main__':
+    # Esegui i test se lo script è chiamato direttamente
+    test_differentiable_spectrogram_module()
+
+    # Esempio d'uso con un file audio reale (opzionale)
+    # file_path = "your_audio_file.wav" # Sostituisci con un tuo file
+    # target_sr_test = 16000
+    # try:
+    #     waveform = load_audio_waveform(file_path, target_sr_test)
+    #     spec_module_real = DifferentiableSpectrogram(sr=target_sr_test, spec_type="combined_log_linear", trainable_filterbank=True).eval()
+    #     spec_real = spec_module_real(waveform.unsqueeze(0))
+    #     print(f"\nSpectrogram from real audio ({file_path}), shape: {spec_real.shape}")
+
+    #     # Visualizzazione opzionale (richiede matplotlib)
+    #     import matplotlib.pyplot as plt
+    #     plt.figure(figsize=(10, 4))
+    #     plt.imshow(torchaudio.transforms.AmplitudeToDB()(spec_real.squeeze().cpu().detach()).numpy(), 
+    #                aspect='auto', origin='lower', cmap='viridis')
+    #     plt.title("Differentiable Spectrogram from Real Audio")
+    #     plt.xlabel("Frames")
+    #     plt.ylabel("Filter Index")
+    #     plt.colorbar(label="Magnitude (dB)")
+    #     plt.tight_layout()
+    #     plt.show()
+    # except FileNotFoundError:
+    #     print(f"\nFile {file_path} non trovato. Salto test con audio reale.")
+    # except Exception as e:
+    #     print(f"\nErrore durante test con audio reale: {e}")
+

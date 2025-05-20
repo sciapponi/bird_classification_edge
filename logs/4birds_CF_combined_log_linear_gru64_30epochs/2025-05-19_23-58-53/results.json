@@ -1,0 +1,7 @@
+{
+  "experiment_name": "4birds_CF_combined_log_linear_gru64_30epochs",
+  "best_val_acc": 71.15869017632242,
+  "test_acc": 70.4030226700252,
+  "total_params": 53256,
+  "trainable_params": 53256
+}
