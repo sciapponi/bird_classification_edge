@@ -9,8 +9,8 @@ hydra:
 # Training parameters
 training:
   batch_size: 32 # Number of samples per batch during training and evaluation
-  epochs: 3 # Total number of training epochs
-  patience: 10 # Number of epochs with no improvement after which training will be stopped (for early stopping)
+  epochs: 30 # Total number of training epochs
+  patience: 4 # Number of epochs with no improvement after which training will be stopped (for early stopping)
   min_delta: 0.001 # Minimum change in the monitored quantity to qualify as an improvement (for early stopping)
   seed: 42 # Random seed for reproducibility
   
@@ -62,7 +62,7 @@ dataset:
   sample_rate: 32000 # Target sample rate in Hz
   clip_duration: 3.0 # Duration of audio clips in seconds
   lowcut: 150 # Lowcut frequency for bandpass filter and f_min for Mel
-  highcut: 10000 # Highcut frequency for bandpass filter and f_max for Mel
+  highcut: 16000 # Highcut frequency for bandpass filter and f_max for Mel
   bird_to_background_ratio: 2.0 # Ratio for mixing with background noise (SNR is main control)
   validation_split: 0.15 # Proportion for validation set
   test_split: 0.15 # Proportion for test set
