@@ -32,7 +32,7 @@ except Exception as e:
 import hydra 
 from hydra.utils import instantiate
 from hydra.core.hydra_config import HydraConfig
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 import logging
 import os
 import numpy as np
@@ -303,7 +303,18 @@ def train(cfg: DictConfig):
     else:
         optimizer_params = model.parameters()
 
-    optimizer = instantiate(cfg.optimizer, params=optimizer_params)
+    # Prepare a clean optimizer config for instantiation,
+    # removing custom keys like 'filter_lr' that are not actual AdamW constructor arguments.
+    # The value of 'filter_lr' is used when setting up 'optimizer_params' for parameter groups.
+    optimizer_constructor_args = {
+        k: v for k, v in cfg.optimizer.items() if k not in ['_target_', 'filter_lr']
+    }
+    
+    # Create a minimal config for instantiate containing only the target,
+    # and pass other args as kwargs.
+    optimizer_target_config = OmegaConf.create({'_target_': cfg.optimizer._target_})
+    optimizer = instantiate(optimizer_target_config, params=optimizer_params, **optimizer_constructor_args)
+
     scheduler = instantiate(cfg.scheduler, optimizer=optimizer)
     criterion = nn.CrossEntropyLoss()
 
