@@ -10,7 +10,7 @@ hydra:
 training:
   batch_size: 32 # Number of samples per batch during training and evaluation
   epochs: 30 # Total number of training epochs
-  patience: 4 # Number of epochs with no improvement after which training will be stopped (for early stopping)
+  patience: 5 # Number of epochs with no improvement after which training will be stopped (for early stopping)
   min_delta: 0.001 # Minimum change in the monitored quantity to qualify as an improvement (for early stopping)
   seed: 42 # Random seed for reproducibility
   

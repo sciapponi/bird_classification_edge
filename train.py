@@ -281,7 +281,29 @@ def train(cfg: DictConfig):
     # cfg.model contiene già gli altri parametri statici del modello.
     model = instantiate(cfg.model, **model_instantiate_overrides).to(device)
     
-    optimizer = instantiate(cfg.optimizer, params=model.parameters())
+    # Separate parameters for the differentiable filter
+    if cfg.model.spectrogram_type == "combined_log_linear" and hasattr(model, 'combined_log_linear_spec'):
+        filter_params = []
+        other_params = []
+        for name, param in model.named_parameters():
+            if 'combined_log_linear_spec.breakpoint' in name or 'combined_log_linear_spec.transition_width' in name:
+                filter_params.append(param)
+            else:
+                other_params.append(param)
+        
+        if filter_params: # Ensure filter_params is not empty
+            optimizer_params = [
+                {'params': other_params},
+                {'params': filter_params, 'lr': cfg.optimizer.get('filter_lr', cfg.optimizer.lr)} # Use specific LR or fallback
+            ]
+            log.info(f"Using separate learning rate for filter parameters: {cfg.optimizer.get('filter_lr', cfg.optimizer.lr)}")
+        else:
+            log.warning("combined_log_linear_spec found, but no specific parameters (breakpoint/transition_width) for separate LR. Using default optimizer setup.")
+            optimizer_params = model.parameters()
+    else:
+        optimizer_params = model.parameters()
+
+    optimizer = instantiate(cfg.optimizer, params=optimizer_params)
     scheduler = instantiate(cfg.scheduler, optimizer=optimizer)
     criterion = nn.CrossEntropyLoss()
 
