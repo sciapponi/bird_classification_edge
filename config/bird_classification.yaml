@@ -9,7 +9,7 @@ hydra:
 # Training parameters
 training:
   batch_size: 32 # Number of samples per batch during training and evaluation
-  epochs: 30 # Total number of training epochs
+  epochs: 10 # Total number of training epochs
   patience: 5 # Number of epochs with no improvement after which training will be stopped (for early stopping)
   min_delta: 0.001 # Minimum change in the monitored quantity to qualify as an improvement (for early stopping)
   seed: 42 # Random seed for reproducibility
@@ -42,6 +42,7 @@ model:
 optimizer:
   _target_: torch.optim.AdamW # Optimizer class
   lr: 1e-3 # Learning rate
+  filter_lr: 0.01 # Specific learning rate for differentiable filter parameters
   weight_decay: 1e-4 # Weight decay for regularization
 
 # Learning rate scheduler configuration
