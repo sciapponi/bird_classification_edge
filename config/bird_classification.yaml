@@ -51,7 +51,7 @@ scheduler:
   mode: min # "min" for loss, "max" for accuracy
   factor: 0.5 # Factor by which LR is reduced
   patience: 3 # Epochs to wait for improvement before reducing LR
-  verbose: true # Print message when LR is updated
+  #verbose: false # Print message when LR is updated
 
 # Dataset configuration
 dataset:

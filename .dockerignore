@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+Dockerfile
+run_docker_training.sh
+
+# Python virtual environments
+venv
+.venv
+*.pyc
+*.pyo
+__pycache__
+
+# Datasets (questi vengono montati, non copiati nell'immagine)
+bird_sound_dataset/
+ESC-50-master/
+augmented_dataset/
+
+# Log files (questi vengono montati)
+logs/
+
+# IDE and OS specific files
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# Markdown files (se molto grandi e non necessari nell'immagine)
+*.md
+
+# Altri file di output o temporanei
+# Aggiungi qui altri pattern se necessario 

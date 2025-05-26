@@ -1,0 +1,7 @@
+{
+  "experiment_name": "all_classes_linear_stft_run1",
+  "best_val_acc": 77.53001715265866,
+  "test_acc": 76.15780445969125,
+  "total_params": 400923,
+  "trainable_params": 400923
+}

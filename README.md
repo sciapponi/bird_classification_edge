@@ -209,6 +209,74 @@ dataset:
    python train.py # Add any Hydra command-line overrides if needed
    ```
 
+## Running with Docker
+
+This project can be run inside a Docker container, which helps manage dependencies and ensures a consistent environment, especially when running on a server with GPUs.
+
+### Prerequisites
+
+*   Docker installed on your system (Docker Desktop for Mac/Windows, Docker Engine for Linux).
+*   For GPU support on Linux, NVIDIA drivers and the NVIDIA Container Toolkit must be installed on the host.
+
+### 1. Configure the Setup
+
+*   **Dataset Paths in `run_docker_training.sh`**:
+    Before running, you might need to configure the paths to your datasets within the `run_docker_training.sh` script. Open this script and review the variables in the "Configuration" section (e.g., `HOST_BIRD_SOUND_DATASET_DIR`, `HOST_ESC50_DIR`, etc.). By default, these are set to relative paths like `$PWD/bird_sound_dataset`, assuming your datasets are in the project's root directory.
+*   **(Optional) User/Group ID for Docker Build**:
+    The `Dockerfile` previously supported building an image with a user matching your host's UID/GID to avoid permission issues with mounted volumes. This is generally recommended for Linux environments. The current simplified `Dockerfile` runs processes as the default user (often `root`). If you revert to a `Dockerfile` version that supports `USER_ID` and `GROUP_ID` arguments, you would use those during the build.
+
+### 2. Build the Docker Image
+
+Navigate to the project's root directory (where the `Dockerfile` is located) and run:
+
+```bash
+# Build command for the current simplified Dockerfile (processes in container run as default user)
+docker build -t bird_classification_edge .
+
+# OR, if you are using a Dockerfile version that supports USER_ID/GROUP_ID arguments 
+# (generally recommended for Linux hosts to match host user permissions):
+# docker build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t bird_classification_edge .
+```
+Replace `bird_classification_edge` with your preferred image name if it differs from the one in `run_docker_training.sh` (default is `bird_classification_edge`).
+
+### 3. Run Training using the Helper Script
+
+The `run_docker_training.sh` script simplifies launching training sessions. Make it executable:
+```bash
+chmod +x run_docker_training.sh
+```
+
+**Common Usage Examples:**
+
+*   **On a Linux Server with GPU (e.g., GPU 0):**
+    Replace `my_container_name_on_server` with the name you've reserved (e.g., from a shared spreadsheet).
+    ```bash
+    ./run_docker_training.sh my_container_name_on_server GPU_ID=0 training.epochs=50
+    ```
+    *   `my_container_name_on_server`: The name for your Docker container.
+    *   `GPU_ID=0`: Specifies which GPU to use. The script sets `CUDA_VISIBLE_DEVICES`.
+    *   `training.epochs=50`: Example of a Hydra override. Any parameters after `GPU_ID` (or after the container name if `GPU_ID` is not used) are passed to `train.py`.
+
+*   **For Local Testing on macOS (CPU-only):**
+    Use the `MAC` flag to disable GPU options that are incompatible with Docker Desktop on macOS.
+    ```bash
+    ./run_docker_training.sh my_mac_test_container MAC training.epochs=1
+    ```
+    *   `MAC`: A special flag that tells the script to remove GPU-specific Docker options.
+
+*   **Basic Run (using defaults from Hydra config and all available GPUs on Linux):**
+    ```bash
+    ./run_docker_training.sh my_default_container
+    ```
+
+The script handles mounting the necessary project directories (`config/`, `logs/`, datasets) into the container. Ensure the dataset paths configured in the script are correct for your environment.
+
+### Included Docker Files:
+
+*   **`Dockerfile`**: Defines the instructions to build the Docker image, including installing Python, system dependencies (like `libgomp1`), Python packages from `requirements.txt`, and copying the project code.
+*   **`.dockerignore`**: Specifies files and directories to exclude from the Docker build context (e.g., local datasets, `.git` folder, virtual environments). This keeps the build context small and speeds up the image build process. Datasets and logs are intended to be mounted as volumes at runtime.
+*   **`run_docker_training.sh`**: A helper script to simplify running `docker run` commands with the correct volume mounts, GPU settings, and Hydra parameter overrides.
+
 ## Usage Examples
 
 ### Generate "No Birds" Samples (Offline Mode Step)
