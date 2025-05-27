@@ -41,6 +41,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, classification_report
 
 # Aggiunto per verificare la presenza di actual_model in DataParallel/DDP
 from torch.nn.parallel import DataParallel, DistributedDataParallel
@@ -423,6 +424,9 @@ def train(cfg: DictConfig):
     history = {
         'train_loss': [], 'train_acc': [],
         'val_loss': [], 'val_acc': [],
+        'val_precision': [],
+        'val_recall': [],
+        'val_f1': [],
         'lr': []
     }
     # Aggiungi chiavi per breakpoint e transition_width se si usa combined_log_linear
@@ -463,6 +467,8 @@ def train(cfg: DictConfig):
         running_val_loss = 0.0
         correct_val_predictions = 0
         total_val_predictions = 0
+        all_val_labels = []       # Per metriche aggiuntive
+        all_val_predictions = []  # Per metriche aggiuntive
         
         val_pbar = tqdm(val_loader, desc=f"Epoch {epoch+1}/{cfg.training.epochs} [Val]", unit="batch")
         with torch.no_grad():
@@ -477,10 +483,30 @@ def train(cfg: DictConfig):
                 correct_val_predictions += (predicted == labels).sum().item()
                 val_pbar.set_postfix(loss=loss.item(), acc=100. * correct_val_predictions / total_val_predictions if total_val_predictions > 0 else 0)
 
+                all_val_labels.extend(labels.cpu().numpy())             # Raccogli etichette
+                all_val_predictions.extend(predicted.cpu().numpy())   # Raccogli predizioni
+
         epoch_val_loss = running_val_loss / len(val_loader.dataset)
         epoch_val_acc = correct_val_predictions / total_val_predictions
         history['val_loss'].append(epoch_val_loss)
         history['val_acc'].append(epoch_val_acc)
+
+        # Calcola e logga Precision, Recall, F1 per la validazione
+        # Utilizza le etichette definite per il test set se disponibili, altrimenti range
+        # Questo è importante per classification_report, meno per le metriche aggregate
+        val_class_labels_for_report = class_labels if 'class_labels' in locals() and class_labels else list(range(actual_num_classes))
+
+        precision_val, recall_val, f1_val, _ = precision_recall_fscore_support(
+            all_val_labels, 
+            all_val_predictions, 
+            average='weighted', 
+            labels=np.unique(all_val_labels + all_val_predictions), # Considera tutte le etichette presenti
+            zero_division=0
+        )
+        history['val_precision'].append(precision_val)
+        history['val_recall'].append(recall_val)
+        history['val_f1'].append(f1_val)
+
         history['lr'].append(optimizer.param_groups[0]['lr'])
 
         # Log dei parametri del filtro differenziabile
@@ -505,6 +531,7 @@ def train(cfg: DictConfig):
         log.info(f"Epoch {epoch+1}/{cfg.training.epochs}")
         log.info(f"Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc*100:.2f}%")
         log.info(f"Val Loss: {epoch_val_loss:.4f}, Val Acc: {epoch_val_acc*100:.2f}%")
+        log.info(f"Val Precision (w): {precision_val:.4f}, Val Recall (w): {recall_val:.4f}, Val F1 (w): {f1_val:.4f}")
         log.info(f"Learning Rate: {optimizer.param_groups[0]['lr']:.6f}")
 
         # Early stopping and model saving
@@ -578,6 +605,40 @@ def train(cfg: DictConfig):
     final_test_acc = correct_test_predictions / total_test_predictions
     log.info(f"Test Loss: {final_test_loss:.4f}, Test Acc: {final_test_acc*100:.2f}%")
 
+    # Calcola e logga Precision, Recall, F1 per il test set (aggregate)
+    precision_test, recall_test, f1_test, _ = precision_recall_fscore_support(
+        all_labels, 
+        all_predictions, 
+        average='weighted', 
+        labels=np.unique(all_labels + all_predictions), # Considera tutte le etichette presenti nel test set
+        zero_division=0
+    )
+    log.info(f"Test Precision (w): {precision_test:.4f}, Test Recall (w): {recall_test:.4f}, Test F1 (w): {f1_test:.4f}")
+
+    # Genera e logga il classification report per classe
+    # Assicurati che class_labels sia definito correttamente prima di questo punto
+    # (di solito viene fatto vicino a save_confusion_matrix)
+    if not 'class_labels' in locals() or not class_labels:
+        log.warning("'class_labels' not defined for classification_report. Using numeric labels.")
+        # Fallback a etichette numeriche se class_labels non è disponibile
+        unique_test_labels = np.unique(all_labels + all_predictions)
+        report_class_labels = [str(l) for l in unique_test_labels]
+    else:
+        report_class_labels = class_labels
+
+    try:
+        test_classification_rep = classification_report(
+            all_labels, 
+            all_predictions, 
+            target_names=report_class_labels,
+            labels=np.unique(all_labels + all_predictions).tolist(), # Assicura che le labels siano quelle presenti
+            zero_division=0
+        )
+        log.info(f"Classification Report (Test Set):\n{test_classification_rep}")
+    except Exception as e:
+        log.error(f"Could not generate classification report: {e}")
+        test_classification_rep = "Error generating report."
+
     # Save confusion matrix
     # Assumendo che save_confusion_matrix sia definito altrove o importato
     # from utils import save_confusion_matrix
@@ -599,8 +660,10 @@ def train(cfg: DictConfig):
         "experiment_name": experiment_name,
         "best_val_acc": best_val_acc, # Questa è la best_val_acc corrispondente a best_val_loss o la best_acc assoluta
         "test_acc": final_test_acc,
+        "test_precision_weighted": precision_test, # NUOVA METRICA
+        "test_recall_weighted": recall_test,     # NUOVA METRICA
+        "test_f1_weighted": f1_test,             # NUOVA METRICA
         "total_params": total_params,
-        "trainable_params": trainable_params,
         # "macs": macs_str if 'macs_str' in locals() else "Not computed" # Aggiungi se calcolato
     }
     if 'macs_str' in locals(): # Per evitare NameError se il calcolo MACs fallisce
@@ -636,6 +699,10 @@ def train(cfg: DictConfig):
                 f.write(f"Final Differentiable Filter Transition Width: {final_transition_width:.2f}\n")
         f.write(f"\nBest validation accuracy: {best_val_acc*100:.2f}%\n") # Usa la best_val_acc registrata
         f.write(f"Test accuracy: {final_test_acc*100:.2f}%\n")
+        f.write(f"Test Precision (weighted): {precision_test:.4f}\n")
+        f.write(f"Test Recall (weighted): {recall_test:.4f}\n")
+        f.write(f"Test F1 (weighted): {f1_test:.4f}\n")
+        f.write(f"\nClassification Report (Test Set):\n{test_classification_rep}\n") # AGGIUNTO REPORT
     log.info(f"Model summary saved to {summary_path}")
     log.info(f"Training completed! Best validation accuracy: {best_val_acc*100:.2f}%")
     log.info(f"Test accuracy: {final_test_acc*100:.2f}%")
@@ -644,91 +711,131 @@ def train(cfg: DictConfig):
 
 # Funzione per plottare la history (spostata o definita qui)
 def plot_training_history(history, output_dir, experiment_name, num_epochs_config):
-    log = logging.getLogger(__name__) # Usa il logger esistente o creane uno nuovo
+    log = logging.getLogger(__name__) 
     
-    actual_epochs_run = len(history['train_loss']) # Numero effettivo di epoche eseguite
+    actual_epochs_run = len(history['train_loss'])
 
     # Determina il numero di subplot necessari
-    num_basic_plots = 2 # Per loss e accuracy
-    
+    num_metric_plots = 2 # Loss e Accuracy base
     plot_filter_params = False
+    plot_lr = False
+    plot_val_prf = False # Flag per P/R/F1
+
     if 'breakpoint' in history and 'transition_width' in history:
-        # Controlla se ci sono dati validi da plottare (non tutti NaN)
-        # Assicurati che le liste abbiano la stessa lunghezza di actual_epochs_run
         if len(history['breakpoint']) == actual_epochs_run and len(history['transition_width']) == actual_epochs_run:
             if not all(np.isnan(history['breakpoint'])) and not all(np.isnan(history['transition_width'])):
                 plot_filter_params = True
-                num_basic_plots += 2 # Aggiungi due subplot per breakpoint e transition_width
+                num_metric_plots += 2 
         else:
-            log.warning("Breakpoint/Transition width history length mismatch with epochs run. Skipping their plot.")
+            log.warning("Breakpoint/Transition width history length mismatch. Skipping their plot.")
 
-
-    # Verifica se c'è anche la history del learning rate e se ha la lunghezza corretta
-    plot_lr = False
     if 'lr' in history and len(history['lr']) == actual_epochs_run:
         plot_lr = True
-        num_basic_plots +=1
+        num_metric_plots +=1
+    
+    # Controlla per Precision, Recall, F1 di validazione
+    if 'val_precision' in history and 'val_recall' in history and 'val_f1' in history:
+        if (len(history['val_precision']) == actual_epochs_run and 
+            len(history['val_recall']) == actual_epochs_run and 
+            len(history['val_f1']) == actual_epochs_run):
+            # Ulteriore controllo per assicurarsi che non siano tutti NaN se dovessero esserlo per qualche motivo
+            if not (all(np.isnan(history['val_precision'])) and 
+                    all(np.isnan(history['val_recall'])) and 
+                    all(np.isnan(history['val_f1']))):
+                plot_val_prf = True
+                num_metric_plots += 3 # Un plot per Precision, uno per Recall, uno per F1
+        else:
+            log.warning("Validation P/R/F1 history length mismatch or missing. Skipping their plots.")
 
-    fig, axs = plt.subplots(num_basic_plots, 1, figsize=(12, num_basic_plots * 5))
-    if num_basic_plots == 1 and not isinstance(axs, np.ndarray): # Rendi axs sempre un array
+    fig, axs = plt.subplots(num_metric_plots, 1, figsize=(12, num_metric_plots * 4), sharex=True) # sharex=True
+    if num_metric_plots == 1 and not isinstance(axs, np.ndarray):
         axs = np.array([axs])
     
+    epochs_range = range(1, actual_epochs_run + 1)
     current_ax_idx = 0
 
     # Plot Loss
-    axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['train_loss'], label='Train Loss', marker='o', linestyle='-')
-    axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['val_loss'], label='Val Loss', marker='o', linestyle='-')
+    axs[current_ax_idx].plot(epochs_range, history['train_loss'], label='Train Loss', marker='.', linestyle='-')
+    axs[current_ax_idx].plot(epochs_range, history['val_loss'], label='Val Loss', marker='.', linestyle='-')
     axs[current_ax_idx].set_title(f'{experiment_name} - Loss per Epoch')
-    axs[current_ax_idx].set_xlabel('Epoch')
     axs[current_ax_idx].set_ylabel('Loss')
     axs[current_ax_idx].legend()
     axs[current_ax_idx].grid(True)
-    axs[current_ax_idx].set_xticks(range(1, actual_epochs_run + 1)) # Assicura tick interi per le epoche
     current_ax_idx += 1
 
     # Plot Accuracy
-    axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['train_acc'], label='Train Accuracy', marker='o', linestyle='-')
-    axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['val_acc'], label='Val Accuracy', marker='o', linestyle='-')
+    axs[current_ax_idx].plot(epochs_range, history['train_acc'], label='Train Accuracy', marker='.', linestyle='-')
+    axs[current_ax_idx].plot(epochs_range, history['val_acc'], label='Val Accuracy', marker='.', linestyle='-')
     axs[current_ax_idx].set_title(f'{experiment_name} - Accuracy per Epoch')
-    axs[current_ax_idx].set_xlabel('Epoch')
     axs[current_ax_idx].set_ylabel('Accuracy')
     axs[current_ax_idx].legend()
     axs[current_ax_idx].grid(True)
-    axs[current_ax_idx].set_xticks(range(1, actual_epochs_run + 1))
     current_ax_idx += 1
+
+    if plot_val_prf:
+        # Plot Validation Precision
+        axs[current_ax_idx].plot(epochs_range, history['val_precision'], label='Val Precision (w)', color='cyan', marker='.', linestyle='-')
+        axs[current_ax_idx].set_title(f'{experiment_name} - Weighted Val Precision per Epoch')
+        axs[current_ax_idx].set_ylabel('Precision (w)')
+        axs[current_ax_idx].legend()
+        axs[current_ax_idx].grid(True)
+        current_ax_idx += 1
+
+        # Plot Validation Recall
+        axs[current_ax_idx].plot(epochs_range, history['val_recall'], label='Val Recall (w)', color='magenta', marker='.', linestyle='-')
+        axs[current_ax_idx].set_title(f'{experiment_name} - Weighted Val Recall per Epoch')
+        axs[current_ax_idx].set_ylabel('Recall (w)')
+        axs[current_ax_idx].legend()
+        axs[current_ax_idx].grid(True)
+        current_ax_idx += 1
+
+        # Plot Validation F1-score
+        axs[current_ax_idx].plot(epochs_range, history['val_f1'], label='Val F1-score (w)', color='brown', marker='.', linestyle='-')
+        axs[current_ax_idx].set_title(f'{experiment_name} - Weighted Val F1-score per Epoch')
+        axs[current_ax_idx].set_ylabel('F1-score (w)')
+        axs[current_ax_idx].legend()
+        axs[current_ax_idx].grid(True)
+        current_ax_idx += 1
 
     if plot_filter_params:
         # Plot Breakpoint
-        axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['breakpoint'], label='Breakpoint (Hz)', color='green', marker='o', linestyle='-')
+        axs[current_ax_idx].plot(epochs_range, history['breakpoint'], label='Breakpoint (Hz)', color='green', marker='.', linestyle='-')
         axs[current_ax_idx].set_title(f'{experiment_name} - Differentiable Filter Breakpoint per Epoch')
-        axs[current_ax_idx].set_xlabel('Epoch')
         axs[current_ax_idx].set_ylabel('Breakpoint (Hz)')
         axs[current_ax_idx].legend()
         axs[current_ax_idx].grid(True)
-        axs[current_ax_idx].set_xticks(range(1, actual_epochs_run + 1))
         current_ax_idx += 1
 
         # Plot Transition Width
-        axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['transition_width'], label='Transition Width', color='purple', marker='o', linestyle='-')
+        axs[current_ax_idx].plot(epochs_range, history['transition_width'], label='Transition Width', color='purple', marker='.', linestyle='-')
         axs[current_ax_idx].set_title(f'{experiment_name} - Differentiable Filter Transition Width per Epoch')
-        axs[current_ax_idx].set_xlabel('Epoch')
         axs[current_ax_idx].set_ylabel('Transition Width')
         axs[current_ax_idx].legend()
         axs[current_ax_idx].grid(True)
-        axs[current_ax_idx].set_xticks(range(1, actual_epochs_run + 1))
         current_ax_idx += 1
     
     if plot_lr:
-        axs[current_ax_idx].plot(range(1, actual_epochs_run + 1), history['lr'], label='Learning Rate', color='red', marker='o', linestyle='-')
+        axs[current_ax_idx].plot(epochs_range, history['lr'], label='Learning Rate', color='red', marker='.', linestyle='-')
         axs[current_ax_idx].set_title(f'{experiment_name} - Learning Rate per Epoch')
-        axs[current_ax_idx].set_xlabel('Epoch')
+        axs[current_ax_idx].set_xlabel('Epoch') # xlabel solo per l'ultimo subplot se sharex=True
         axs[current_ax_idx].set_ylabel('Learning Rate')
         axs[current_ax_idx].legend()
         axs[current_ax_idx].grid(True)
-        axs[current_ax_idx].set_xticks(range(1, actual_epochs_run + 1))
-        # current_ax_idx += 1 # Non necessario se è l'ultimo plot
+        # current_ax_idx += 1 # Non necessario
+    
+    # Imposta xticks per tutti i subplot se sharex=True, o per l'ultimo se non lo è e non è l'ultimo asse.
+    # Se sharex=True, basta impostarlo per l'ultimo asse visibile.
+    for ax in axs: # Assicura che tutti gli assi abbiano i tick delle epoche corretti
+        ax.set_xticks(epochs_range)
+        # Imposta xlim per evitare spazi vuoti se actual_epochs_run è piccolo
+        if actual_epochs_run > 0:
+            ax.set_xlim(0.5, actual_epochs_run + 0.5)
 
-    plt.tight_layout(pad=3.0) # Aggiungi un po' di padding
+    if not plot_lr: # Se LR non è l'ultimo plot, aggiungi xlabel all'ultimo plot corrente
+        axs[current_ax_idx -1].set_xlabel('Epoch')
+
+
+    plt.tight_layout(pad=2.0) # Riduci padding se molti subplot
     plot_path = os.path.join(output_dir, "training_history.png")
     try:
         plt.savefig(plot_path)
