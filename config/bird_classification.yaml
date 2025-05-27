@@ -40,10 +40,11 @@ model:
 
 # Optimizer configuration
 optimizer:
-  _target_: torch.optim.AdamW # Optimizer class
-  lr: 1e-3 # Learning rate
-  filter_lr: 3 # Specific learning rate for differentiable filter parameters
-  weight_decay: 1e-4 # Weight decay for regularization
+  _target_: torch.optim.AdamW
+  lr: 0.001
+  breakpoint_lr: 3.0  # Rinominato da filter_lr
+  transition_width_lr: 0.1 # Nuovo LR per la transition_width
+  weight_decay: 0.0001
 
 # Learning rate scheduler configuration
 scheduler:

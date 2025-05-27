@@ -284,47 +284,70 @@ def train(cfg: DictConfig):
     
     # Get learning rates and other optimizer hyperparams as Python primitives
     main_lr = float(cfg.optimizer.lr)
-    filter_lr_config = cfg.optimizer.get('filter_lr') # Get filter_lr, might be None
+    # Recupera i learning rate specifici per breakpoint e transition_width
+    breakpoint_lr_config = cfg.optimizer.get('breakpoint_lr')
+    transition_width_lr_config = cfg.optimizer.get('transition_width_lr')
     
-    # Use main_lr as fallback for filter_lr if filter_lr is not set or is None
-    f_lr = float(filter_lr_config) if filter_lr_config is not None else main_lr
+    # Usa main_lr come fallback se i LR specifici non sono impostati o sono None
+    bp_lr = float(breakpoint_lr_config) if breakpoint_lr_config is not None else main_lr
+    tw_lr = float(transition_width_lr_config) if transition_width_lr_config is not None else main_lr
     
     weight_decay = float(cfg.optimizer.get('weight_decay', 0.0)) # Default to 0.0 if not present
 
     optimizer_params_list = []
 
     if cfg.model.spectrogram_type == "combined_log_linear" and hasattr(model, 'combined_log_linear_spec'):
-        filter_param_names = ['combined_log_linear_spec.breakpoint', 'combined_log_linear_spec.transition_width']
-        current_filter_params = []
+        # Nomi dei parametri specifici da cercare
+        breakpoint_param_name = 'combined_log_linear_spec.breakpoint'
+        transition_width_param_name = 'combined_log_linear_spec.transition_width'
+        
+        current_breakpoint_params = []
+        current_transition_width_params = []
         current_other_params = []
         
         for name, param in model.named_parameters():
             if not param.requires_grad:
                 continue
-            if any(fp_name in name for fp_name in filter_param_names):
-                current_filter_params.append(param)
+            if breakpoint_param_name in name:
+                current_breakpoint_params.append(param)
+            elif transition_width_param_name in name:
+                current_transition_width_params.append(param)
             else:
                 current_other_params.append(param)
         
-        if current_filter_params:
-            # Add group for other parameters
-            if current_other_params: # Only add if there are other params
-                 optimizer_params_list.append({'params': current_other_params, 'lr': main_lr})
-            # Add group for filter parameters
-            optimizer_params_list.append({'params': current_filter_params, 'lr': f_lr})
-            log.info(f"Using specific LR for filter parameters: {f_lr}. Main LR for others: {main_lr}.")
-            # Check if all params were sorted into a group
-            num_total_model_params = sum(1 for p in model.parameters() if p.requires_grad)
-            num_grouped_params = len(current_other_params) + len(current_filter_params)
-            if num_total_model_params != num_grouped_params:
-                log.warning(f"Parameter count mismatch: Total trainable = {num_total_model_params}, Grouped = {num_grouped_params}. Some params might be missed!")
-
+        # Aggiungi gruppo per gli altri parametri (se presenti)
+        if current_other_params:
+             optimizer_params_list.append({'params': current_other_params, 'lr': main_lr})
+        
+        # Aggiungi gruppo per i parametri del breakpoint (se presenti)
+        if current_breakpoint_params:
+            optimizer_params_list.append({'params': current_breakpoint_params, 'lr': bp_lr})
+            log.info(f"Using specific LR for breakpoint parameters: {bp_lr}.")
         else:
-            log.warning("combined_log_linear_spec specified, but no filter parameters found or they don't require grad. Using main_lr for all parameters.")
-            # Fallback: all parameters in one group with main_lr
-            all_trainable_params = [p for p in model.parameters() if p.requires_grad]
-            if all_trainable_params:
-                 optimizer_params_list.append({'params': all_trainable_params, 'lr': main_lr})
+            log.info("No trainable 'breakpoint' parameters found or 'breakpoint_lr' not used.")
+
+        # Aggiungi gruppo per i parametri della transition_width (se presenti)
+        if current_transition_width_params:
+            optimizer_params_list.append({'params': current_transition_width_params, 'lr': tw_lr})
+            log.info(f"Using specific LR for transition_width parameters: {tw_lr}.")
+        else:
+            log.info("No trainable 'transition_width' parameters found or 'transition_width_lr' not used.")
+
+        if not current_other_params and not current_breakpoint_params and not current_transition_width_params:
+             log.warning("combined_log_linear_spec specified, but no trainable parameters found at all. Using main_lr for all parameters if any exist later.")
+             # Fallback se nessun parametro è stato trovato, anche se è improbabile se il modello ha combined_log_linear_spec
+             all_trainable_params = [p for p in model.parameters() if p.requires_grad]
+             if all_trainable_params:
+                  optimizer_params_list = [{'params': all_trainable_params, 'lr': main_lr}]
+
+        # Check if all params were sorted into a group
+        num_total_model_params = sum(1 for p in model.parameters() if p.requires_grad)
+        num_grouped_params = len(current_other_params) + len(current_breakpoint_params) + len(current_transition_width_params)
+        if num_total_model_params != num_grouped_params and (current_breakpoint_params or current_transition_width_params or current_other_params) : # check only if some groups were populated
+            log.warning(f"Parameter count mismatch: Total trainable = {num_total_model_params}, Grouped = {num_grouped_params}. Some params might be missed!")
+            # If mismatch, and specific LRs were intended, this could be an issue.
+            # Ensure all parameters intended for specific LRs are correctly named.
+
     else:
         # Default: all parameters in one group with main_lr
         all_trainable_params = [p for p in model.parameters() if p.requires_grad]
