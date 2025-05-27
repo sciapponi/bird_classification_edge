@@ -605,6 +605,39 @@ def train(cfg: DictConfig):
     final_test_acc = correct_test_predictions / total_test_predictions
     log.info(f"Test Loss: {final_test_loss:.4f}, Test Acc: {final_test_acc*100:.2f}%")
 
+    # Determina le etichette delle classi per il report e la confusion matrix
+    # La fonte di verità per il numero di classi è actual_num_classes.
+    # La fonte di verità per i nomi delle classi di uccelli è cfg.dataset.allowed_bird_classes.
+
+    temp_class_names = list(cfg.dataset.allowed_bird_classes)
+    has_no_bird_class = (train_no_birds_dataset and len(train_no_birds_dataset) > 0)
+
+    if actual_num_classes == len(temp_class_names) + 1 and has_no_bird_class:
+        # Caso corretto: numero di classi del modello = uccelli + "non-bird"
+        report_target_names = temp_class_names + ["non-bird"]
+    elif actual_num_classes == len(temp_class_names) and not has_no_bird_class:
+        # Caso corretto: numero di classi del modello = solo uccelli
+        report_target_names = temp_class_names
+    else:
+        # C'è un disallineamento. Loggalo e usa etichette numeriche come fallback.
+        log.warning(
+            f"Mismatch in class name definition. "
+            f"actual_num_classes: {actual_num_classes}, "
+            f"len(cfg.dataset.allowed_bird_classes): {len(temp_class_names)}, "
+            f"has_no_bird_class: {has_no_bird_class}. "
+            "Using numeric labels for classification report."
+        )
+        report_target_names = [str(i) for i in range(actual_num_classes)]
+
+    # Verifica finale della lunghezza (dovrebbe sempre corrispondere ora, a meno del fallback)
+    if len(report_target_names) != actual_num_classes:
+        log.error(
+            f"CRITICAL: Final length of report_target_names ({len(report_target_names)}) "
+            f"does not match actual_num_classes ({actual_num_classes}) even after logic adjustment. "
+            "Defaulting to numeric labels."
+        )
+        report_target_names = [str(i) for i in range(actual_num_classes)]
+
     # Calcola e logga Precision, Recall, F1 per il test set (aggregate)
     precision_test, recall_test, f1_test, _ = precision_recall_fscore_support(
         all_labels, 
@@ -616,22 +649,13 @@ def train(cfg: DictConfig):
     log.info(f"Test Precision (w): {precision_test:.4f}, Test Recall (w): {recall_test:.4f}, Test F1 (w): {f1_test:.4f}")
 
     # Genera e logga il classification report per classe
-    # Assicurati che class_labels sia definito correttamente prima di questo punto
-    # (di solito viene fatto vicino a save_confusion_matrix)
-    if not 'class_labels' in locals() or not class_labels:
-        log.warning("'class_labels' not defined for classification_report. Using numeric labels.")
-        # Fallback a etichette numeriche se class_labels non è disponibile
-        unique_test_labels = np.unique(all_labels + all_predictions)
-        report_class_labels = [str(l) for l in unique_test_labels]
-    else:
-        report_class_labels = class_labels
-
+    # Ora usiamo 'report_target_names' che dovrebbe contenere i nomi corretti o un fallback sicuro.
     try:
         test_classification_rep = classification_report(
             all_labels, 
             all_predictions, 
-            target_names=report_class_labels,
-            labels=np.unique(all_labels + all_predictions).tolist(), # Assicura che le labels siano quelle presenti
+            target_names=report_target_names, # USA I NOMI DELLE CLASSI DEFINITI SOPRA
+            labels=np.arange(actual_num_classes), # Usa tutte le possibili etichette da 0 a N-1 classi
             zero_division=0
         )
         log.info(f"Classification Report (Test Set):\n{test_classification_rep}")
@@ -640,15 +664,9 @@ def train(cfg: DictConfig):
         test_classification_rep = "Error generating report."
 
     # Save confusion matrix
-    # Assumendo che save_confusion_matrix sia definito altrove o importato
-    # from utils import save_confusion_matrix
-    # Determina le etichette delle classi per la matrice di confusione
-    class_labels = list(cfg.dataset.allowed_bird_classes)
-    if (train_no_birds_dataset and len(train_no_birds_dataset) > 0): # Se la classe 'no-bird' è stata aggiunta
-        class_labels.append("non-bird") # o il nome corretto usato
-
     try:
-        save_confusion_matrix(all_labels, all_predictions, class_labels, output_dir)
+        # Passa report_target_names anche a save_confusion_matrix per coerenza
+        save_confusion_matrix(all_labels, all_predictions, report_target_names, output_dir)
     except NameError:
         log.error("Function 'save_confusion_matrix' not found. Cannot generate confusion matrix plot.")
     except Exception as e:
