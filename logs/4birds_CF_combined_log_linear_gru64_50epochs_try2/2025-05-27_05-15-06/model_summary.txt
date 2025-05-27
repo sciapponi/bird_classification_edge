@@ -1,0 +1,9 @@
+Model: models.Improved_Phi_GRU_ATT
+Total parameters: 53,256
+Trainable parameters: 53,256
+MACs: None
+Final Differentiable Filter Breakpoint: 3875.76 Hz
+Final Differentiable Filter Transition Width: 111.15
+
+Best validation accuracy: 82.37%
+Test accuracy: 83.00%

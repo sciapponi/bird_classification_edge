@@ -15,6 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
+RUN mkdir -p /app/logs && chmod -R 777 /app/logs
+
 # Non è più necessario creare utenti/gruppi o cambiare USER
 # I comandi verranno eseguiti come root (o l'utente predefinito dell'immagine base)
 
