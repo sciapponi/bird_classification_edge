@@ -9,8 +9,8 @@ hydra:
 # Training parameters
 training:
   batch_size: 32 # Number of samples per batch during training and evaluation
-  epochs: 1 # Total number of training epochs
-  patience: 5 # Number of epochs with no improvement after which training will be stopped (for early stopping)
+  epochs: 50 # Total number of training epochs
+  patience: 10 # Number of epochs with no improvement after which training will be stopped (for early stopping)
   min_delta: 0.001 # Minimum change in the monitored quantity to qualify as an improvement (for early stopping)
   seed: 42 # Random seed for reproducibility
   
@@ -22,7 +22,7 @@ model:
   n_mel_bins: 64 # Number of Mel frequency bins (used if spectrogram_type is "mel")
   n_linear_filters: 64 # Number of linear triangular filters (used if spectrogram_type is "linear_triangular")
   # f_min and f_max for mel/linear_triangular spectrograms are typically taken from dataset.lowcut and dataset.highcut
-  hidden_dim: 8 # GRU hidden dimension
+  hidden_dim: 64 # GRU hidden dimension
   n_fft: 1024 # Size of the FFT window for spectrogram generation (e.g., 1024 for 32ms window at 32kHz)
   hop_length: 320 # Hop length (stride) for spectrogram generation (e.g., 320 for 10ms hop at 32kHz)
   matchbox: # Configuration for the MatchboxNetSkip CNN backbone

@@ -1,0 +1,10 @@
+{
+  "experiment_name": "4birds_CF_combined_log_linear_gru64_50epochs_try2",
+  "best_val_acc": 0.4167657550535077,
+  "test_acc": 0.4179548156956005,
+  "test_precision_weighted": 0.24763694760761787,
+  "test_recall_weighted": 0.4179548156956005,
+  "test_f1_weighted": 0.30009603152812775,
+  "total_params": 30416,
+  "macs": null
+}

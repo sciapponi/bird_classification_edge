@@ -1,0 +1,23 @@
+Model: models.Improved_Phi_GRU_ATT
+Total parameters: 30,997
+Trainable parameters: 30,997
+MACs: None
+Final Differentiable Filter Breakpoint: 3943.09 Hz
+Final Differentiable Filter Transition Width: 99.61
+
+Best validation accuracy: 86.82%
+Test accuracy: 84.88%
+Test Precision (weighted): 0.8583
+Test Recall (weighted): 0.8488
+Test F1 (weighted): 0.8478
+
+Classification Report (Test Set):
+              precision    recall  f1-score   support
+
+   Bubo_bubo       0.92      0.77      0.84       129
+    non-bird       0.80      0.93      0.86       129
+
+    accuracy                           0.85       258
+   macro avg       0.86      0.85      0.85       258
+weighted avg       0.86      0.85      0.85       258
+
