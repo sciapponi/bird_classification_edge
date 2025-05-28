@@ -11,6 +11,8 @@ get_bird_images.py
 table
 visualize_model.py
 present.md
+images/
+misc/
 
 # Python cache files
 *.pyc
