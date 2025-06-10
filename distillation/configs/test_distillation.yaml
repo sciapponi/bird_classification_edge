@@ -1,0 +1,36 @@
+# Test Configuration for Knowledge Distillation
+# Simplified version for quick testing
+
+defaults:
+  - distillation_config
+
+# Override experiment name
+experiment_name: "distillation_test"
+
+# Test with ALL 5 CLASSES (4 birds + non-bird)
+dataset:
+  allowed_bird_classes: null    # Use all available classes
+  main_data_dir: "bird_sound_dataset"
+  # Include non-bird samples - ONLY pregenerated to avoid ESC-50 dependency
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: "augmented_dataset/no_birds"
+  num_no_bird_samples: 50       # Limit for testing
+  esc50_dir: "esc-50/ESC-50-master"    # Correct path to ESC-50
+  
+  # Disable augmentation for testing
+  augmentation:
+    enabled: false
+
+# Quick test parameters
+training:
+  epochs: 3                     # Just 3 epochs for testing
+  batch_size: 4                 # Small batch for testing
+  patience: 10
+  min_delta: 0.001
+  seed: 42
+
+# Simple distillation parameters
+distillation:
+  alpha: 0.3                    # Balanced distillation
+  temperature: 4.0
+  adaptive: false 

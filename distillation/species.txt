@@ -1,0 +1,70 @@
+Accipiter gentilis_Northern Goshawk
+Aegithalos caudatus_Long-tailed Tit
+Aegolius funereus_Boreal Owl
+Apus apus_Common Swift
+Ardea cinerea_Gray Heron
+Asio otus_Long-eared Owl
+Athene noctua_Little Owl
+Bubo bubo_Eurasian Eagle-Owl
+Buteo buteo_Common Buzzard
+Caprimulgus europaeus_Eurasian Nightjar
+Carduelis carduelis_European Goldfinch
+Certhia brachydactyla_Short-toed Treecreeper
+Certhia familiaris_Eurasian Treecreeper
+Chloris chloris_European Greenfinch
+Coccothraustes coccothraustes_Hawfinch
+Columba palumbus_Common Wood-Pigeon
+Corvus corax_Common Raven
+Cuculus canorus_Common Cuckoo
+Curruca communis_Greater Whitethroat
+Cyanistes caeruleus_Eurasian Blue Tit
+Delichon urbicum_Common House-Martin
+Dendrocopos major_Great Spotted Woodpecker
+Dryobates minor_Lesser Spotted Woodpecker
+Dryocopus martius_Black Woodpecker
+Emberiza cia_Rock Bunting
+Emberiza cirlus_Cirl Bunting
+Erithacus rubecula_European Robin
+Falco tinnunculus_Eurasian Kestrel
+Ficedula hypoleuca_European Pied Flycatcher
+Fringilla coelebs_Common Chaffinch
+Garrulus glandarius_Eurasian Jay
+Hirundo rustica_Barn Swallow
+Jynx torquilla_Eurasian Wryneck
+Lanius collurio_Red-backed Shrike
+Lophophanes cristatus_Crested Tit
+Milvus milvus_Red Kite
+Motacilla alba_White Wagtail
+Motacilla cinerea_Gray Wagtail
+Muscicapa striata_Spotted Flycatcher
+Oriolus oriolus_Eurasian Golden Oriole
+Otus scops_Eurasian Scops-Owl
+Parus major_Great Tit
+Passer montanus_Eurasian Tree Sparrow
+Periparus ater_Coal Tit
+Pernis apivorus_European Honey-buzzard
+Phoenicurus ochruros_Black Redstart
+Phoenicurus phoenicurus_Common Redstart
+Phylloscopus bonelli_Western Bonelli's Warbler
+Phylloscopus collybita_Common Chiffchaff
+Phylloscopus sibilatrix_Wood Warbler
+Picus canus_Gray-headed Woodpecker
+Picus viridis_Eurasian Green Woodpecker
+Poecile montanus_Willow Tit
+Poecile palustris_Marsh Tit
+Prunella modularis_Dunnock
+Pyrrhula pyrrhula_Eurasian Bullfinch
+Regulus ignicapilla_Common Firecrest
+Regulus regulus_Goldcrest
+Serinus serinus_European Serin
+Sitta europaea_Eurasian Nuthatch
+Spinus spinus_Eurasian Siskin
+Strix aluco_Tawny Owl
+Sturnus vulgaris_European Starling
+Sylvia atricapilla_Eurasian Blackcap
+Troglodytes troglodytes_Eurasian Wren
+Turdus merula_Eurasian Blackbird
+Turdus philomelos_Song Thrush
+Turdus pilaris_Fieldfare
+Turdus viscivorus_Mistle Thrush
+Upupa epops_Eurasian Hoopoe

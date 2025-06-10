@@ -11,3 +11,4 @@ omegaconf
 tqdm
 librosa
 torchsummary
+birdnetlib

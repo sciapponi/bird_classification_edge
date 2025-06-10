@@ -1,8 +1,11 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Use an official Python runtime with build tools
+FROM python:3.9
 
-# Install libgomp1 for PyTorch/Torchaudio compatibility
-RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
+# Install required system dependencies for audio processing and compilation
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /app
