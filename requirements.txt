@@ -12,3 +12,6 @@ tqdm
 librosa
 torchsummary
 birdnetlib
+tensorflow>=2.8.0
+tflite-runtime
+ffmpeg-python
