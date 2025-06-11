@@ -1,8 +1,9 @@
 torch
 torchaudio
 torchvision
-numpy
+numpy<2.0.0
 pandas
+resampy
 matplotlib
 seaborn
 scikit-learn
