@@ -15,6 +15,7 @@ import logging
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from tqdm import tqdm
 
 # Add project root to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -213,7 +214,8 @@ class DistillationTrainer:
         correct = 0
         total = 0
         
-        for batch_idx, (audio, hard_labels, soft_labels) in enumerate(self.train_loader):
+        pbar = tqdm(self.train_loader, desc=f"Epoch {self.epoch} [Train]", unit="batch")
+        for audio, hard_labels, soft_labels in pbar:
             # Move to device
             audio = audio.to(self.device)
             hard_labels = hard_labels.to(self.device)
@@ -240,12 +242,13 @@ class DistillationTrainer:
             total += hard_labels.size(0)
             correct += predicted.eq(hard_labels).sum().item()
             
-            # Log progress
-            if batch_idx % 50 == 0:
-                logger.info(
-                    f'Epoch {self.epoch}, Batch {batch_idx}/{len(self.train_loader)}, '
-                    f'Loss: {loss.item():.4f} (Hard: {hard_loss.item():.4f}, Soft: {soft_loss.item():.4f})'
-                )
+            # Set postfix for tqdm progress bar
+            pbar.set_postfix(
+                loss=loss.item(), 
+                hard_loss=hard_loss.item(), 
+                soft_loss=soft_loss.item(),
+                acc=f"{(100. * correct / total):.2f}%"
+            )
         
         avg_loss = total_loss / len(self.train_loader)
         avg_hard_loss = total_hard_loss / len(self.train_loader)
@@ -263,8 +266,9 @@ class DistillationTrainer:
         correct = 0
         total = 0
         
+        pbar = tqdm(self.val_loader, desc=f"Epoch {self.epoch} [Val]", unit="batch")
         with torch.no_grad():
-            for audio, hard_labels, soft_labels in self.val_loader:
+            for audio, hard_labels, soft_labels in pbar:
                 # Move to device
                 audio = audio.to(self.device)
                 hard_labels = hard_labels.to(self.device)
@@ -273,7 +277,7 @@ class DistillationTrainer:
                 # Forward pass
                 logits = self.model(audio)
                 
-                # Compute loss
+                # Compute distillation loss
                 loss, hard_loss, soft_loss = self.criterion(logits, hard_labels, soft_labels)
                 
                 # Statistics
@@ -285,6 +289,12 @@ class DistillationTrainer:
                 _, predicted = logits.max(1)
                 total += hard_labels.size(0)
                 correct += predicted.eq(hard_labels).sum().item()
+
+                # Set postfix for tqdm progress bar
+                pbar.set_postfix(
+                    loss=loss.item(),
+                    acc=f"{(100. * correct / total):.2f}%"
+                )
         
         avg_loss = total_loss / len(self.val_loader)
         avg_hard_loss = total_hard_loss / len(self.val_loader)
@@ -374,8 +384,9 @@ class DistillationTrainer:
         all_predictions = []
         all_labels = []
         
+        pbar = tqdm(self.test_loader, desc="Testing", unit="batch")
         with torch.no_grad():
-            for audio, hard_labels, soft_labels in self.test_loader:
+            for audio, hard_labels, soft_labels in pbar:
                 audio = audio.to(self.device)
                 hard_labels = hard_labels.to(self.device)
                 
@@ -387,17 +398,27 @@ class DistillationTrainer:
                 
                 all_predictions.extend(predicted.cpu().numpy())
                 all_labels.extend(hard_labels.cpu().numpy())
+
+                pbar.set_postfix(acc=f"{(100. * correct / total):.2f}%")
         
         test_acc = 100. * correct / total
         logger.info(f"Test Accuracy: {test_acc:.2f}%")
         
         # Generate detailed metrics
-        class_names = [f"Class_{i}" for i in range(len(set(all_labels)))]
-        report = classification_report(all_labels, all_predictions, target_names=class_names)
+        class_names = self.test_loader.dataset.get_classes()
+        if len(set(all_labels)) > len(class_names):
+             # Fallback if the number of unique labels in the test set is greater
+             # than the number of classes provided by the dataset.
+            class_names = [f"Class_{i}" for i in range(len(set(all_labels)))]
+
+        report = classification_report(
+            all_labels, all_predictions, target_names=class_names, 
+            zero_division=0, labels=range(len(class_names))
+        )
         logger.info(f"Classification Report:\n{report}")
         
         # Save confusion matrix
-        cm = confusion_matrix(all_labels, all_predictions)
+        cm = confusion_matrix(all_labels, all_predictions, labels=range(len(class_names)))
         save_confusion_matrix(cm, class_names, 'distillation_confusion_matrix.png')
         
         return test_acc, report, cm
@@ -466,8 +487,15 @@ def main(cfg: DictConfig):
     
     # Setup
     train_dataset, val_dataset, test_dataset = trainer.setup_data()
-    num_classes = len(train_dataset.get_classes())
     
+    # Get num_classes from the dataset, which now reads it from soft labels metadata
+    soft_labels_info = train_dataset.get_soft_labels_info()
+    num_classes = soft_labels_info.get('num_classes')
+    
+    if not num_classes:
+        logger.error("Could not determine the number of classes from soft labels.")
+        return
+
     trainer.setup_model(num_classes)
     trainer.setup_optimizer()
     trainer.setup_criterion()

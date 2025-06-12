@@ -533,7 +533,9 @@ class BirdSoundDataset(Dataset):
         else: # Handle case of pure silence
              mixed_waveform = torch.zeros_like(waveform)
 
-        print(f"Applied background mix: SNR={snr_db:.2f}dB")
+        # Opzionale: stampa l'SNR per il debug
+        # print(f"Applied background mix: SNR={snr_db:.2f}dB")
+
         return mixed_waveform
         
     def reverb(self, waveform, sample_rate=None, reverberance=50):

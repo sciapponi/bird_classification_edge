@@ -53,7 +53,7 @@ echo "Docker image: $DOCKER_IMAGE_NAME"
 if [[ $USE_GPU == true ]]; then
     if [[ -n $GPU_ID ]]; then
         echo "GPU: $GPU_ID"
-        GPU_FLAGS="--gpus device=$GPU_ID -e CUDA_VISIBLE_DEVICES=$GPU_ID"
+        GPU_FLAGS="--gpus device=$GPU_ID"
     else
         echo "GPU: all available"
         GPU_FLAGS="--gpus all"

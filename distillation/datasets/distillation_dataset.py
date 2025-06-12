@@ -27,6 +27,7 @@ class DistillationBirdSoundDataset:
         self.soft_labels_path = Path(soft_labels_path)
         self.soft_labels_data = {}
         self.soft_labels_metadata = {}
+        self.num_classes = 0  # Initialize
         
         # Load soft labels first
         self._load_soft_labels()
@@ -57,6 +58,11 @@ class DistillationBirdSoundDataset:
         # Load metadata
         with open(metadata_file, 'r') as f:
             self.soft_labels_metadata = json.load(f)
+        
+        # Set number of classes from metadata
+        self.num_classes = self.soft_labels_metadata.get('num_classes')
+        if not self.num_classes:
+            raise ValueError("Could not find 'num_classes' in soft labels metadata.")
         
         print(f"Loaded soft labels for {len(self.soft_labels_data)} files")
         print(f"Teacher confidence threshold: {self.soft_labels_metadata.get('confidence_threshold', 'Unknown')}")
@@ -95,48 +101,38 @@ class DistillationBirdSoundDataset:
             if rel_path in self.soft_labels_data:
                 soft_labels = np.array(self.soft_labels_data[rel_path], dtype=np.float32)
                 
-                # Ensure we have exactly 5 classes (4 birds + non-bird)
-                if len(soft_labels) != 5:
-                    # If somehow we have different number of classes, pad or truncate
-                    if len(soft_labels) < 5:
+                # Ensure we have the correct number of classes
+                if len(soft_labels) != self.num_classes:
+                    # If somehow we have a different number of classes, pad or truncate
+                    if len(soft_labels) < self.num_classes:
                         # Pad with zeros for missing classes
-                        padded = np.zeros(5, dtype=np.float32)
+                        padded = np.zeros(self.num_classes, dtype=np.float32)
                         padded[:len(soft_labels)] = soft_labels
                         soft_labels = padded
                     else:
-                        # Truncate if more than 5 classes
-                        soft_labels = soft_labels[:5]
+                        # Truncate if more than expected
+                        soft_labels = soft_labels[:self.num_classes]
                         
             else:
-                # Not found, create default soft labels based on file path
-                soft_labels = np.zeros(5, dtype=np.float32)
-                
-                # Check if this is a non-bird file
-                if 'no_birds' in rel_path or 'empty_' in rel_path:
-                    # Non-bird file: high confidence for non-bird class (index 4)
-                    soft_labels[4] = 1.0
-                else:
-                    # Bird file: distribute equally among bird classes (indices 0-3)
-                    soft_labels[:4] = 0.25
-                
+                # Not found, create default soft labels (zero vector)
+                soft_labels = np.zeros(self.num_classes, dtype=np.float32)
+
+                # For non-bird files (from ESC-50, etc.), we can't make assumptions
+                # about which index is the 'non-bird' class without more info.
+                # The soft labels should ideally cover all files.
+                # Here, we default to a zero vector, which is neutral.
+
                 # Debug: print missing files occasionally
                 if np.random.random() < 0.01:  # Print only 1% of missing files
                     print(f"Warning: No soft labels found for {rel_path}")
-                    print(f"Using default: {'non-bird' if soft_labels[4] > 0.5 else 'bird'} distribution")
+                    print(f"Using default: zero vector")
             
             return soft_labels
             
         except Exception as e:
             # Fallback based on file path
             print(f"Error getting soft labels for {file_path}: {e}")
-            soft_labels = np.zeros(5, dtype=np.float32)
-            
-            # Check if this looks like a non-bird file
-            if 'no_birds' in str(file_path) or 'empty_' in str(file_path):
-                soft_labels[4] = 1.0  # Non-bird class
-            else:
-                soft_labels[:4] = 0.25  # Equal distribution for bird classes
-                
+            soft_labels = np.zeros(self.num_classes, dtype=np.float32)
             return soft_labels
     
     def __getitem__(self, idx):
@@ -206,19 +202,15 @@ class DistillationBirdSoundDataset:
         }
     
     def get_classes(self):
-        """Get list of class names (compatible method)"""
-        # For ConcatDataset (from dataset_factory), we know the structure:
-        # 4 bird classes + 1 non-bird class
-        if hasattr(self.base_dataset, 'allowed_classes'):
-            return self.base_dataset.allowed_classes
-        else:
-            # Fallback: return the expected 5 classes based on soft labels metadata
-            target_species = self.soft_labels_metadata.get('target_species', [])
-            if target_species:
-                return target_species
-            else:
-                # Final fallback: hardcoded for our case
-                return ['Poecile_montanus', 'Certhia_familiaris', 'Apus_apus', 'Bubo_bubo', 'non-bird']
+        """Get list of class names from the soft labels metadata."""
+        # The source of truth for classes should be the teacher's labels.
+        target_species = self.soft_labels_metadata.get('target_species')
+        
+        if not target_species or len(target_species) != self.num_classes:
+            print("Warning: 'target_species' in metadata doesn't match 'num_classes'. Falling back to generic names.")
+            return [f"Class_{i}" for i in range(self.num_classes)]
+            
+        return target_species
 
     def __len__(self):
         """Return length of dataset"""
