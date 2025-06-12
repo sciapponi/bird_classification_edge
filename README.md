@@ -2,6 +2,37 @@
 
 This repository contains a bird sound classification system designed to run on edge devices. It includes functionality for dataset preparation, augmentation, and training.
 
+## Table of Contents
+
+- [Installation and Setup](#installation-and-setup)
+- [Project Structure](#project-structure)
+- [Standard Training Workflow](#standard-training-workflow)
+- [Advanced Workflow: Knowledge Distillation](#advanced-workflow-knowledge-distillation)
+- [Docker Execution](#docker-execution)
+
+## Installation and Setup
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository_url>
+    cd bird_classification_edge
+    ```
+
+2.  **Create and activate a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Download Datasets:**
+    -   Place your bird recordings in `bird_sound_dataset/`, organized by species folders.
+    -   The ESC-50 dataset for environmental sounds will be downloaded automatically on the first run if not found in `esc-50/`.
+
 ## Project Structure
 
 The codebase is organized into a modular structure:
@@ -37,221 +68,116 @@ The codebase is organized into a modular structure:
 └── [other project files]
 ```
 
-## Knowledge Distillation with BirdNET
+## Standard Training Workflow
 
-This project includes a complete knowledge distillation pipeline using BirdNET as the teacher model to improve the accuracy of lightweight student models suitable for edge deployment.
+This is the primary workflow for training the model without knowledge distillation. It uses the standard dataset and `CrossEntropyLoss`.
 
-### Overview
+### 1. Configure Your Training
 
-Knowledge distillation is a model compression technique where a small "student" model learns from a larger, more accurate "teacher" model. In our case:
-- **Teacher**: BirdNET (large, pre-trained on thousands of bird species)
-- **Student**: Our lightweight model (~53k parameters, suitable for AudioMoth)
-- **Goal**: Transfer BirdNET's knowledge while maintaining edge deployment compatibility
+-   Edit the main configuration file: `config/bird_classification.yaml`.
+-   Adjust parameters like `epochs`, `batch_size`, `learning_rate`.
+-   Select the desired bird species under `dataset.allowed_bird_classes`.
 
-### 📁 Distillation Package Structure
+### 2. Handle "No Birds" Samples
 
+You can choose one of two modes in your configuration file:
+
+-   **Offline Mode (Recommended):** First, generate a fixed set of "no-bird" samples.
+    ```bash
+    python generate_no_birds_samples.py
+    ```
+    Then, in `config/bird_classification.yaml`, set `load_pregenerated_no_birds: true`.
+
+-   **Online Mode:** Set `load_pregenerated_no_birds: false`. "No-bird" samples will be generated on-the-fly during training setup.
+
+### 3. Run the Training Script
+```bash
+# Run training with the configuration from your .yaml file
+python train.py
+
+# Override any parameter from the command line
+python train.py training.epochs=50 optimizer.lr=0.001
 ```
-distillation/
-├── scripts/                     # Executable scripts
-│   ├── extract_soft_labels.py  # Extract soft labels from BirdNET teacher
-│   └── train_distillation.py   # Train student with distillation
-├── datasets/                    # Dataset classes with soft labels
-│   └── distillation_dataset.py # Loads both hard and soft labels
-├── losses/                      # Distillation loss functions
-│   └── distillation_loss.py    # Combined hard + soft loss
-└── configs/                     # Configuration files
-    ├── distillation_config.yaml # Main distillation config
-    └── test_distillation.yaml   # Quick test configuration
-```
 
-### 🔄 Distillation Workflow
+## Advanced Workflow: Knowledge Distillation
 
-#### Step 1: Extract Soft Labels from BirdNET Teacher
+This workflow uses a large "teacher" model (BirdNET) to train our smaller "student" model, improving its accuracy and generalization.
+
+### How it Works
+The student model learns from two sources:
+1.  **Hard Labels:** The ground truth (e.g., "This is `Bubo_bubo`").
+2.  **Soft Labels:** The teacher's detailed probabilities (e.g., "70% `Bubo_bubo`, 20% `Apus_apus`").
+
+This is controlled by a `DistillationLoss` function: `L_total = (1-α) * L_hard + α * L_soft`.
+
+### Workflow Steps
+
+#### Step 1: Extract Soft Labels from the Teacher
+Run the extraction script to have BirdNET analyze your dataset and produce `soft_labels.json`.
 
 ```bash
-# Extract soft probability distributions from BirdNET for all audio files
-python extract_soft_labels.py --confidence_threshold 0.05
-
-# Advanced usage with custom parameters
-python extract_soft_labels.py \
-  --dataset_path bird_sound_dataset \
-  --output_path soft_labels \
-  --confidence_threshold 0.03 \
-  --max_files_per_class 100  # For testing with subset
+# Extract soft labels for all classes defined in distillation/species.txt
+python extract_soft_labels.py --output_path soft_labels_complete
 ```
 
-This script:
-- Analyzes each audio file with BirdNET
-- Extracts probability distributions across all bird species
-- Maps BirdNET's 70 species to your dataset's classes
-- Handles "non-bird" classification for environmental sounds
-- Saves results as `soft_labels/soft_labels.json` and metadata
-
-#### Step 2: Train Student Model with Knowledge Distillation
+#### Step 2: Train the Student with Distillation
+Run the distillation training script. It will use the configuration in `distillation/configs/distillation_config.yaml`.
 
 ```bash
-# Train with distillation using default configuration
+# Ensure soft_labels_path in the config points to the correct directory
 python train_distillation.py
-
-# Quick test with subset (3 epochs, 4 bird species)
-python train_distillation.py --config-name=test_distillation
-
-# Custom parameters via Hydra overrides
-python train_distillation.py \
-  distillation.alpha=0.3 \
-  distillation.temperature=4.0 \
-  training.epochs=30 \
-  training.batch_size=16
 ```
 
-### 🎯 Key Distillation Components
+### Training on a Custom Subset of Classes
 
-#### DistillationLoss
-Combines hard ground truth labels with soft teacher predictions:
-```python
-# L_total = (1-α) * L_hard + α * L_soft
-# L_hard: Standard cross-entropy with ground truth
-# L_soft: KL divergence between student and teacher predictions
-total_loss = (1 - alpha) * hard_loss + alpha * soft_loss
-```
+If you want to train on fewer classes, you must generate new soft labels that match.
 
-**Key Parameters:**
-- `alpha` (0.0-1.0): Balance between hard and soft supervision
-  - 0.0 = Standard training (only ground truth)
-  - 0.5 = Equal weight to both
-  - 1.0 = Pure distillation (only teacher)
-- `temperature`: Softens probability distributions for better knowledge transfer
+1.  **Create a Custom Species List:** Create a new file, e.g., `distillation/species_4.txt`, with only the species you want.
+    ```
+    # distillation/species_4.txt
+    Poecile montanus
+    Certhia familiaris
+    Apus apus
+    Bubo bubo
+    ```
+2.  **Generate Matching Soft Labels:** Run the extraction script pointing to your new list and a new output folder.
+    ```bash
+    python extract_soft_labels.py \
+        --species_list distillation/species_4.txt \
+        --output_path soft_labels_4_classes
+    ```
+3.  **Configure and Train:** Update `distillation/configs/distillation_config.yaml` to point `soft_labels_path` to `soft_labels_4_classes` and list the same 4 species under `allowed_bird_classes`. Then run `python train_distillation.py`.
 
-#### Adaptive Distillation
-Automatically adjusts the hard/soft balance based on validation performance:
-- Increases teacher influence when validation accuracy plateaus
-- Helps overcome training difficulties with challenging species
+## Docker Execution
 
-### 📊 Expected Benefits
+The knowledge distillation pipeline is fully runnable in Docker, ideal for server deployment.
 
-Based on knowledge distillation literature and our model architecture:
-
-- **Accuracy Improvement**: +2-5% absolute improvement expected
-- **Challenging Species**: Better performance on difficult classes (e.g., Poecile montanus)
-- **Generalization**: Improved robustness to acoustic variations
-- **Inter-class Relationships**: Student learns which species are acoustically similar
-- **Edge Compatibility**: Student model size remains unchanged (~53k parameters)
-
-### 🔧 Configuration & Hyperparameters
-
-#### Key Distillation Parameters (`distillation_config.yaml`)
-
-```yaml
-distillation:
-  alpha: 0.3                    # Teacher influence (start with 0.3)
-  temperature: 4.0              # Probability smoothing (2.0-8.0)
-  adaptive: false               # Auto-adjust alpha based on validation
-  confidence_threshold: 0.05    # Min confidence for teacher predictions
-
-training:
-  lr: 0.0005                   # Often needs lower LR than standard training
-  epochs: 30                   # More epochs beneficial for distillation
-  batch_size: 16               # Can be larger since teacher runs offline
-```
-
-#### Hyperparameter Guidelines
-
-| Parameter | Range | Description | Tuning Tips |
-|-----------|-------|-------------|-------------|
-| `alpha` | 0.1-0.7 | Teacher influence weight | Start 0.3, increase if student struggles |
-| `temperature` | 1.0-8.0 | Softness of distributions | Higher for more teacher knowledge transfer |
-| `learning_rate` | 0.0001-0.001 | Student model learning rate | Often 2-5x lower than standard training |
-| `confidence_threshold` | 0.03-0.1 | Min teacher confidence | Lower captures more inter-class relationships |
-
-### 📈 Monitoring Training
-
-The distillation training provides detailed logging:
-
-```
-Epoch 1: Train Loss: 1.234, Train Acc: 75.2%, Val Loss: 1.156, Val Acc: 78.1%
-  Hard Loss: 1.456, Soft Loss: 0.789, Alpha: 0.300
-New best model saved! Val Acc: 78.1%
-```
-
-**Key Metrics:**
-- **Total Loss**: Combined objective being optimized
-- **Hard Loss**: Standard classification performance
-- **Soft Loss**: How well student matches teacher distributions
-- **Alpha**: Current hard/soft balance (adaptive distillation)
-
-### 🚀 Quick Start Example
-
+### 1. Build the Docker Image
 ```bash
-# 1. Extract soft labels (run once per dataset)
-python extract_soft_labels.py --confidence_threshold 0.05
-
-# 2. Run quick test (3 epochs, 4 species)
-python train_distillation.py --config-name=test_distillation
-
-# 3. Full training run
-python train_distillation.py \
-  distillation.alpha=0.3 \
-  training.epochs=50 \
-  training.batch_size=16
+docker build -t bird_classification_edge .
 ```
 
-### 🔬 Advanced Usage
+### 2. Run the Workflow
 
-#### Custom Soft Label Extraction
-```python
-from distillation import DistillationBirdSoundDataset
+-   **Step 1: Extract Soft Labels:**
+    ```bash
+    # Use GPU 0 for extraction
+    ./run_docker_soft_labels.sh my_extraction_gpu0 GPU_ID=0
+    
+    # Run on a Mac (CPU only)
+    ./run_docker_soft_labels.sh my_extraction_mac MAC
+    ```
+    This saves results to `soft_labels_complete/`.
 
-# Load dataset with soft labels
-dataset = DistillationBirdSoundDataset(
-    soft_labels_path="soft_labels",
-    root_dir="bird_sound_dataset", 
-    subset="training"
-)
+-   **Step 2: Run Distillation Training:**
+    ```bash
+    # Use GPU 0 for training
+    ./run_docker_distillation.sh my_training_gpu0 GPU_ID=0
 
-# Access both hard and soft labels
-audio, hard_label, soft_labels = dataset[0]
-print(f"Hard label: {hard_label}")
-print(f"Soft labels shape: {soft_labels.shape}")  # [num_classes]
-```
-
-#### Custom Distillation Training Loop
-```python
-from distillation import DistillationLoss
-
-# Create distillation loss
-criterion = DistillationLoss(alpha=0.3, temperature=4.0)
-
-# Training step
-student_logits = model(audio)
-total_loss, hard_loss, soft_loss = criterion(
-    student_logits, hard_labels, teacher_soft_labels
-)
-
-# Monitor individual loss components
-print(f"Total: {total_loss:.3f}, Hard: {hard_loss:.3f}, Soft: {soft_loss:.3f}")
-```
-
-### 📋 Troubleshooting
-
-**Common Issues:**
-
-1. **"No soft labels found" warnings**: 
-   - Check that `extract_soft_labels.py` completed successfully
-   - Verify `soft_labels/` directory exists with `.json` files
-
-2. **High soft loss, low accuracy**:
-   - Try lower `alpha` (0.1-0.2) for more ground truth supervision
-   - Reduce `temperature` (2.0-3.0) for sharper teacher distributions
-
-3. **Training instability**:
-   - Lower learning rate (0.0001-0.0005)
-   - Enable adaptive distillation (`distillation.adaptive: true`)
-
-4. **Out of memory errors**:
-   - Reduce `batch_size` in distillation config
-   - Soft labels add minimal memory overhead
-
-For detailed documentation on distillation components, see [`distillation/README.md`](distillation/README.md).
+    # Override parameters
+    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50
+    ```
+For more details on server usage, GPU management, and troubleshooting, see the comments within the `run_docker_*.sh` scripts.
 
 ## Data Augmentation and "No Birds" Class Workflow
 
@@ -371,261 +297,36 @@ dataset:
 | `--output_dir` | augmented_dataset | Directory to save generated samples |
 | `--num_samples` | 100 | Number of "no birds" samples to generate |
 | `--esc50_ratio` | 0.5 | Proportion of samples from ESC-50 vs. empty segments |
-| `--files_per_class` | None | Maximum files to scan per bird class |
-| `--energy_threshold` | 1.5 | Threshold factor for detecting silence (higher = more segments) |
+| `--files_per_class` | None | Maximum files to scan per bird class (for testing) |
+| `--energy_threshold`| 1.5 | Energy threshold factor for detecting silence (higher = more segments) |
 
-## Important Parameters
+## Docker Execution
 
-- **energy_threshold_factor**: Controls how "silent" segments must be to be included
-  - **0.5**: Very strict (original setting) - few segments found
-  - **1.5-3.0**: More lenient - finds more segments
-  - Values above 3.0 may include segments with actual bird calls
+The knowledge distillation pipeline is fully runnable in Docker, ideal for server deployment.
 
-- **SNR (Signal-to-Noise Ratio)** for background mixing: 
-  - **5-15 dB**: Default range
-  - Lower values = background sounds more prominent
-
-## Installation and Setup
-
-1. Clone this repository:
-   ```bash
-   git clone <repository_url>
-   cd bird_classification_edge
-   ```
-
-2. Create and Activate a Virtual Environment (Recommended):
-   It is highly recommended to use a virtual environment to manage project dependencies and avoid conflicts with other Python projects or your system's Python installation.
-
-   *   **Create the virtual environment (e.g., named `venv`):
-       ```bash
-       python3 -m venv venv
-       ```
-
-   *   **Activate the virtual environment:**
-       *   On macOS/Linux (bash/zsh):
-           ```bash
-           source venv/bin/activate
-           ```
-       *   On Windows (Command Prompt):
-           ```bash
-           venv\Scripts\activate.bat
-           ```
-       *   On Windows (PowerShell):
-           ```bash
-           venv\Scripts\Activate.ps1
-           ```
-       (Your terminal prompt should change to indicate the active environment, e.g., `(venv)`).
-
-3. Install dependencies:
-   Once the virtual environment is activated, install the required packages using the `requirements.txt` file (if available and up-to-date) or install them manually.
-   ```bash
-   pip install -r requirements.txt
-   ```
-   If `requirements.txt` is missing or outdated, you can install common packages like:
-   ```bash
-   pip install torch torchaudio torchvision numpy pandas matplotlib seaborn scikit-learn hydra-core omegaconf tqdm
-   ```
-
-4. Download bird recordings or use your own dataset. Ensure your bird sounds are organized into subdirectories by species within a main data directory (e.g., `bird_sound_dataset/species_A/sound1.wav`).
-
-5. **Decide on "No Birds" Sample Strategy:**
-    a. **Offline Mode (Recommended Start):** Run `generate_no_birds_samples.py` to create them (e.g., into `augmented_dataset/no_birds/`). Then, ensure `load_pregenerated_no_birds: true` and `pregenerated_no_birds_dir` is correctly set in your `config/bird_classification.yaml`.
-    b. **On-the-Fly Mode:** Ensure `load_pregenerated_no_birds: false` in your config. The script will generate them during setup using ESC-50 and silent segments from your bird data.
-
-6. Configure training parameters in `config/bird_classification.yaml` (especially the `dataset` section reflecting your choice above, and paths like `bird_data_dir`, `esc50_dir`).
-
-7. Run training:
-   ```bash
-   python train.py # Add any Hydra command-line overrides if needed
-   ```
-
-## Docker Deployment for Knowledge Distillation
-
-The knowledge distillation pipeline can be run entirely in Docker containers, making it ideal for server deployment with GPU support.
-
-### Prerequisites
-
-- Docker installed with GPU support (nvidia-docker2 for Linux servers)
-- Required datasets mounted in the project directory:
-  - `bird_sound_dataset/` - Bird audio files  
-  - `augmented_dataset/no_birds/` - Non-bird samples
-  - `esc-50/ESC-50-master/` - ESC-50 environmental sounds
-
-### Build Docker Image
-
+### 1. Build the Docker Image
 ```bash
-# Build the Docker image with all dependencies
 docker build -t bird_classification_edge .
 ```
 
-### Knowledge Distillation Workflow
+### 2. Run the Workflow
 
-#### Step 1: Extract Soft Labels from BirdNET Teacher
+-   **Step 1: Extract Soft Labels:**
+    ```bash
+    # Use GPU 0 for extraction
+    ./run_docker_soft_labels.sh my_extraction_gpu0 GPU_ID=0
+    
+    # Run on a Mac (CPU only)
+    ./run_docker_soft_labels.sh my_extraction_mac MAC
+    ```
+    This saves results to `soft_labels_complete/`.
 
-```bash
-# Basic usage - extract soft labels for all files
-./run_docker_soft_labels.sh leonardo_soft_labels_gpu0 GPU_ID=0
+-   **Step 2: Run Distillation Training:**
+    ```bash
+    # Use GPU 0 for training
+    ./run_docker_distillation.sh my_training_gpu0 GPU_ID=0
 
-# With custom parameters
-./run_docker_soft_labels.sh leonardo_extraction GPU_ID=1 --confidence_threshold 0.03 --max_files_per_class 500
-
-# For macOS (CPU only)
-./run_docker_soft_labels.sh leonardo_test_mac MAC
-```
-
-**What this does:**
-- Runs BirdNET teacher model on all audio files (~5000 files)
-- Generates probability distributions for each file
-- Saves to `soft_labels_complete/` directory
-- Expected runtime: 2-3 hours on GPU server
-
-#### Step 2: Train Student with Knowledge Distillation
-
-```bash
-# Basic distillation training
-./run_docker_distillation.sh leonardo_distillation_gpu0 GPU_ID=0
-
-# Full training with custom hyperparameters
-./run_docker_distillation.sh leonardo_kd_training GPU_ID=1 \
-  distillation.alpha=0.3 \
-  distillation.temperature=4.0 \
-  training.epochs=50 \
-  training.batch_size=16
-
-# Quick test run
-./run_docker_distillation.sh leonardo_test GPU_ID=0 \
-  --config-name=test_distillation \
-  training.epochs=3
-```
-
-**What this does:**
-- Trains student model using both hard labels and BirdNET soft labels
-- Uses 5-class classification (4 birds + non-bird)
-- Automatically uses complete soft labels from Step 1
-- Expected runtime: 2-4 hours depending on epochs
-
-### GPU Management on Server
-
-```bash
-# Check GPU usage
-watch nvidia-smi
-
-# Use specific GPU (recommended on shared servers)
-./run_docker_soft_labels.sh your_unique_name GPU_ID=1
-./run_docker_distillation.sh your_unique_name GPU_ID=1
-
-# Check running containers
-docker ps
-```
-
-### Container Naming Convention
-
-Use descriptive, unique container names on shared servers:
-- `leonardo_extraction_gpu0` - Soft label extraction
-- `leonardo_distillation_gpu1` - Distillation training  
-- `teamname_purpose_gpu#` - General pattern
-
-### Directory Structure (Server)
-
-```
-/path/to/project/
-├── bird_sound_dataset/          # ~4240 bird audio files
-├── augmented_dataset/no_birds/  # ~836 non-bird samples  
-├── esc-50/ESC-50-master/       # ESC-50 environmental sounds
-├── soft_labels_complete/        # Generated by extraction (Step 1)
-│   ├── soft_labels.json         # Probability distributions
-│   └── soft_labels_metadata.json # Teacher model info
-├── logs/                        # Training logs and models
-└── [scripts and configs]
-```
-
-### Monitoring and Troubleshooting
-
-#### Check Extraction Progress
-```bash
-# Monitor soft labels extraction
-docker logs leonardo_extraction_gpu0
-
-# Check number of files processed
-ls soft_labels_complete/ && wc -l soft_labels_complete/soft_labels.json
-```
-
-#### Check Training Progress  
-```bash
-# Monitor training logs
-docker logs leonardo_distillation_gpu0
-
-# Check latest model checkpoint
-ls -la logs/bird_classification_distillation/
-```
-
-#### Common Issues
-
-1. **"Directory not found" errors:**
-   ```bash
-   # Verify all required directories exist
-   ls -la bird_sound_dataset/ augmented_dataset/no_birds/ esc-50/ESC-50-master/
-   ```
-
-2. **"Soft labels file not found":**
-   - Run Step 1 (extraction) first before Step 2 (training)
-   - Check that `soft_labels_complete/soft_labels.json` exists
-
-3. **GPU out of memory:**
-   ```bash
-   # Reduce batch size for distillation
-   ./run_docker_distillation.sh name GPU_ID=0 training.batch_size=8
-   ```
-
-4. **Container name conflicts:**
-   ```bash
-   # Use unique names or remove existing container
-   docker rm old_container_name
-   ```
-
-### Expected Results
-
-After successful knowledge distillation:
-- **Accuracy improvement**: +2-5% over baseline student model
-- **Model size**: Still ~53k parameters (edge-compatible)
-- **Better generalization**: Especially for challenging species
-- **Robustness**: Improved performance on acoustic variations
-
-### Advanced Docker Usage
-
-#### Custom Soft Label Extraction
-```bash
-# Extract subset for testing
-./run_docker_soft_labels.sh test_extraction GPU_ID=0 \
-  --max_files_per_class 10 \
-  --confidence_threshold 0.1
-
-# Extract with different output directory  
-./run_docker_soft_labels.sh custom_extraction GPU_ID=0 \
-  --output_path custom_soft_labels
-```
-
-#### Custom Distillation Configuration
-```bash
-# Use custom config file
-./run_docker_distillation.sh custom_training GPU_ID=0 \
-  --config-name=custom_distillation_config \
-  soft_labels_path=custom_soft_labels
-
-# Adaptive distillation with different alpha schedule
-./run_docker_distillation.sh adaptive_training GPU_ID=0 \
-  distillation.adaptive=true \
-  distillation.adaptation_rate=0.05 \
-  distillation.alpha_schedule=cosine
-```
-
-#### Background Execution
-```bash
-# Run extraction in background (for long jobs)
-nohup ./run_docker_soft_labels.sh bg_extraction GPU_ID=0 > extraction.log 2>&1 &
-
-# Monitor background job
-tail -f extraction.log
-```
-
-## Running with Docker
+    # Override parameters
+    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50
+    ```
+For more details on server usage, GPU management, and troubleshooting, see the comments within the `run_docker_*.sh` scripts. 

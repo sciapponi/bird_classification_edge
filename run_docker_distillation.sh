@@ -14,7 +14,7 @@ HOST_PROJECT_DIR="$PWD"
 HOST_BIRD_SOUND_DATASET_DIR="$PWD/bird_sound_dataset"
 HOST_AUGMENTED_DATASET_DIR="$PWD/augmented_dataset"
 HOST_ESC50_DIR="$PWD/esc-50"
-HOST_SOFT_LABELS_DIR="$PWD/soft_labels_complete"
+HOST_SOFT_LABELS_DIR="$PWD/test_soft_labels"
 HOST_LOGS_DIR="$PWD/logs"
 
 # Container paths
@@ -22,7 +22,7 @@ CONTAINER_PROJECT_DIR="/app"
 CONTAINER_BIRD_SOUND_DATASET_DIR="/app/bird_sound_dataset"
 CONTAINER_AUGMENTED_DATASET_DIR="/app/augmented_dataset"
 CONTAINER_ESC50_DIR="/app/esc-50"
-CONTAINER_SOFT_LABELS_DIR="/app/soft_labels_complete"
+CONTAINER_SOFT_LABELS_DIR="/app/test_soft_labels"
 CONTAINER_LOGS_DIR="/app/logs"
 
 # Parse arguments
@@ -127,9 +127,10 @@ DOCKER_CMD="$DOCKER_CMD -v $HOST_LOGS_DIR:$CONTAINER_LOGS_DIR"
 # Image and command
 DOCKER_CMD="$DOCKER_CMD $DOCKER_IMAGE_NAME"
 
-# Default distillation training command
+# Default distillation command
 DISTILLATION_CMD="python train_distillation.py"
-DISTILLATION_CMD="$DISTILLATION_CMD soft_labels_path=soft_labels_complete"
+# The path inside the container must match the mounted volume
+DISTILLATION_CMD="$DISTILLATION_CMD soft_labels_path=test_soft_labels"
 
 # Add any Hydra overrides
 if [[ ${#HYDRA_OVERRIDES[@]} -gt 0 ]]; then

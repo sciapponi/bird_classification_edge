@@ -63,7 +63,16 @@ scheduler:
 # Dataset parameters
 dataset:
   main_data_dir: "bird_sound_dataset"
-  allowed_bird_classes: null    # Use all available classes
+  # Explicitly define the classes to match the teacher model's output
+  allowed_bird_classes: 
+    - "Poecile montanus"
+    - "Certhia familiaris"
+    - "Apus apus"
+    - "Bubo bubo"
+    - "Periparus ater"
+    - "Emberiza cia"
+    - "Lophophanes cristatus"
+    - "Certhia brachydactyla"
   
   # Include non-bird samples for 5-class classification
   load_pregenerated_no_birds: true
