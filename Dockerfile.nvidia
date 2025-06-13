@@ -1,8 +1,12 @@
-# Use an official Python runtime with build tools
-FROM python:3.9
+# Use NVIDIA CUDA base image
+FROM nvidia/cuda:11.8-devel-ubuntu20.04
 
-# Install required system dependencies for audio processing, compilation, and BirdNET
+# Install Python and system dependencies
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
+    python3.9 \
+    python3.9-dev \
+    python3-pip \
     libgomp1 \
     build-essential \
     ffmpeg \
@@ -11,16 +15,21 @@ RUN apt-get update && apt-get install -y \
     portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Set python3.9 as default python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+
 # Set the working directory in the container
 WORKDIR /app
 
-# Install PyTorch with CUDA support first
+# Install PyTorch with CUDA support
 RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 # Copy the requirements file and install other packages
 COPY requirements.txt .
-# Remove only exact torch package lines from requirements to avoid conflicts
-RUN sed -i '/^torch$/d; /^torchaudio$/d; /^torchvision$/d' requirements.txt
+# Remove torch packages from requirements to avoid conflicts
+RUN sed -i '/^torch/d' requirements.txt
+RUN sed -i '/^# torch/d' requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
@@ -30,13 +39,9 @@ COPY . .
 RUN mkdir -p /app/logs && chmod -R 777 /app/logs
 RUN mkdir -p /app/benchmark/benchmark_results && chmod -R 777 /app/benchmark/benchmark_results
 
-# Set environment variables for audio processing
+# Set environment variables
 ENV PYTHONPATH="/app:$PYTHONPATH"
 ENV MATPLOTLIB_BACKEND="Agg"
 
-# Non è più necessario creare utenti/gruppi o cambiare USER
-# I comandi verranno eseguiti come root (o l'utente predefinito dell'immagine base)
-
-# Set the default command to run when the container starts
-# Default to training, but can be overridden for benchmarking
+# Set the default command
 CMD ["python", "train.py"] 

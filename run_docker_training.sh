@@ -47,24 +47,29 @@ fi
 
 echo "--- Avvio container Docker ---"
 echo "Nome Container: $CONTAINER_NAME"
+
+# Rinomino RUN_ON_MAC in USE_GPU per coerenza
+USE_GPU=true
 if [ "$RUN_ON_MAC" = true ]; then
-    echo "GPU ID: N/A (Esecuzione su Mac, CPU forzata)"
-else
-    echo "GPU ID: ${GPU_ID:-all (default)}"
+    USE_GPU=false
 fi
+
+# GPU configuration
+if [[ $USE_GPU == true ]]; then
+    if [[ -n $GPU_ID ]]; then
+        echo "GPU ID: $GPU_ID"
+        GPU_FLAG_OPTS="--gpus device=$GPU_ID"
+    else
+        echo "GPU ID: all (default)"
+        GPU_FLAG_OPTS="--gpus all"
+    fi
+else
+    echo "GPU ID: N/A (Esecuzione su Mac, CPU forzata)"
+    GPU_FLAG_OPTS=""
+fi
+
 echo "Parametri Hydra aggiuntivi: ${EXTRA_HYDRA_PARAMS:-Nessuno}"
 echo "-----------------------------"
-
-# Impostazione CUDA_VISIBLE_DEVICES
-CUDA_DEVICE_OPTS=""
-GPU_FLAG_OPTS="--gpus all" # Default per Linux server
-
-if [ "$RUN_ON_MAC" = true ]; then
-    GPU_FLAG_OPTS="" # Rimuove --gpus all per Mac
-    echo "Informazione: L'opzione --gpus all è stata rimossa per l'esecuzione su Mac."
-elif [ -n "$GPU_ID" ]; then
-    CUDA_DEVICE_OPTS="--env CUDA_VISIBLE_DEVICES=$GPU_ID"
-fi
 
 # Costruzione dei mount per i volumi
 VOLUME_MOUNTS=""
@@ -105,7 +110,7 @@ VOLUME_MOUNTS="$VOLUME_MOUNTS -v $HOST_LOGS_DIR:$CONTAINER_LOGS_DIR"
 
 # Comando Docker run
 # shellcheck disable=SC2086
-docker run $GPU_FLAG_OPTS $CUDA_DEVICE_OPTS --name "$CONTAINER_NAME" --rm -it --shm-size=16gb \
+docker run $GPU_FLAG_OPTS --name "$CONTAINER_NAME" --rm -it --shm-size=16gb \
     $VOLUME_MOUNTS \
     "$IMAGE_NAME" \
     python train.py $EXTRA_HYDRA_PARAMS

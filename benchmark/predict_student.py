@@ -53,6 +53,16 @@ class StudentModelPredictor:
         
         # Setup device
         if device == "auto":
+            # Debug environment variables
+            cuda_devices = os.environ.get('CUDA_VISIBLE_DEVICES', '')
+            logger.info(f"Environment CUDA_VISIBLE_DEVICES: '{cuda_devices}'")
+            logger.info(f"PyTorch CUDA available: {torch.cuda.is_available()}")
+            if torch.cuda.is_available():
+                logger.info(f"PyTorch CUDA device count: {torch.cuda.device_count()}")
+                for i in range(torch.cuda.device_count()):
+                    logger.info(f"CUDA device {i}: {torch.cuda.get_device_name(i)}")
+            
+            # Use GPU if available (like the distillation script does)
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
@@ -105,8 +115,8 @@ class StudentModelPredictor:
                 transition_width=model_config.matchbox.transition_width
             )
             
-            # Load state dict
-            checkpoint = torch.load(self.model_path, map_location=self.device)
+            # Load state dict - ALWAYS load on CPU first to avoid CUDA device mismatch
+            checkpoint = torch.load(self.model_path, map_location='cpu')
             
             # Extract model state dict from checkpoint
             if 'model_state_dict' in checkpoint:

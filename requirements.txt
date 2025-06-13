@@ -1,6 +1,7 @@
-torch
-torchaudio
-torchvision
+# torch packages installed separately with CUDA support in Dockerfile
+# torch
+# torchaudio
+# torchvision
 numpy<2.0.0
 pandas
 resampy

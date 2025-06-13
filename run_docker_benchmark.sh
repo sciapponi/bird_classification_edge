@@ -24,7 +24,7 @@ CONTAINER_LOGS_DIR="$CONTAINER_APP_DIR/logs"
 CONTAINER_NAME="$CONTAINER_NAME_DEFAULT"
 GPU_ID=""
 EXTRA_HYDRA_PARAMS=""
-RUN_ON_MAC=false # Flag for Mac execution
+USE_GPU=true # Changed from RUN_ON_MAC to USE_GPU for consistency
 BENCHMARK_CONFIG="quick_start" # Default benchmark config
 
 # Argument parsing for container name, GPU, and Hydra parameters
@@ -40,7 +40,7 @@ if [ "$#" -ge 1 ]; then
         elif [[ "$1" == "CONFIG="* ]]; then
             BENCHMARK_CONFIG="${1#CONFIG=}"
         elif [[ "$1" == "MAC" ]]; then
-            RUN_ON_MAC=true
+            USE_GPU=false
         else
             EXTRA_HYDRA_PARAMS="$EXTRA_HYDRA_PARAMS $1"
         fi
@@ -51,24 +51,23 @@ fi
 echo "--- Starting Docker Benchmark Container ---"
 echo "Container Name: $CONTAINER_NAME"
 echo "Benchmark Config: $BENCHMARK_CONFIG"
-if [ "$RUN_ON_MAC" = true ]; then
-    echo "GPU ID: N/A (Mac execution, CPU forced)"
+
+# GPU configuration (copying working distillation script pattern exactly)
+if [[ $USE_GPU == true ]]; then
+    if [[ -n $GPU_ID ]]; then
+        echo "GPU: $GPU_ID"
+        GPU_FLAGS="--gpus device=$GPU_ID"
+    else
+        echo "GPU: all available"
+        GPU_FLAGS="--gpus all"
+    fi
 else
-    echo "GPU ID: ${GPU_ID:-all (default)}"
+    echo "GPU: disabled (Mac mode)"
+    GPU_FLAGS=""
 fi
+
 echo "Additional Hydra Parameters: ${EXTRA_HYDRA_PARAMS:-None}"
 echo "----------------------------------------"
-
-# CUDA_VISIBLE_DEVICES setup
-CUDA_DEVICE_OPTS=""
-GPU_FLAG_OPTS="--gpus all" # Default for Linux server
-
-if [ "$RUN_ON_MAC" = true ]; then
-    GPU_FLAG_OPTS="" # Remove --gpus all for Mac
-    echo "Info: --gpus all option removed for Mac execution."
-elif [ -n "$GPU_ID" ]; then
-    CUDA_DEVICE_OPTS="--env CUDA_VISIBLE_DEVICES=$GPU_ID"
-fi
 
 # Build volume mounts
 VOLUME_MOUNTS=""
@@ -115,10 +114,10 @@ echo "----------------------------------------"
 
 # Docker run command
 echo "Starting benchmark with config: $BENCHMARK_CONFIG"
-echo "Full command: docker run $GPU_FLAG_OPTS $CUDA_DEVICE_OPTS --name $CONTAINER_NAME --rm -it --shm-size=16gb $VOLUME_MOUNTS $IMAGE_NAME python benchmark/run_benchmark.py --config-name=$BENCHMARK_CONFIG $EXTRA_HYDRA_PARAMS"
+echo "Full command: docker run $GPU_FLAGS --name $CONTAINER_NAME --rm -it --shm-size=16gb $VOLUME_MOUNTS $IMAGE_NAME python benchmark/run_benchmark.py --config-name=$BENCHMARK_CONFIG $EXTRA_HYDRA_PARAMS"
 
 # shellcheck disable=SC2086
-docker run $GPU_FLAG_OPTS $CUDA_DEVICE_OPTS --name "$CONTAINER_NAME" --rm -it --shm-size=16gb \
+docker run $GPU_FLAGS --name "$CONTAINER_NAME" --rm -it --shm-size=16gb \
     $VOLUME_MOUNTS \
     "$IMAGE_NAME" \
     python benchmark/run_benchmark.py --config-name="$BENCHMARK_CONFIG" $EXTRA_HYDRA_PARAMS

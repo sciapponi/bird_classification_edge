@@ -1,3 +1,4 @@
+import torch
 #!/usr/bin/env python3
 """
 Bird Classification Benchmark Runner
@@ -320,83 +321,71 @@ def run_comparison(cfg: DictConfig, student_df: pd.DataFrame, birdnet_df: pd.Dat
 def main(cfg: DictConfig) -> None:
     """Main benchmark function."""
     
-    # Get original working directory (before Hydra changes it)
-    from hydra.core.hydra_config import HydraConfig
-    hydra_cwd = HydraConfig.get().runtime.cwd
+    # Get original working directory
+    original_cwd = hydra.utils.get_original_cwd()
     
-    # The original_cwd will be the benchmark directory, but we need the project root
-    # Go up one level to get to the project root
-    if hydra_cwd.endswith('/benchmark'):
-        original_cwd = os.path.dirname(hydra_cwd)
-    else:
-        original_cwd = hydra_cwd
+    # Create output directories
+    benchmark_dir = os.path.join(original_cwd, "benchmark")
+    predictions_dir = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir)
+    os.makedirs(predictions_dir, exist_ok=True)
     
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("🐦 BIRD CLASSIFICATION BENCHMARK")
-    logger.info("="*60)
-    logger.info(f"Working directory: {original_cwd}")
+    logger.info("=" * 60)
+    logger.info(f"Working directory: {os.getcwd()}")
     logger.info(f"Hydra output directory: {os.getcwd()}")
     
-    try:
-        # Step 1: Discover audio files and create ground truth
-        logger.info("\n" + "="*40)
-        logger.info("📁 STEP 1: Audio Discovery")
-        logger.info("="*40)
-        
-        file_info, ground_truth_df = discover_audio_files(cfg, original_cwd)
-        
-        if len(ground_truth_df) == 0:
-            logger.error("No audio files found. Exiting.")
-            return
-        
-        # Save ground truth
-        benchmark_dir = os.path.join(original_cwd, "benchmark")
-        ground_truth_path = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir, "ground_truth.csv")
-        os.makedirs(os.path.dirname(ground_truth_path), exist_ok=True)
-        ground_truth_df.to_csv(ground_truth_path, index=False)
-        logger.info(f"✅ Ground truth saved to: {ground_truth_path}")
-        
-        # Step 2: Student model predictions
-        logger.info("\n" + "="*40)
-        logger.info("🤖 STEP 2: Student Model Predictions")
-        logger.info("="*40)
-        
-        student_predictions = run_student_predictions(cfg, ground_truth_df, original_cwd)
-        
-        # Step 3: BirdNET predictions
-        logger.info("\n" + "="*40)
-        logger.info("🦅 STEP 3: BirdNET Predictions")
-        logger.info("="*40)
-        
-        birdnet_predictions = run_birdnet_predictions(cfg, ground_truth_df, original_cwd)
-        
-        # Step 4: Model comparison
-        logger.info("\n" + "="*40)
-        logger.info("📊 STEP 4: Model Comparison")
-        logger.info("="*40)
-        
-        comparison_results = run_comparison(cfg, student_predictions, birdnet_predictions, original_cwd)
-        
-        # Final summary
-        logger.info("\n" + "="*60)
-        logger.info("🎉 BENCHMARK COMPLETED SUCCESSFULLY")
-        logger.info("="*60)
-        logger.info(f"Total files processed: {len(ground_truth_df)}")
-        logger.info(f"Results saved in: {os.path.join(original_cwd, 'benchmark', cfg.benchmark.paths.output_dir)}")
-        
-        if comparison_results:
-            metrics = comparison_results.get('metrics', {})
-            if 'accuracy' in metrics:
-                logger.info(f"🤖 Student accuracy: {metrics['student_accuracy']:.3f}")
-                logger.info(f"🦅 BirdNET accuracy: {metrics['birdnet_accuracy']:.3f}")
-        
-        logger.info("="*60)
-        
-    except Exception as e:
-        logger.error(f"Benchmark failed: {e}")
-        import traceback
-        logger.error(traceback.format_exc())
-        raise
+    # ========================================
+    # STEP 1: Audio Discovery
+    # ========================================
+    logger.info("\n" + "=" * 40)
+    logger.info("📁 STEP 1: Audio Discovery")
+    logger.info("=" * 40)
+    
+    _, ground_truth_df = discover_audio_files(cfg, original_cwd)
+    
+    # Save ground truth for reference
+    gt_path = os.path.join(predictions_dir, "ground_truth.csv")
+    ground_truth_df.to_csv(gt_path, index=False)
+    logger.info(f"✅ Ground truth saved to: {gt_path}")
+
+    # ========================================
+    # STEP 2: Student Model Predictions
+    # ========================================
+    logger.info("\n" + "=" * 40)
+    logger.info("🤖 STEP 2: Student Model Predictions")
+    logger.info("=" * 40)
+    
+    student_predictions_df = run_student_predictions(cfg, ground_truth_df, original_cwd)
+
+    # ========================================
+    # STEP 3: BirdNET Predictions
+    # ========================================
+    logger.info("\n" + "=" * 40)
+    logger.info("🦉 STEP 3: BirdNET Predictions")
+    logger.info("=" * 40)
+    
+    birdnet_predictions_df = run_birdnet_predictions(cfg, ground_truth_df, original_cwd)
+
+    # ========================================
+    # STEP 4: Metrics and Comparison
+    # ========================================
+    logger.info("\n" + "=" * 40)
+    logger.info("📊 STEP 4: Metrics and Comparison")
+    logger.info("=" * 40)
+
+    # Merge predictions
+    student_preds = student_predictions_df[['audio_path', 'student_prediction', 'student_confidence']]
+    birdnet_preds = birdnet_predictions_df[['audio_path', 'birdnet_prediction', 'birdnet_confidence']]
+    combined_df = pd.merge(ground_truth_df, student_preds, on='audio_path')
+    combined_df = pd.merge(combined_df, birdnet_preds, on='audio_path')
+
+    # Run comparison
+    run_comparison(cfg, combined_df, original_cwd)
+    
+    logger.info("\n" + "=" * 60)
+    logger.info("🎉 BENCHMARK COMPLETED SUCCESSFULLY!")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":
