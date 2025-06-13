@@ -1,0 +1,403 @@
+{
+  "metrics": {
+    "student_accuracy": 0.7777777777777778,
+    "student_precision": 0.6785714285714286,
+    "student_recall": 0.5785714285714285,
+    "student_f1": 0.5922902494331065,
+    "birdnet_accuracy": 0.9444444444444444,
+    "birdnet_precision": 0.95,
+    "birdnet_recall": 0.95,
+    "birdnet_f1": 0.9428571428571428
+  },
+  "detailed_metrics": {
+    "student": {
+      "accuracy": 0.7777777777777778,
+      "precision_micro": 0.7777777777777778,
+      "precision_macro": 0.6785714285714286,
+      "precision_weighted": 0.9583333333333334,
+      "recall_micro": 0.7777777777777778,
+      "recall_macro": 0.5785714285714285,
+      "recall_weighted": 0.7777777777777778,
+      "f1_micro": 0.7777777777777778,
+      "f1_macro": 0.5922902494331065,
+      "f1_weighted": 0.8119929453262786,
+      "per_class": {
+        "Apus_apus": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 3.0
+        },
+        "Bubo_bubo": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1-score": 0.8571428571428571,
+          "support": 3.0
+        },
+        "Certhia_familiaris": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1-score": 0.8888888888888888,
+          "support": 5.0
+        },
+        "Lophophanes_cristatus": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "Periparus_ater": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "Poecile_montanus": {
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1-score": 0.4,
+          "support": 4.0
+        },
+        "no_birds": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 3.0
+        },
+        "accuracy": 0.7777777777777778,
+        "macro avg": {
+          "precision": 0.6785714285714286,
+          "recall": 0.5785714285714285,
+          "f1-score": 0.5922902494331065,
+          "support": 18.0
+        },
+        "weighted avg": {
+          "precision": 0.9583333333333334,
+          "recall": 0.7777777777777778,
+          "f1-score": 0.8119929453262786,
+          "support": 18.0
+        }
+      }
+    },
+    "birdnet": {
+      "accuracy": 0.9444444444444444,
+      "precision_micro": 0.9444444444444444,
+      "precision_macro": 0.95,
+      "precision_weighted": 0.9583333333333334,
+      "recall_micro": 0.9444444444444444,
+      "recall_macro": 0.95,
+      "recall_weighted": 0.9444444444444444,
+      "f1_micro": 0.9444444444444444,
+      "f1_macro": 0.9428571428571428,
+      "f1_weighted": 0.9444444444444444,
+      "per_class": {
+        "Apus_apus": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 3.0
+        },
+        "Bubo_bubo": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 3.0
+        },
+        "Certhia_familiaris": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 5.0
+        },
+        "Lophophanes_cristatus": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "Periparus_ater": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "Poecile_montanus": {
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1-score": 0.8571428571428571,
+          "support": 4.0
+        },
+        "no_birds": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1-score": 0.8571428571428571,
+          "support": 3.0
+        },
+        "accuracy": 0.9444444444444444,
+        "macro avg": {
+          "precision": 0.6785714285714286,
+          "recall": 0.6785714285714286,
+          "f1-score": 0.673469387755102,
+          "support": 18.0
+        },
+        "weighted avg": {
+          "precision": 0.9583333333333334,
+          "recall": 0.9444444444444444,
+          "f1-score": 0.9444444444444444,
+          "support": 18.0
+        }
+      }
+    }
+  },
+  "agreement_analysis": {
+    "counts": {
+      "both_correct": 14,
+      "student_only_correct": 0,
+      "birdnet_only_correct": 3,
+      "both_incorrect": 1
+    },
+    "percentages": {
+      "both_correct": 77.77777777777779,
+      "student_only_correct": 0.0,
+      "birdnet_only_correct": 16.666666666666664,
+      "both_incorrect": 5.555555555555555
+    },
+    "detailed_cases": [
+      {
+        "audio_path": "bird_sound_dataset/Certhia_familiaris/XC778215-TREE-CREEPER-calls1-Northaw-Herts-8.25am-04072013-(2).mp3",
+        "true_label": "Certhia_familiaris",
+        "student_prediction": "Lophophanes_cristatus",
+        "student_confidence": 0.32546061277389526,
+        "birdnet_prediction": "Certhia_familiaris",
+        "birdnet_confidence": 0.4028613567352295,
+        "student_correct": false,
+        "birdnet_correct": true,
+        "category": "birdnet_only_correct"
+      },
+      {
+        "audio_path": "bird_sound_dataset/Poecile_montanus/XC422538-Mesange boreale tsui tsui tsui tsui et cri 3.mp3",
+        "true_label": "Poecile_montanus",
+        "student_prediction": "Periparus_ater",
+        "student_confidence": 0.7329362034797668,
+        "birdnet_prediction": "Poecile_montanus",
+        "birdnet_confidence": 0.9992102384567261,
+        "student_correct": false,
+        "birdnet_correct": true,
+        "category": "birdnet_only_correct"
+      },
+      {
+        "audio_path": "bird_sound_dataset/Poecile_montanus/XC653190-Mesange boreale chant etire.mp3",
+        "true_label": "Poecile_montanus",
+        "student_prediction": "Periparus_ater",
+        "student_confidence": 0.28826671838760376,
+        "birdnet_prediction": "Poecile_montanus",
+        "birdnet_confidence": 0.49718430638313293,
+        "student_correct": false,
+        "birdnet_correct": true,
+        "category": "birdnet_only_correct"
+      },
+      {
+        "audio_path": "bird_sound_dataset/Poecile_montanus/XC777592-PN_potoczek_220419_01.mp3",
+        "true_label": "Poecile_montanus",
+        "student_prediction": "Bubo_bubo",
+        "student_confidence": 0.27257829904556274,
+        "birdnet_prediction": "no_birds",
+        "birdnet_confidence": 0.0,
+        "student_correct": false,
+        "birdnet_correct": false,
+        "category": "both_incorrect"
+      }
+    ]
+  },
+  "per_class_analysis": {
+    "Apus_apus": {
+      "support": 3,
+      "student_accuracy": 1.0,
+      "birdnet_accuracy": 1.0,
+      "student_predictions": 3,
+      "birdnet_predictions": 3
+    },
+    "Bubo_bubo": {
+      "support": 3,
+      "student_accuracy": 1.0,
+      "birdnet_accuracy": 1.0,
+      "student_predictions": 4,
+      "birdnet_predictions": 3
+    },
+    "Certhia_familiaris": {
+      "support": 5,
+      "student_accuracy": 0.8,
+      "birdnet_accuracy": 1.0,
+      "student_predictions": 4,
+      "birdnet_predictions": 5
+    },
+    "Poecile_montanus": {
+      "support": 4,
+      "student_accuracy": 0.25,
+      "birdnet_accuracy": 0.75,
+      "student_predictions": 1,
+      "birdnet_predictions": 3
+    },
+    "no_birds": {
+      "support": 3,
+      "student_accuracy": 1.0,
+      "birdnet_accuracy": 1.0,
+      "student_predictions": 3,
+      "birdnet_predictions": 4
+    }
+  },
+  "confusion_matrices": {
+    "student": [
+      [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        4,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        2,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3
+      ]
+    ],
+    "birdnet": [
+      [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3
+      ]
+    ],
+    "labels": [
+      "Apus_apus",
+      "Bubo_bubo",
+      "Certhia_familiaris",
+      "Lophophanes_cristatus",
+      "Periparus_ater",
+      "Poecile_montanus",
+      "no_birds"
+    ]
+  },
+  "summary": {
+    "total_samples": 18,
+    "num_classes": 7,
+    "classes": [
+      "Apus_apus",
+      "Bubo_bubo",
+      "Certhia_familiaris",
+      "Lophophanes_cristatus",
+      "Periparus_ater",
+      "Poecile_montanus",
+      "no_birds"
+    ]
+  }
+}

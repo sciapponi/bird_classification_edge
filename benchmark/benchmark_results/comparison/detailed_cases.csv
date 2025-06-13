@@ -1,0 +1,5 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+bird_sound_dataset/Certhia_familiaris/XC778215-TREE-CREEPER-calls1-Northaw-Herts-8.25am-04072013-(2).mp3,Certhia_familiaris,Lophophanes_cristatus,0.32546061277389526,Certhia_familiaris,0.4028613567352295,False,True,birdnet_only_correct
+bird_sound_dataset/Poecile_montanus/XC422538-Mesange boreale tsui tsui tsui tsui et cri 3.mp3,Poecile_montanus,Periparus_ater,0.7329362034797668,Poecile_montanus,0.9992102384567261,False,True,birdnet_only_correct
+bird_sound_dataset/Poecile_montanus/XC653190-Mesange boreale chant etire.mp3,Poecile_montanus,Periparus_ater,0.28826671838760376,Poecile_montanus,0.49718430638313293,False,True,birdnet_only_correct
+bird_sound_dataset/Poecile_montanus/XC777592-PN_potoczek_220419_01.mp3,Poecile_montanus,Bubo_bubo,0.27257829904556274,no_birds,0.0,False,False,both_incorrect

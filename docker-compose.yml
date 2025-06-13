@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # Main training service
+  train:
+    build: .
+    image: bird_classification_edge
+    container_name: bird_train_container
+    volumes:
+      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./augmented_dataset:/app/augmented_dataset
+      - ./esc-50:/app/esc-50
+      - ./config:/app/config
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app:$PYTHONPATH
+      - MATPLOTLIB_BACKEND=Agg
+    command: python train.py
+    shm_size: 16gb
+    # Uncomment for GPU support on Linux
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Knowledge distillation training service
+  distillation:
+    build: .
+    image: bird_classification_edge
+    container_name: bird_distillation_container
+    volumes:
+      - .:/app
+      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./augmented_dataset:/app/augmented_dataset
+      - ./esc-50:/app/esc-50
+      - ./test_soft_labels:/app/test_soft_labels
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app:$PYTHONPATH
+      - MATPLOTLIB_BACKEND=Agg
+    working_dir: /app
+    command: python train_distillation.py dataset.soft_labels_path=test_soft_labels
+    shm_size: 8gb
+    # Uncomment for GPU support on Linux
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Soft labels extraction service
+  extract-soft-labels:
+    build: .
+    image: bird_classification_edge
+    container_name: bird_soft_labels_container
+    volumes:
+      - .:/app
+      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./augmented_dataset:/app/augmented_dataset
+      - ./esc-50:/app/esc-50
+      - ./soft_labels_complete:/app/soft_labels_complete
+      - ./test_soft_labels:/app/test_soft_labels
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app:$PYTHONPATH
+      - MATPLOTLIB_BACKEND=Agg
+    working_dir: /app
+    command: python extract_soft_labels.py
+    shm_size: 8gb
+    # Uncomment for GPU support on Linux
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Benchmark service
+  benchmark:
+    build: .
+    image: bird_classification_edge
+    container_name: bird_benchmark_container
+    volumes:
+      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./augmented_dataset:/app/augmented_dataset
+      - ./benchmark:/app/benchmark
+      - ./logs:/app/logs
+      - ./best_distillation_model.pt:/app/best_distillation_model.pt
+      - ./models.py:/app/models.py
+      - ./modules.py:/app/modules.py
+      - ./differentiable_spec_torch.py:/app/differentiable_spec_torch.py
+    environment:
+      - PYTHONPATH=/app:$PYTHONPATH
+      - MATPLOTLIB_BACKEND=Agg
+    working_dir: /app
+    command: python benchmark/run_benchmark.py --config-name=quick_start
+    shm_size: 16gb
+    # Uncomment for GPU support on Linux
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Quick benchmark service (for testing with limited files)
+  benchmark-quick:
+    build: .
+    image: bird_classification_edge
+    container_name: bird_benchmark_quick_container
+    volumes:
+      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./augmented_dataset:/app/augmented_dataset
+      - ./benchmark:/app/benchmark
+      - ./logs:/app/logs
+      - ./best_distillation_model.pt:/app/best_distillation_model.pt
+      - ./models.py:/app/models.py
+      - ./modules.py:/app/modules.py
+      - ./differentiable_spec_torch.py:/app/differentiable_spec_torch.py
+    environment:
+      - PYTHONPATH=/app:$PYTHONPATH
+      - MATPLOTLIB_BACKEND=Agg
+    working_dir: /app
+    command: python benchmark/run_benchmark.py --config-name=quick_start +debug.files_limit=20
+    shm_size: 16gb
+
+  # Full benchmark service (for complete evaluation)
+  benchmark-full:
+    build: .
+    image: bird_classification_edge
+    container_name: bird_benchmark_full_container
+    volumes:
+      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./augmented_dataset:/app/augmented_dataset
+      - ./benchmark:/app/benchmark
+      - ./logs:/app/logs
+      - ./best_distillation_model.pt:/app/best_distillation_model.pt
+      - ./models.py:/app/models.py
+      - ./modules.py:/app/modules.py
+      - ./differentiable_spec_torch.py:/app/differentiable_spec_torch.py
+    environment:
+      - PYTHONPATH=/app:$PYTHONPATH
+      - MATPLOTLIB_BACKEND=Agg
+    working_dir: /app
+    command: python benchmark/run_benchmark.py --config-name=benchmark
+    shm_size: 16gb 

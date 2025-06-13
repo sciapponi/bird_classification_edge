@@ -1,0 +1,19 @@
+audio_path,label,category,species,full_path
+bird_sound_dataset/Apus_apus/XC466677-COMPILATION Common swift duets compilation.mp3,Apus_apus,bird,Apus_apus,/app/bird_sound_dataset/Apus_apus/XC466677-COMPILATION Common swift duets compilation.mp3
+bird_sound_dataset/Apus_apus/XC829868-apus-apus-3-trabajo-08-04-2022.mp3,Apus_apus,bird,Apus_apus,/app/bird_sound_dataset/Apus_apus/XC829868-apus-apus-3-trabajo-08-04-2022.mp3
+bird_sound_dataset/Apus_apus/XC736928-vencejos.mp3,Apus_apus,bird,Apus_apus,/app/bird_sound_dataset/Apus_apus/XC736928-vencejos.mp3
+bird_sound_dataset/Bubo_bubo/XC793532-d)04h56-HGD-f-3cris.mp3,Bubo_bubo,bird,Bubo_bubo,/app/bird_sound_dataset/Bubo_bubo/XC793532-d)04h56-HGD-f-3cris.mp3
+bird_sound_dataset/Bubo_bubo/XC684926-R4_00445a.mp3,Bubo_bubo,bird,Bubo_bubo,/app/bird_sound_dataset/Bubo_bubo/XC684926-R4_00445a.mp3
+bird_sound_dataset/Bubo_bubo/XC774566-230110_001.mp3,Bubo_bubo,bird,Bubo_bubo,/app/bird_sound_dataset/Bubo_bubo/XC774566-230110_001.mp3
+bird_sound_dataset/Certhia_familiaris/XC462597-Grimpereau des bois cris d alarme +.mp3,Certhia_familiaris,bird,Certhia_familiaris,/app/bird_sound_dataset/Certhia_familiaris/XC462597-Grimpereau des bois cris d alarme +.mp3
+bird_sound_dataset/Certhia_familiaris/XC528176-200202_13.mp3,Certhia_familiaris,bird,Certhia_familiaris,/app/bird_sound_dataset/Certhia_familiaris/XC528176-200202_13.mp3
+bird_sound_dataset/Certhia_familiaris/XC702449-cerfam kratko pjev bolje donau drau.mp3,Certhia_familiaris,bird,Certhia_familiaris,/app/bird_sound_dataset/Certhia_familiaris/XC702449-cerfam kratko pjev bolje donau drau.mp3
+bird_sound_dataset/Certhia_familiaris/XC591233-Jarek Matusiak-128  pełzacz leśny ed.mp3,Certhia_familiaris,bird,Certhia_familiaris,/app/bird_sound_dataset/Certhia_familiaris/XC591233-Jarek Matusiak-128  pełzacz leśny ed.mp3
+bird_sound_dataset/Certhia_familiaris/XC778215-TREE-CREEPER-calls1-Northaw-Herts-8.25am-04072013-(2).mp3,Certhia_familiaris,bird,Certhia_familiaris,/app/bird_sound_dataset/Certhia_familiaris/XC778215-TREE-CREEPER-calls1-Northaw-Herts-8.25am-04072013-(2).mp3
+bird_sound_dataset/Poecile_montanus/XC422538-Mesange boreale tsui tsui tsui tsui et cri 3.mp3,Poecile_montanus,bird,Poecile_montanus,/app/bird_sound_dataset/Poecile_montanus/XC422538-Mesange boreale tsui tsui tsui tsui et cri 3.mp3
+bird_sound_dataset/Poecile_montanus/XC653190-Mesange boreale chant etire.mp3,Poecile_montanus,bird,Poecile_montanus,/app/bird_sound_dataset/Poecile_montanus/XC653190-Mesange boreale chant etire.mp3
+bird_sound_dataset/Poecile_montanus/XC922521-parmon.mp3,Poecile_montanus,bird,Poecile_montanus,/app/bird_sound_dataset/Poecile_montanus/XC922521-parmon.mp3
+bird_sound_dataset/Poecile_montanus/XC777592-PN_potoczek_220419_01.mp3,Poecile_montanus,bird,Poecile_montanus,/app/bird_sound_dataset/Poecile_montanus/XC777592-PN_potoczek_220419_01.mp3
+augmented_dataset/no_birds/esc50_0036.wav,no_birds,no_birds,no_birds,/app/augmented_dataset/no_birds/esc50_0036.wav
+augmented_dataset/no_birds/empty_0390.wav,no_birds,no_birds,no_birds,/app/augmented_dataset/no_birds/empty_0390.wav
+augmented_dataset/no_birds/empty_0358.wav,no_birds,no_birds,no_birds,/app/augmented_dataset/no_birds/empty_0358.wav

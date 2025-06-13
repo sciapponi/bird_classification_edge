@@ -1,0 +1,19 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species
+bird_sound_dataset/Apus_apus/XC466677-COMPILATION Common swift duets compilation.mp3,Apus_apus,Apus_apus,0.999108612537384,20,{'Apus_apus': 0.999108612537384}
+bird_sound_dataset/Apus_apus/XC829868-apus-apus-3-trabajo-08-04-2022.mp3,Apus_apus,Apus_apus,0.9959671497344971,10,{'Apus_apus': 0.9959671497344971}
+bird_sound_dataset/Apus_apus/XC736928-vencejos.mp3,Apus_apus,Apus_apus,0.994575023651123,27,{'Apus_apus': 0.994575023651123}
+bird_sound_dataset/Bubo_bubo/XC793532-d)04h56-HGD-f-3cris.mp3,Bubo_bubo,Bubo_bubo,0.738568902015686,2,{'Bubo_bubo': 0.738568902015686}
+bird_sound_dataset/Bubo_bubo/XC684926-R4_00445a.mp3,Bubo_bubo,Bubo_bubo,0.9965875148773193,78,{'Bubo_bubo': 0.9965875148773193}
+bird_sound_dataset/Bubo_bubo/XC774566-230110_001.mp3,Bubo_bubo,Bubo_bubo,0.9967007040977478,103,{'Bubo_bubo': 0.9967007040977478}
+bird_sound_dataset/Certhia_familiaris/XC462597-Grimpereau des bois cris d alarme +.mp3,Certhia_familiaris,Certhia_familiaris,0.5756481289863586,1,{'Certhia_familiaris': 0.5756481289863586}
+bird_sound_dataset/Certhia_familiaris/XC528176-200202_13.mp3,Certhia_familiaris,Certhia_familiaris,0.8782704472541809,8,{'Certhia_familiaris': 0.8782704472541809}
+bird_sound_dataset/Certhia_familiaris/XC702449-cerfam kratko pjev bolje donau drau.mp3,Certhia_familiaris,Certhia_familiaris,0.9936429262161255,2,{'Certhia_familiaris': 0.9936429262161255}
+bird_sound_dataset/Certhia_familiaris/XC591233-Jarek Matusiak-128  pełzacz leśny ed.mp3,Certhia_familiaris,Certhia_familiaris,0.9869521856307983,4,{'Certhia_familiaris': 0.9869521856307983}
+bird_sound_dataset/Certhia_familiaris/XC778215-TREE-CREEPER-calls1-Northaw-Herts-8.25am-04072013-(2).mp3,Certhia_familiaris,Certhia_familiaris,0.4028613567352295,2,{'Certhia_familiaris': 0.4028613567352295}
+bird_sound_dataset/Poecile_montanus/XC422538-Mesange boreale tsui tsui tsui tsui et cri 3.mp3,Poecile_montanus,Poecile_montanus,0.9992102384567261,10,"{'Poecile_montanus': 0.9992102384567261, 'Certhia_familiaris': 0.5763511657714844}"
+bird_sound_dataset/Poecile_montanus/XC653190-Mesange boreale chant etire.mp3,Poecile_montanus,Poecile_montanus,0.49718430638313293,3,{'Poecile_montanus': 0.49718430638313293}
+bird_sound_dataset/Poecile_montanus/XC922521-parmon.mp3,Poecile_montanus,Poecile_montanus,0.9501916170120239,5,{'Poecile_montanus': 0.9501916170120239}
+bird_sound_dataset/Poecile_montanus/XC777592-PN_potoczek_220419_01.mp3,Poecile_montanus,no_birds,0.0,0,{}
+augmented_dataset/no_birds/esc50_0036.wav,no_birds,no_birds,0.0,0,{}
+augmented_dataset/no_birds/empty_0390.wav,no_birds,no_birds,0.0,0,{}
+augmented_dataset/no_birds/empty_0358.wav,no_birds,no_birds,0.0,0,{}

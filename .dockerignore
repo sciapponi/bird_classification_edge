@@ -5,22 +5,30 @@
 # Docker
 .dockerignore
 Dockerfile
+docker-compose.yml
 run_docker_training.sh
+run_docker_benchmark.sh
+run_docker_soft_labels.sh
+run_docker_distillation.sh
 
 # Python virtual environments
 venv
 .venv
+birdenv
 *.pyc
 *.pyo
 __pycache__
 
-# Datasets (questi vengono montati, non copiati nell'immagine)
+# Datasets (these are mounted, not copied into the image)
 bird_sound_dataset/
 ESC-50-master/
 augmented_dataset/
 
-# Log files (questi vengono montati)
+# Log files (these are mounted)
 logs/
+
+# Benchmark results (these are generated at runtime)
+benchmark/benchmark_results/
 
 # IDE and OS specific files
 .idea/
@@ -28,8 +36,26 @@ logs/
 *.DS_Store
 Thumbs.db
 
-# Markdown files (se molto grandi e non necessari nell'immagine)
+# Markdown files (if very large and not needed in the image)
 *.md
 
-# Altri file di output o temporanei
-# Aggiungi qui altri pattern se necessario 
+# Large model files (these are mounted)
+*.pt
+*.pth
+
+# Other output or temporary files
+soft_labels_complete/
+test_soft_labels/
+misc/
+table/
+images/
+present.pdf
+*.pdf
+
+# Additional exclusions for cleaner builds
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/ 
