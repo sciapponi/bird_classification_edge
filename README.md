@@ -96,7 +96,7 @@ You can choose one of two modes in your configuration file:
 python train.py
 
 # Override any parameter from the command line
-python train.py training.epochs=50 optimizer.lr=0.001
+python train.py training.epochs=50 optimizer.lr=0.001 dataset.num_workers=8
 ```
 
 ## Advanced Workflow: Knowledge Distillation
@@ -174,8 +174,9 @@ docker build -t bird_classification_edge .
     # Use GPU 0 for training
     ./run_docker_distillation.sh my_training_gpu0 GPU_ID=0
 
-    # Override parameters
-    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50
+    # Override parameters. Note: For distillation, some top-level params like batch_size
+    # are in the 'training' block, while dataset params are in the 'dataset' block.
+    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50 dataset.num_workers=8
     ```
 For more details on server usage, GPU management, and troubleshooting, see the comments within the `run_docker_*.sh` scripts.
 
@@ -264,7 +265,8 @@ Below are some important parameters in `config/bird_classification.yaml` related
 
 ```yaml
 dataset:
-  # Bird sound dataset parameters
+  # General dataset settings
+  num_workers: 4                       # Number of parallel data loading processes. Increase to use more CPU cores and speed up data preparation.
   bird_data_dir: "bird_sound_dataset"  # Path to bird sound data
   esc50_dir: "ESC-50-master"           # Path to ESC-50 dataset
   
@@ -327,6 +329,6 @@ docker build -t bird_classification_edge .
     ./run_docker_distillation.sh my_training_gpu0 GPU_ID=0
 
     # Override parameters
-    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50
+    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50 dataset.num_workers=8
     ```
 For more details on server usage, GPU management, and troubleshooting, see the comments within the `run_docker_*.sh` scripts. 

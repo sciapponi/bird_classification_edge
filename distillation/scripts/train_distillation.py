@@ -16,6 +16,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
+import pandas as pd
+import json
 
 # Add project root to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -58,22 +60,43 @@ def save_checkpoint(model, optimizer, epoch, val_loss, val_acc, filepath='checkp
 def load_checkpoint(filepath):
     return torch.load(filepath)
 
-def save_confusion_matrix(cm, class_names, filepath):
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=class_names, yticklabels=class_names)
+def save_confusion_matrix(y_true, y_pred, class_names, png_path, csv_path):
+    """Saves the confusion matrix as a PNG image and a CSV file."""
+    logger.info(f"Generating confusion matrix...")
+    cm = confusion_matrix(y_true, y_pred)
+    cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)
+    
+    # Save CSV
+    try:
+        cm_df.to_csv(csv_path)
+        logger.info(f"Confusion matrix CSV saved to {csv_path}")
+    except Exception as e:
+        logger.error(f"Failed to save confusion matrix CSV: {e}")
+
+    # Save PNG
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(cm_df, annot=True, fmt='d', cmap='Blues')
     plt.title('Confusion Matrix')
-    plt.ylabel('True Label')
-    plt.xlabel('Predicted Label')
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
     plt.tight_layout()
-    plt.savefig(filepath, dpi=300)
-    plt.close()
+    try:
+        plt.savefig(png_path)
+        logger.info(f"Confusion matrix PNG saved to {png_path}")
+    except Exception as e:
+        logger.error(f"Failed to save confusion matrix PNG: {e}")
+    finally:
+        plt.close()
 
 class DistillationTrainer:
-    def __init__(self, config, soft_labels_path):
+    def __init__(self, config, soft_labels_path, output_dir):
         self.config = config
         self.soft_labels_path = soft_labels_path
+        self.output_dir = Path(output_dir)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # Ensure output directory exists
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Initialize components
         self.model = None
@@ -88,14 +111,17 @@ class DistillationTrainer:
         self.epoch = 0
         self.best_val_loss = float('inf')
         self.best_val_acc = 0.0
+        self.test_acc = 0.0
         self.train_losses = []
         self.val_losses = []
         self.train_accs = []
         self.val_accs = []
         self.hard_losses = []
         self.soft_losses = []
+        self.learning_rates = []  # Track learning rates
         
         logger.info(f"Initialized trainer on device: {self.device}")
+        logger.info(f"Outputs will be saved to: {self.output_dir}")
     
     def setup_data(self):
         """Setup data loaders for distillation training"""
@@ -121,13 +147,18 @@ class DistillationTrainer:
         logger.info(f"Val samples: {len(val_dataset)}")
         logger.info(f"Test samples: {len(test_dataset)}")
         
-        # Log soft labels info
+        # Get soft labels info and extract number of classes
         soft_info = train_dataset.get_soft_labels_info()
+        self.num_classes = soft_info['num_classes']
+        self.class_names = train_dataset.get_classes()
+        
         logger.info(f"Soft labels info: {soft_info}")
+        logger.info(f"Number of classes: {self.num_classes}")
+        logger.info(f"Class names: {self.class_names}")
         
         return train_dataset, val_dataset, test_dataset
     
-    def setup_model(self, num_classes):
+    def setup_model(self):
         """Setup student model"""
         logger.info("Setting up student model...")
         
@@ -135,10 +166,10 @@ class DistillationTrainer:
         model_config = self.config.model
         
         # Convert matchbox config to regular dict to avoid Hydra struct issues
-        matchbox_config = dict(model_config.get('matchbox', {}))
+        matchbox_config = OmegaConf.to_container(model_config.get('matchbox', {}), resolve=True)
         
         self.model = Improved_Phi_GRU_ATT(
-            num_classes=num_classes,
+            num_classes=self.num_classes,
             spectrogram_type=model_config.get('spectrogram_type', 'mel'),
             sample_rate=self.config.dataset.get('sample_rate', 32000),
             n_mel_bins=model_config.get('n_mel_bins', 64),
@@ -205,6 +236,12 @@ class DistillationTrainer:
         logger.info(f"Using {'Adaptive' if adaptive else 'Standard'} DistillationLoss")
         logger.info(f"Alpha: {alpha}, Temperature: {temperature}")
     
+    def save_best_model(self):
+        """Saves the best model based on validation loss."""
+        model_path = self.output_dir / f"{self.config.experiment_name}_best_model.pth"
+        logger.info(f"Saving best model to {model_path}...")
+        torch.save(self.model.state_dict(), model_path)
+    
     def train_epoch(self):
         """Train for one epoch"""
         self.model.train()
@@ -255,14 +292,19 @@ class DistillationTrainer:
         avg_soft_loss = total_soft_loss / len(self.train_loader)
         accuracy = 100. * correct / total
         
-        return avg_loss, avg_hard_loss, avg_soft_loss, accuracy
+        # Store metrics
+        self.train_losses.append(avg_loss)
+        self.hard_losses.append(avg_hard_loss)
+        self.soft_losses.append(avg_soft_loss)
+        self.train_accs.append(accuracy)
+        
+        logger.info(f"Epoch {self.epoch} [Train] Avg Loss: {avg_loss:.4f}, Avg Acc: {accuracy:.4f}")
+        return avg_loss, accuracy
     
     def validate_epoch(self):
         """Validate for one epoch"""
         self.model.eval()
         total_loss = 0.0
-        total_hard_loss = 0.0
-        total_soft_loss = 0.0
         correct = 0
         total = 0
         
@@ -277,240 +319,256 @@ class DistillationTrainer:
                 # Forward pass
                 logits = self.model(audio)
                 
-                # Compute distillation loss
-                loss, hard_loss, soft_loss = self.criterion(logits, hard_labels, soft_labels)
+                # Compute distillation loss (only hard loss matters for val accuracy)
+                loss, _, _ = self.criterion(logits, hard_labels, soft_labels)
                 
                 # Statistics
                 total_loss += loss.item()
-                total_hard_loss += hard_loss.item()
-                total_soft_loss += soft_loss.item()
                 
                 # Accuracy
                 _, predicted = logits.max(1)
                 total += hard_labels.size(0)
                 correct += predicted.eq(hard_labels).sum().item()
 
-                # Set postfix for tqdm progress bar
                 pbar.set_postfix(
-                    loss=loss.item(),
+                    loss=loss.item(), 
                     acc=f"{(100. * correct / total):.2f}%"
                 )
         
+        # Calculate average loss and accuracy (convert to percentage like train_acc)
         avg_loss = total_loss / len(self.val_loader)
-        avg_hard_loss = total_hard_loss / len(self.val_loader)
-        avg_soft_loss = total_soft_loss / len(self.val_loader)
-        accuracy = 100. * correct / total
+        accuracy = 100. * correct / total  # Convert to percentage for consistency
         
-        return avg_loss, avg_hard_loss, avg_soft_loss, accuracy
+        # Store metrics
+        self.val_losses.append(avg_loss)
+        self.val_accs.append(accuracy)
+        
+        logger.info(f"Epoch {self.epoch} [Val] Avg Loss: {avg_loss:.4f}, Avg Acc: {accuracy:.4f}")
+        return avg_loss, accuracy
     
     def train(self):
         """Main training loop"""
-        logger.info("Starting distillation training...")
+        # Setup components before training
+        train_dataset, _, _ = self.setup_data()
+        self.setup_model()
+        self.setup_optimizer()
+        self.setup_criterion()
         
-        # Setup early stopping
-        early_stopping = EarlyStopping(
-            patience=self.config.training.patience,
-            min_delta=self.config.training.min_delta
+        # Early stopping
+        early_stopper = EarlyStopping(
+            patience=self.config.training.get('patience', 10),
+            min_delta=self.config.training.get('min_delta', 0.001)
         )
         
+        logger.info("Starting training loop...")
         for epoch in range(self.config.training.epochs):
-            self.epoch = epoch
+            self.epoch = epoch + 1
             
-            # Train epoch
-            train_loss, train_hard_loss, train_soft_loss, train_acc = self.train_epoch()
+            # Track learning rate at the start of the epoch
+            current_lr = self.optimizer.param_groups[0]['lr']
+            self.learning_rates.append(current_lr)
             
-            # Validate epoch
-            val_loss, val_hard_loss, val_soft_loss, val_acc = self.validate_epoch()
+            # Train and validate
+            self.train_epoch()
+            val_loss, val_acc = self.validate_epoch()
             
-            # Update learning rate
+            # Update learning rate scheduler
             if self.scheduler:
-                if hasattr(self.scheduler, 'step'):
-                    if 'ReduceLROnPlateau' in str(type(self.scheduler)):
-                        self.scheduler.step(val_loss)
-                    else:
-                        self.scheduler.step()
+                if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                    self.scheduler.step(val_loss)
+                else:
+                    self.scheduler.step()
             
-            # Adaptive alpha adjustment
-            if hasattr(self.criterion, 'adapt_alpha'):
-                self.criterion.adapt_alpha(val_acc)
-            
-            # Store metrics
-            self.train_losses.append(train_loss)
-            self.val_losses.append(val_loss)
-            self.train_accs.append(train_acc)
-            self.val_accs.append(val_acc)
-            self.hard_losses.append(train_hard_loss)
-            self.soft_losses.append(train_soft_loss)
-            
-            # Log epoch results
-            logger.info(
-                f'Epoch {epoch}: Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%, '
-                f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%'
-            )
-            logger.info(
-                f'  Hard Loss: {train_hard_loss:.4f}, Soft Loss: {train_soft_loss:.4f}, '
-                f'Alpha: {self.criterion.alpha:.3f}'
-            )
-            
-            # Save checkpoint if best model
-            if val_acc > self.best_val_acc:
-                self.best_val_acc = val_acc
+            # Check for best model
+            if val_loss < self.best_val_loss:
                 self.best_val_loss = val_loss
-                save_checkpoint(
-                    self.model, self.optimizer, epoch, val_loss, val_acc,
-                    filepath='best_distillation_model.pt'
-                )
-                logger.info(f"New best model saved! Val Acc: {val_acc:.2f}%")
-            
+                self.best_val_acc = val_acc
+                logger.info(f"New best validation loss: {self.best_val_loss:.4f}, Acc: {self.best_val_acc:.4f}")
+                self.save_best_model()
+
             # Early stopping check
-            if early_stopping(val_loss):
-                logger.info(f"Early stopping triggered at epoch {epoch}")
+            if early_stopper(val_loss):
+                logger.info("Early stopping triggered.")
                 break
         
-        logger.info("Training completed!")
-        logger.info(f"Best validation accuracy: {self.best_val_acc:.2f}%")
-    
+        logger.info("Training loop finished.")
+        self.save_training_plots()
+
     def test(self):
-        """Test the best model"""
-        logger.info("Testing best model...")
+        """Test the model on the test set"""
+        logger.info("Starting testing...")
         
-        # Load best model
-        checkpoint = load_checkpoint('best_distillation_model.pt')
-        self.model.load_state_dict(checkpoint['model_state_dict'])
-        
+        # Load best model for testing
+        model_path = self.output_dir / f"{self.config.experiment_name}_best_model.pth"
+        if model_path.exists():
+            logger.info(f"Loading best model from {model_path} for testing...")
+            self.model.load_state_dict(torch.load(model_path, map_location=self.device))
+        else:
+            logger.warning("No best model found. Testing with the model from the last epoch.")
+            
         self.model.eval()
-        correct = 0
-        total = 0
-        all_predictions = []
-        all_labels = []
+        all_preds = []
+        all_true = []
         
-        pbar = tqdm(self.test_loader, desc="Testing", unit="batch")
         with torch.no_grad():
-            for audio, hard_labels, soft_labels in pbar:
+            pbar = tqdm(self.test_loader, desc="Testing", unit="batch")
+            for audio, hard_labels, _ in pbar:
                 audio = audio.to(self.device)
                 hard_labels = hard_labels.to(self.device)
                 
                 logits = self.model(audio)
                 _, predicted = logits.max(1)
                 
-                total += hard_labels.size(0)
-                correct += predicted.eq(hard_labels).sum().item()
-                
-                all_predictions.extend(predicted.cpu().numpy())
-                all_labels.extend(hard_labels.cpu().numpy())
-
-                pbar.set_postfix(acc=f"{(100. * correct / total):.2f}%")
+                all_preds.extend(predicted.cpu().numpy())
+                all_true.extend(hard_labels.cpu().numpy())
         
-        test_acc = 100. * correct / total
-        logger.info(f"Test Accuracy: {test_acc:.2f}%")
+        # Calculate metrics
+        self.test_acc = sum(1 for i, j in zip(all_true, all_preds) if i == j) / len(all_true)
+        logger.info(f"Test Accuracy: {self.test_acc:.4f}")
         
-        # Generate detailed metrics
-        class_names = self.test_loader.dataset.get_classes()
-        if len(set(all_labels)) > len(class_names):
-             # Fallback if the number of unique labels in the test set is greater
-             # than the number of classes provided by the dataset.
-            class_names = [f"Class_{i}" for i in range(len(set(all_labels)))]
-
-        report = classification_report(
-            all_labels, all_predictions, target_names=class_names, 
-            zero_division=0, labels=range(len(class_names))
-        )
-        logger.info(f"Classification Report:\n{report}")
+        # Generate classification report
+        report_str = classification_report(all_true, all_preds, target_names=self.class_names, zero_division=0)
+        report_dict = classification_report(all_true, all_preds, target_names=self.class_names, zero_division=0, output_dict=True)
+        logger.info(f"Test Report:\n{report_str}")
         
         # Save confusion matrix
-        cm = confusion_matrix(all_labels, all_predictions, labels=range(len(class_names)))
-        save_confusion_matrix(cm, class_names, 'distillation_confusion_matrix.png')
-        
-        return test_acc, report, cm
-    
+        cm_png_path = self.output_dir / "confusion_matrix.png"
+        cm_csv_path = self.output_dir / "confusion_matrix.csv"
+        save_confusion_matrix(all_true, all_preds, self.class_names, cm_png_path, cm_csv_path)
+
+        # Save results and summary
+        self.save_results(self.test_acc, report_dict)
+        self.save_model_summary(report_str)
+
     def save_training_plots(self):
-        """Save training history plots"""
-        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+        """Saves training history plots."""
+        if not self.train_losses:
+            logger.warning("No training history to plot. Skipping plot generation.")
+            return
+
+        epochs = range(1, len(self.train_losses) + 1)
         
-        # Loss plots
-        axes[0, 0].plot(self.train_losses, label='Train Total')
-        axes[0, 0].plot(self.val_losses, label='Val Total')
-        axes[0, 0].set_title('Total Loss')
-        axes[0, 0].set_xlabel('Epoch')
-        axes[0, 0].set_ylabel('Loss')
-        axes[0, 0].legend()
-        axes[0, 0].grid(True)
+        plt.figure(figsize=(12, 10))
         
-        # Accuracy plots
-        axes[0, 1].plot(self.train_accs, label='Train')
-        axes[0, 1].plot(self.val_accs, label='Val')
-        axes[0, 1].set_title('Accuracy')
-        axes[0, 1].set_xlabel('Epoch')
-        axes[0, 1].set_ylabel('Accuracy (%)')
-        axes[0, 1].legend()
-        axes[0, 1].grid(True)
+        # Plot Loss
+        plt.subplot(2, 2, 1)
+        plt.plot(epochs, self.train_losses, '.-', label='Train Loss')
+        plt.plot(epochs, self.val_losses, '.-', label='Val Loss')
+        plt.title('Training & Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.grid(True)
+        plt.legend()
         
-        # Hard vs Soft loss
-        axes[1, 0].plot(self.hard_losses, label='Hard Loss')
-        axes[1, 0].plot(self.soft_losses, label='Soft Loss')
-        axes[1, 0].set_title('Hard vs Soft Loss')
-        axes[1, 0].set_xlabel('Epoch')
-        axes[1, 0].set_ylabel('Loss')
-        axes[1, 0].legend()
-        axes[1, 0].grid(True)
+        # Plot Accuracy
+        plt.subplot(2, 2, 2)
+        plt.plot(epochs, self.train_accs, '.-', label='Train Accuracy')
+        plt.plot(epochs, self.val_accs, '.-', label='Val Accuracy')
+        plt.title('Training & Validation Accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.grid(True)
+        plt.legend()
         
-        # Alpha evolution (if adaptive)
-        if hasattr(self.criterion, 'alpha'):
-            alpha_values = [self.criterion.alpha] * len(self.train_losses)  # Simplified
-            axes[1, 1].plot(alpha_values)
-            axes[1, 1].set_title('Alpha Evolution')
-            axes[1, 1].set_xlabel('Epoch')
-            axes[1, 1].set_ylabel('Alpha')
-            axes[1, 1].grid(True)
+        # Plot Hard/Soft Loss
+        plt.subplot(2, 2, 3)
+        plt.plot(epochs, self.hard_losses, '.-', label='Hard Loss (Train)')
+        plt.plot(epochs, self.soft_losses, '.-', label='Soft Loss (Train)')
+        plt.title('Distillation Loss Components')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.grid(True)
+        plt.legend()
+        
+        # Plot Learning Rate
+        plt.subplot(2, 2, 4)
+        plt.plot(epochs, self.learning_rates, '.-', label='Learning Rate')
+        plt.title('Learning Rate')
+        plt.xlabel('Epochs')
+        plt.ylabel('Learning Rate')
+        plt.grid(True)
+        plt.legend()
         
         plt.tight_layout()
-        plt.savefig('distillation_training_history.png', dpi=300, bbox_inches='tight')
+        plot_path = self.output_dir / "training_history.png"
+        plt.savefig(plot_path)
         plt.close()
+        logger.info(f"Saved training plots to {plot_path}")
+
+    def save_results(self, test_acc, report_dict):
+        """Saves test results to a JSON file."""
+        results = {
+            "experiment_name": self.config.experiment_name,
+            "best_val_acc": self.best_val_acc / 100.0,  # Convert percentage back to fraction for JSON
+            "test_acc": test_acc,
+            "test_f1_weighted": report_dict.get('weighted avg', {}).get('f1-score'),
+            "test_precision_weighted": report_dict.get('weighted avg', {}).get('precision'),
+            "test_recall_weighted": report_dict.get('weighted avg', {}).get('recall'),
+            "total_params": sum(p.numel() for p in self.model.parameters()),
+            "trainable_params": sum(p.numel() for p in self.model.parameters() if p.requires_grad),
+        }
         
-        logger.info("Training plots saved to distillation_training_history.png")
+        results_path = self.output_dir / "results.json"
+        with open(results_path, 'w') as f:
+            json.dump(results, f, indent=4)
+        logger.info(f"Results saved to {results_path}")
+
+    def save_model_summary(self, test_report_str):
+        """Saves a summary of the model and training results to a text file."""
+        summary_path = self.output_dir / "model_summary.txt"
+        with open(summary_path, 'w') as f:
+            f.write(f"Model: {self.model.__class__.__name__}\n")
+            f.write(f"Total parameters: {sum(p.numel() for p in self.model.parameters()):,}\n")
+            f.write(f"Trainable parameters: {sum(p.numel() for p in self.model.parameters() if p.requires_grad):,}\n\n")
+            f.write(f"Best validation accuracy: {self.best_val_acc:.2f}%\n")
+            f.write(f"Test accuracy: {self.test_acc*100:.2f}%\n")
+            f.write(f"Classification Report (Test Set):\n{test_report_str}\n")
+        logger.info(f"Model summary saved to {summary_path}")
 
 @hydra.main(version_base=None, config_path="../configs", config_name="distillation_config")
 def main(cfg: DictConfig):
-    """Main training function"""
-    logger.info("Starting knowledge distillation training")
-    logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
+    """Main function to run distillation training."""
     
-    # Check for soft labels path
-    soft_labels_path = cfg.get('soft_labels_path', 'soft_labels')
-    if not Path(soft_labels_path).exists():
-        logger.error(f"Soft labels directory not found: {soft_labels_path}")
-        logger.error("Please run extract_soft_labels.py first!")
-        return
+    # --- Setup Output Directory and Logging ---
+    output_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
     
-    # Create trainer
-    trainer = DistillationTrainer(cfg, soft_labels_path)
+    # Configure file logging in addition to console logging
+    log_file = os.path.join(output_dir, "distillation_train.log")
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - [%(levelname)s] - %(message)s')
+    file_handler.setFormatter(formatter)
     
-    # Setup
-    train_dataset, val_dataset, test_dataset = trainer.setup_data()
+    # Add handler to the root logger to catch logs from all modules
+    # This might log hydra's own logs too. For cleaner logs, get specific logger.
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
     
-    # Get num_classes from the dataset, which now reads it from soft labels metadata
-    soft_labels_info = train_dataset.get_soft_labels_info()
-    num_classes = soft_labels_info.get('num_classes')
-    
-    if not num_classes:
-        logger.error("Could not determine the number of classes from soft labels.")
-        return
+    logger.info(f"Hydra output directory: {output_dir}")
+    logger.info("Full config:\n" + OmegaConf.to_yaml(cfg))
 
-    trainer.setup_model(num_classes)
-    trainer.setup_optimizer()
-    trainer.setup_criterion()
+    soft_labels_path = cfg.dataset.soft_labels_path
     
-    # Train
-    trainer.train()
+    # Check if soft_labels_path exists
+    if not os.path.exists(soft_labels_path):
+        logger.error(f"Soft labels path does not exist: {soft_labels_path}")
+        sys.exit(1)
+        
+    logger.info(f"Using soft labels from: {soft_labels_path}")
     
-    # Test
-    test_acc, report, cm = trainer.test()
+    # --- Trainer Initialization ---
+    trainer = DistillationTrainer(config=cfg, soft_labels_path=soft_labels_path, output_dir=output_dir)
     
-    # Save plots
-    trainer.save_training_plots()
+    # --- Run Training and Testing ---
+    try:
+        trainer.train()
+        trainer.test()
+    except Exception as e:
+        logger.exception(f"An error occurred during training or testing: {e}")
+        sys.exit(1)
+        
+    logger.info("Script finished successfully.")
     
-    logger.info("Distillation training completed successfully!")
-    logger.info(f"Final test accuracy: {test_acc:.2f}%")
 
 if __name__ == "__main__":
     main() 

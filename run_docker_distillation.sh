@@ -130,7 +130,7 @@ DOCKER_CMD="$DOCKER_CMD $DOCKER_IMAGE_NAME"
 # Default distillation command
 DISTILLATION_CMD="python train_distillation.py"
 # The path inside the container must match the mounted volume
-DISTILLATION_CMD="$DISTILLATION_CMD soft_labels_path=test_soft_labels"
+DISTILLATION_CMD="$DISTILLATION_CMD dataset.soft_labels_path=test_soft_labels"
 
 # Add any Hydra overrides
 if [[ ${#HYDRA_OVERRIDES[@]} -gt 0 ]]; then

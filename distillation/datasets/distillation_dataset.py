@@ -238,7 +238,7 @@ def create_distillation_dataloader(config, soft_labels_path, split='train'):
     else:
         subset = 'testing'
     
-    # Create distillation dataset
+    # Create distillation dataset - Reverted to manual mapping to fix TypeError
     dataset = DistillationBirdSoundDataset(
         soft_labels_path=soft_labels_path,
         # Parameters for dataset_factory.create_combined_dataset
@@ -257,17 +257,14 @@ def create_distillation_dataloader(config, soft_labels_path, split='train'):
         pregenerated_no_birds_dir=config.get('pregenerated_no_birds_dir', 'augmented_dataset/no_birds'),
         num_no_bird_samples=config.get('num_no_bird_samples', 100)
     )
-    
-    # Create dataloader
-    batch_size = config.get('batch_size', 8)
-    shuffle = (split == 'train')
-    
+
+    # Create DataLoader with more workers to speed up data loading
     dataloader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=config.get('num_workers', 0),
-        pin_memory=True
+        dataset, 
+        batch_size=config.get('batch_size', 16), # Get batch_size from dataset config section
+        shuffle=(split == 'train'),
+        num_workers=4,  # Use 4 parallel workers for data loading
+        pin_memory=True # Essential for fast CPU-to-GPU transfer
     )
     
     return dataloader, dataset
