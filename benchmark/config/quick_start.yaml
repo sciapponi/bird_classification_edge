@@ -1,0 +1,44 @@
+# Quick Start Configuration for Bird Classification Benchmark
+# Copy this file and modify the paths section to get started quickly
+
+defaults:
+  - benchmark
+
+# Override only the essential paths - modify these!
+benchmark:
+  paths:
+    audio_dir: "bird_sound_dataset"                   # Use project's bird dataset directory
+    no_birds_dir: "augmented_dataset/no_birds"       # Directory with no_birds samples
+    student_model: "best_distillation_model.pt"      # Use the trained model in project root
+    ground_truth: null                               # Auto-generated from folder structure
+    output_dir: "benchmark/benchmark_results"
+    predictions_dir: "benchmark_results/predictions"
+    comparison_dir: "benchmark_results/comparison"
+    
+# Simplified settings for quick testing
+segmentation:
+  duration: 3.0
+  
+student_model:
+  inference:
+    confidence_threshold: 0.1
+    device: "auto"
+    student_config: "config/bird_classification.yaml"
+    
+birdnet:
+  confidence_threshold: 0.1
+  
+logging:
+  level: "INFO"
+  
+# Test mode - process only small subset for quick validation
+debug:
+  dev_mode: true            # Set to true for testing with subset
+  test_with_subset: true    # Set to true to process only 10 files
+  subset_size: 3            # Use only 3 files for quick test
+  files_limit: null  # Set to a number to limit files processed (e.g., 10 for quick test)
+  
+# Simplified comparison config
+comparison:
+  save_plots: true
+  save_detailed_json: true 

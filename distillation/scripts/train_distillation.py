@@ -285,7 +285,7 @@ class DistillationTrainer:
                 hard_loss=hard_loss.item(), 
                 soft_loss=soft_loss.item(),
                 acc=f"{(100. * correct / total):.2f}%"
-            )
+                )
         
         avg_loss = total_loss / len(self.train_loader)
         avg_hard_loss = total_hard_loss / len(self.train_loader)
@@ -329,7 +329,7 @@ class DistillationTrainer:
                 _, predicted = logits.max(1)
                 total += hard_labels.size(0)
                 correct += predicted.eq(hard_labels).sum().item()
-
+        
                 pbar.set_postfix(
                     loss=loss.item(), 
                     acc=f"{(100. * correct / total):.2f}%"
@@ -375,9 +375,9 @@ class DistillationTrainer:
             # Update learning rate scheduler
             if self.scheduler:
                 if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-                    self.scheduler.step(val_loss)
-                else:
-                    self.scheduler.step()
+                        self.scheduler.step(val_loss)
+                    else:
+                        self.scheduler.step()
             
             # Check for best model
             if val_loss < self.best_val_loss:
@@ -385,7 +385,7 @@ class DistillationTrainer:
                 self.best_val_acc = val_acc
                 logger.info(f"New best validation loss: {self.best_val_loss:.4f}, Acc: {self.best_val_acc:.4f}")
                 self.save_best_model()
-
+            
             # Early stopping check
             if early_stopper(val_loss):
                 logger.info("Early stopping triggered.")
@@ -393,7 +393,7 @@ class DistillationTrainer:
         
         logger.info("Training loop finished.")
         self.save_training_plots()
-
+    
     def test(self):
         """Test the model on the test set"""
         logger.info("Starting testing...")
@@ -405,7 +405,7 @@ class DistillationTrainer:
             self.model.load_state_dict(torch.load(model_path, map_location=self.device))
         else:
             logger.warning("No best model found. Testing with the model from the last epoch.")
-            
+        
         self.model.eval()
         all_preds = []
         all_true = []
@@ -435,11 +435,11 @@ class DistillationTrainer:
         cm_png_path = self.output_dir / "confusion_matrix.png"
         cm_csv_path = self.output_dir / "confusion_matrix.csv"
         save_confusion_matrix(all_true, all_preds, self.class_names, cm_png_path, cm_csv_path)
-
+        
         # Save results and summary
         self.save_results(self.test_acc, report_dict)
         self.save_model_summary(report_str)
-
+    
     def save_training_plots(self):
         """Saves training history plots."""
         if not self.train_losses:
@@ -566,7 +566,7 @@ def main(cfg: DictConfig):
     except Exception as e:
         logger.exception(f"An error occurred during training or testing: {e}")
         sys.exit(1)
-        
+    
     logger.info("Script finished successfully.")
     
 

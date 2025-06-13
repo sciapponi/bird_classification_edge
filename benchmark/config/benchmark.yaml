@@ -1,0 +1,284 @@
+# Benchmark Pipeline Configuration
+# Hydra configuration for bird classification model comparison
+
+defaults:
+  - _self_
+
+# Benchmark pipeline configuration
+benchmark:
+  name: "bird_classification_benchmark"
+  description: "Comparison between student model and BirdNET"
+  
+  # Input/Output paths (can be overridden via CLI)
+  paths:
+    audio_dir: "bird_sound_dataset"  # Directory with audio files to process (class subdirectories)
+    no_birds_dir: "augmented_dataset/no_birds"  # Directory with no_birds samples
+    ground_truth: null  # Auto-generated from folder structure
+    output_dir: "benchmark_results/"  # Base output directory
+    
+    # Model paths
+    student_model: "best_distillation_model.pt"  # Student model checkpoint
+    student_config: "config/bird_classification.yaml"  # Optional student model config
+    
+    # Derived paths (auto-generated)
+    segments_dir: "${benchmark.paths.output_dir}/segments"
+    predictions_dir: "benchmark_results/predictions"
+    comparison_dir: "benchmark_results/comparison"
+
+# Audio segmentation configuration
+segmentation:
+  duration: 3.0  # Segment duration in seconds (consistent with model training)
+  overlap: 0.0   # Overlap between segments (0.0 = no overlap)
+  sample_rate: 32000  # Target sample rate
+  min_duration_ratio: 0.9  # Minimum segment duration as ratio of full duration
+  
+  # Audio processing
+  supported_formats: [".wav", ".mp3", ".flac", ".ogg", ".m4a", ".aac"]
+  force_mono: true
+  
+  # Quality filters
+  min_amplitude_threshold: 0.001  # Skip very quiet segments
+  max_noise_ratio: 0.8  # Skip very noisy segments
+
+# Student model prediction configuration  
+student_model:
+  # Model architecture (will be merged with loaded config)
+  architecture:
+    num_classes: 9  # 8 bird species + 1 no_birds class
+    spectrogram_type: "combined_log_linear"
+    n_mel_bins: 64
+    n_linear_filters: 64
+    hidden_dim: 64
+    n_fft: 1024
+    hop_length: 320
+    matchbox:
+      base_filters: 32
+      num_layers: 3
+      kernel_size: 5
+      stride: 1
+      dropout: 0.05
+      breakpoint: 4000
+      transition_width: 100
+  
+  # Audio preprocessing (should match training)
+  preprocessing:
+    sample_rate: 32000
+    clip_duration: 3.0
+    lowcut: 150.0
+    highcut: 16000.0
+    
+  # Prediction parameters
+  inference:
+    device: "auto"  # "auto", "cpu", "cuda"
+    batch_size: 32  # Batch size for inference
+    confidence_threshold: 0.1
+    use_amp: false  # Automatic Mixed Precision
+    
+  # Class mapping
+  classes:
+    # Target bird species (matching your model training from config/bird_classification.yaml)
+    allowed_species:
+      - "Bubo_bubo"
+      - "Certhia_familiaris"
+      - "Apus_apus"
+      - "Certhia_brachydactyla"
+      - "Emberiza_cia"
+      - "Lophophanes_cristatus"
+      - "Periparus_ater"
+      - "Poecile_montanus"
+    
+    # Whether model includes "no_birds" class
+    has_no_birds_class: true
+    no_birds_label: "no_birds"
+
+# BirdNET prediction configuration
+birdnet:
+  # Analysis parameters
+  confidence_threshold: 0.1
+  sensitivity: 1.25  # BirdNET sensitivity parameter
+  
+  # Filtering (disabled for fair comparison)
+  disable_location_filter: true
+  disable_time_filter: true
+  
+  # Geographic filtering (if enabled)
+  location:
+    latitude: null
+    longitude: null
+    
+  # Temporal filtering (if enabled)  
+  temporal:
+    week: -1  # -1 = disable, 1-48 for week of year
+    date: null  # YYYY-MM-DD format
+    
+  # Species filtering
+  target_species: ${student_model.classes.allowed_species}
+  species_list: null  # Path to custom species list file
+  
+  # Performance optimization
+  overlap: 0.0  # BirdNET internal overlap
+  chunk_size: 10  # Process in chunks for memory efficiency
+
+# Model comparison configuration
+comparison:
+  # Evaluation metrics
+  metrics:
+    # Basic metrics
+    calculate_accuracy: true
+    calculate_precision: true
+    calculate_recall: true
+    calculate_f1: true
+    
+    # Advanced metrics
+    calculate_confusion_matrix: true
+    calculate_per_class_metrics: true
+    calculate_agreement_analysis: true
+    
+    # Averaging methods
+    averaging_methods: ["micro", "macro", "weighted"]
+    
+  # Ground truth format
+  ground_truth:
+    format: "auto"  # "auto", "single_label", "multi_label"
+    label_column: "label"  # For single label format
+    segment_column: "segment_name"
+    
+    # Multi-label specific
+    positive_values: [1, "1", true, "true", "yes"]
+    negative_values: [0, "0", false, "false", "no", null]
+    
+  # Agreement analysis
+  agreement:
+    # Correctness criteria
+    exact_match: true  # Require exact label match
+    partial_match: false  # Allow partial matches in multi-label
+    confidence_weighting: false  # Weight by confidence scores
+    
+    # Analysis categories
+    categories:
+      both_correct: "both_correct"
+      student_only: "student_only_correct"
+      birdnet_only: "birdnet_only_correct" 
+      both_incorrect: "both_incorrect"
+      
+  # Visualization
+  visualization:
+    # Plot settings
+    figsize: [16, 8]
+    dpi: 300
+    style: "seaborn-v0_8"
+    color_palette: "viridis"
+    
+    # Confusion matrix
+    confusion_matrix:
+      normalize: null  # null, "true", "pred", "all"
+      colormap: "Blues"
+      show_values: true
+      
+    # Agreement plots
+    agreement_plot:
+      pie_chart: true
+      bar_chart: true
+      per_class_comparison: true
+
+# Output configuration
+output:
+  # File naming
+  naming:
+    student_predictions: "student_predictions.csv"
+    birdnet_predictions: "birdnet_predictions.csv"
+    segments_metadata: "segments_metadata.csv"
+    comparison_report: "comparison_report.json"
+    comparison_summary: "comparison_summary.txt"
+    detailed_cases: "detailed_cases.csv"
+    
+  # Visualization files
+  plots:
+    confusion_matrices: "confusion_matrices.png"
+    agreement_analysis: "agreement_analysis.png"
+    per_class_accuracy: "per_class_accuracy.png"
+    confidence_distribution: "confidence_distribution.png"
+    
+  # Export formats
+  formats:
+    save_json: true
+    save_csv: true
+    save_plots: true
+    save_summary: true
+    
+  # Compression
+  compression:
+    compress_audio: false  # Compress segmented audio files
+    compression_format: "flac"  # "flac", "mp3", "ogg"
+
+# Logging configuration
+logging:
+  level: "INFO"  # "DEBUG", "INFO", "WARNING", "ERROR"
+  log_to_file: true
+  log_file: "${benchmark.paths.output_dir}/benchmark.log"
+  
+  # Progress bars
+  show_progress_bars: true
+  progress_bar_style: "tqdm"
+  
+  # Detailed logging
+  log_predictions: false  # Log individual predictions (verbose)
+  log_preprocessing: false  # Log preprocessing steps
+  log_model_loading: true
+
+# Performance configuration
+performance:
+  # Parallel processing
+  use_multiprocessing: true
+  num_workers: 4  # Number of parallel workers (-1 = auto)
+  
+  # Memory management
+  max_memory_usage: "8GB"  # Maximum memory usage
+  cleanup_intermediate: true  # Clean up intermediate files
+  
+  # Caching
+  cache_predictions: true
+  cache_preprocessed_audio: false
+  cache_dir: "${benchmark.paths.output_dir}/.cache"
+
+# Validation and safety
+validation:
+  # Input validation
+  check_audio_integrity: true
+  validate_ground_truth: true
+  validate_model_compatibility: true
+  
+  # Output validation
+  verify_segment_count: true
+  check_prediction_consistency: true
+  
+  # Error handling
+  continue_on_error: false  # Continue if some segments fail
+  max_error_rate: 0.1  # Maximum allowed error rate
+  
+# Development and debugging
+debug:
+  # Development mode
+  dev_mode: false
+  test_with_subset: false  # Test with small subset of data
+  subset_size: 10  # Number of files to process in test mode
+  
+  # Profiling
+  enable_profiling: false
+  profile_memory: false
+  profile_time: false
+  
+  # Reproducibility
+  random_seed: 42
+  deterministic: true
+
+# Hydra configuration
+hydra:
+  job:
+    name: bird_benchmark
+    chdir: true
+  run:
+    dir: ${benchmark.paths.output_dir}/hydra_outputs/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: ${benchmark.paths.output_dir}/hydra_multirun/${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${hydra.job.num} 

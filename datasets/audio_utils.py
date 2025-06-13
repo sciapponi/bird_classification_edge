@@ -295,4 +295,50 @@ def count_audio_files(directory, allowed_extensions=('.wav', '.mp3', '.ogg', '.f
         for file in files:
             if file.endswith(tuple(allowed_extensions)):
                 count += 1
-    return count 
+    return count
+
+
+def load_and_preprocess_audio(audio_path, sr=32000, clip_duration=3.0, 
+                             lowcut=150.0, highcut=16000.0, force_mono=True):
+    """
+    Load and preprocess audio file for model inference.
+    
+    Args:
+        audio_path (str or Path): Path to audio file
+        sr (int): Target sample rate
+        clip_duration (float): Duration in seconds
+        lowcut (float): Low cutoff frequency for bandpass filter in Hz
+        highcut (float): High cutoff frequency for bandpass filter in Hz
+        force_mono (bool): Whether to force mono audio
+        
+    Returns:
+        ndarray: Preprocessed audio data
+    """
+    try:
+        # Load audio file
+        audio, original_sr = librosa.load(audio_path, sr=sr, mono=force_mono)
+        
+        # Ensure we have the right duration
+        target_length = int(sr * clip_duration)
+        
+        if len(audio) > target_length:
+            # Trim to target length (take center)
+            start_idx = (len(audio) - target_length) // 2
+            audio = audio[start_idx:start_idx + target_length]
+        elif len(audio) < target_length:
+            # Pad with zeros to reach target length
+            padding = target_length - len(audio)
+            audio = np.pad(audio, (0, padding), mode='constant', constant_values=0)
+        
+        # Apply bandpass filter if specified
+        if lowcut > 0 and highcut > 0 and highcut > lowcut:
+            audio = apply_bandpass_filter(audio, lowcut, highcut, sr)
+        
+        # Normalize audio
+        if np.max(np.abs(audio)) > 0:
+            audio = audio / np.max(np.abs(audio))
+        
+        return audio
+        
+    except Exception as e:
+        raise RuntimeError(f"Failed to load and preprocess audio {audio_path}: {e}") 
