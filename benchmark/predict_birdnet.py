@@ -53,7 +53,27 @@ class BirdNETPredictor:
         self.species_list_path = self._create_species_list(target_species)
         
         # Initialize BirdNET analyzer with custom species list
-        self.analyzer = Analyzer(custom_species_list_path=self.species_list_path)
+        # Apply UTF-8 patch for international characters
+        import locale
+        import builtins
+        
+        # Set locale to UTF-8
+        locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+        
+        # Temporarily patch builtins.open to use UTF-8 encoding
+        original_open = builtins.open
+        def utf8_open(*args, **kwargs):
+            if 'encoding' not in kwargs:
+                kwargs['encoding'] = 'utf-8'
+            return original_open(*args, **kwargs)
+        
+        # Apply patch and initialize analyzer
+        builtins.open = utf8_open
+        try:
+            self.analyzer = Analyzer(custom_species_list_path=self.species_list_path)
+        finally:
+            # Restore original open function
+            builtins.open = original_open
         
         # Create species mapping (BirdNET format -> project format)
         self.species_mapping = {
@@ -278,8 +298,7 @@ def main(cfg: DictConfig) -> None:
         )
         
         # Save predictions
-        benchmark_dir = os.path.join(original_cwd, "benchmark")
-        output_path = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir, "birdnet_predictions.csv")
+        output_path = os.path.join(original_cwd, cfg.benchmark.paths.predictions_dir, "birdnet_predictions.csv")
         
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         predictions_df.to_csv(output_path, index=False)

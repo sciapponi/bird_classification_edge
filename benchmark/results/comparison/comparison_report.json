@@ -1,0 +1,247 @@
+{
+  "metrics": {
+    "student_accuracy": 0.6666666666666666,
+    "student_precision": 0.5,
+    "student_recall": 0.5,
+    "student_f1": 0.5,
+    "birdnet_accuracy": 0.6666666666666666,
+    "birdnet_precision": 0.5,
+    "birdnet_recall": 0.5,
+    "birdnet_f1": 0.5
+  },
+  "detailed_metrics": {
+    "student": {
+      "accuracy": 0.6666666666666666,
+      "precision_micro": 0.6666666666666666,
+      "precision_macro": 0.5,
+      "precision_weighted": 0.6666666666666666,
+      "recall_micro": 0.6666666666666666,
+      "recall_macro": 0.5,
+      "recall_weighted": 0.6666666666666666,
+      "f1_micro": 0.6666666666666666,
+      "f1_macro": 0.5,
+      "f1_weighted": 0.6666666666666666,
+      "per_class": {
+        "Apus_apus": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1.0
+        },
+        "Bubo_bubo": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 1.0
+        },
+        "Certhia_brachydactyla": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1.0
+        },
+        "no_birds": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "accuracy": 0.6666666666666666,
+        "macro avg": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1-score": 0.5,
+          "support": 3.0
+        },
+        "weighted avg": {
+          "precision": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "f1-score": 0.6666666666666666,
+          "support": 3.0
+        }
+      }
+    },
+    "birdnet": {
+      "accuracy": 0.6666666666666666,
+      "precision_micro": 0.6666666666666666,
+      "precision_macro": 0.5,
+      "precision_weighted": 0.6666666666666666,
+      "recall_micro": 0.6666666666666666,
+      "recall_macro": 0.5,
+      "recall_weighted": 0.6666666666666666,
+      "f1_micro": 0.6666666666666666,
+      "f1_macro": 0.5,
+      "f1_weighted": 0.6666666666666666,
+      "per_class": {
+        "Apus_apus": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1.0
+        },
+        "Bubo_bubo": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1.0
+        },
+        "Certhia_brachydactyla": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 1.0
+        },
+        "no_birds": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "accuracy": 0.6666666666666666,
+        "macro avg": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1-score": 0.5,
+          "support": 3.0
+        },
+        "weighted avg": {
+          "precision": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "f1-score": 0.6666666666666666,
+          "support": 3.0
+        }
+      }
+    }
+  },
+  "agreement_analysis": {
+    "counts": {
+      "both_correct": 1,
+      "student_only_correct": 1,
+      "birdnet_only_correct": 1,
+      "both_incorrect": 0
+    },
+    "percentages": {
+      "both_correct": 33.33333333333333,
+      "student_only_correct": 33.33333333333333,
+      "birdnet_only_correct": 33.33333333333333,
+      "both_incorrect": 0.0
+    },
+    "detailed_cases": [
+      {
+        "audio_path": "../bird_sound_dataset/Bubo_bubo/XC902463-Gufo-reale-Sciarbo-12.5.24.mp3",
+        "true_label": "Bubo_bubo",
+        "student_prediction": "no_birds",
+        "student_confidence": 0.48635074496269226,
+        "birdnet_prediction": "Bubo_bubo",
+        "birdnet_confidence": 0.9578163027763367,
+        "student_correct": false,
+        "birdnet_correct": true,
+        "category": "birdnet_only_correct"
+      },
+      {
+        "audio_path": "../bird_sound_dataset/Certhia_brachydactyla/XC630183-Boomkruiper 20210320-01a.mp3",
+        "true_label": "Certhia_brachydactyla",
+        "student_prediction": "Certhia_brachydactyla",
+        "student_confidence": 0.8684283494949341,
+        "birdnet_prediction": "no_birds",
+        "birdnet_confidence": 0.0,
+        "student_correct": true,
+        "birdnet_correct": false,
+        "category": "student_only_correct"
+      }
+    ]
+  },
+  "per_class_analysis": {
+    "Apus_apus": {
+      "support": 1,
+      "student_accuracy": 1.0,
+      "birdnet_accuracy": 1.0,
+      "student_predictions": 1,
+      "birdnet_predictions": 1
+    },
+    "Bubo_bubo": {
+      "support": 1,
+      "student_accuracy": 0.0,
+      "birdnet_accuracy": 1.0,
+      "student_predictions": 0,
+      "birdnet_predictions": 1
+    },
+    "Certhia_brachydactyla": {
+      "support": 1,
+      "student_accuracy": 1.0,
+      "birdnet_accuracy": 0.0,
+      "student_predictions": 1,
+      "birdnet_predictions": 0
+    }
+  },
+  "confusion_matrices": {
+    "student": [
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "birdnet": [
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "labels": [
+      "Apus_apus",
+      "Bubo_bubo",
+      "Certhia_brachydactyla",
+      "no_birds"
+    ]
+  },
+  "summary": {
+    "total_samples": 3,
+    "num_classes": 4,
+    "classes": [
+      "Apus_apus",
+      "Bubo_bubo",
+      "Certhia_brachydactyla",
+      "no_birds"
+    ]
+  }
+}

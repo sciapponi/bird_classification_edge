@@ -1,0 +1,3 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Bubo_bubo/XC902463-Gufo-reale-Sciarbo-12.5.24.mp3,Bubo_bubo,no_birds,0.48635074496269226,Bubo_bubo,0.9578163027763367,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC630183-Boomkruiper 20210320-01a.mp3,Certhia_brachydactyla,Certhia_brachydactyla,0.8684283494949341,no_birds,0.0,True,False,student_only_correct

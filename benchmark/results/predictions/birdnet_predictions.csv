@@ -1,0 +1,4 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species
+../bird_sound_dataset/Apus_apus/A Mauersegler III.mp3,Apus_apus,Apus_apus,0.9995957016944885,4,{'Apus_apus': 0.9995957016944885}
+../bird_sound_dataset/Bubo_bubo/XC902463-Gufo-reale-Sciarbo-12.5.24.mp3,Bubo_bubo,Bubo_bubo,0.9578163027763367,7,{'Bubo_bubo': 0.9578163027763367}
+../bird_sound_dataset/Certhia_brachydactyla/XC630183-Boomkruiper 20210320-01a.mp3,Certhia_brachydactyla,no_birds,0.0,0,{}

@@ -179,8 +179,7 @@ def run_student_predictions(cfg: DictConfig, ground_truth_df: pd.DataFrame, orig
         )
         
         # Save predictions
-        benchmark_dir = os.path.join(original_cwd, "benchmark")
-        output_path = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir, "student_predictions.csv")
+        output_path = os.path.join(original_cwd, cfg.benchmark.paths.predictions_dir, "student_predictions.csv")
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         predictions_df.to_csv(output_path, index=False)
         
@@ -231,8 +230,7 @@ def run_birdnet_predictions(cfg: DictConfig, ground_truth_df: pd.DataFrame, orig
         )
         
         # Save predictions
-        benchmark_dir = os.path.join(original_cwd, "benchmark")
-        output_path = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir, "birdnet_predictions.csv")
+        output_path = os.path.join(original_cwd, cfg.benchmark.paths.predictions_dir, "birdnet_predictions.csv")
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         predictions_df.to_csv(output_path, index=False)
         
@@ -301,8 +299,7 @@ def run_comparison(cfg: DictConfig, student_df: pd.DataFrame, birdnet_df: pd.Dat
         )
         
         # Save comparison results
-        benchmark_dir = os.path.join(original_cwd, "benchmark")
-        output_dir = os.path.join(benchmark_dir, cfg.benchmark.paths.comparison_dir)
+        output_dir = os.path.join(original_cwd, cfg.benchmark.paths.comparison_dir)
         os.makedirs(output_dir, exist_ok=True)
         
         comparator.save_results(comparison_results, output_dir)
@@ -330,8 +327,7 @@ def main(cfg: DictConfig) -> None:
     original_cwd = hydra.utils.get_original_cwd()
     
     # Create output directories
-    benchmark_dir = os.path.join(original_cwd, "benchmark")
-    predictions_dir = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir)
+    predictions_dir = os.path.join(original_cwd, cfg.benchmark.paths.predictions_dir)
     os.makedirs(predictions_dir, exist_ok=True)
     
     logger.info("=" * 60)
@@ -379,14 +375,8 @@ def main(cfg: DictConfig) -> None:
     logger.info("📊 STEP 4: Metrics and Comparison")
     logger.info("=" * 40)
 
-    # Merge predictions
-    student_preds = student_predictions_df[['audio_path', 'student_prediction', 'student_confidence']]
-    birdnet_preds = birdnet_predictions_df[['audio_path', 'birdnet_prediction', 'birdnet_confidence']]
-    combined_df = pd.merge(ground_truth_df, student_preds, on='audio_path')
-    combined_df = pd.merge(combined_df, birdnet_preds, on='audio_path')
-
     # Run comparison
-    run_comparison(cfg, combined_df, original_cwd)
+    run_comparison(cfg, student_predictions_df, birdnet_predictions_df, original_cwd)
     
     logger.info("\n" + "=" * 60)
     logger.info("🎉 BENCHMARK COMPLETED SUCCESSFULLY!")

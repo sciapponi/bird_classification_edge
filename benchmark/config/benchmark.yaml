@@ -14,7 +14,7 @@ benchmark:
     audio_dir: "bird_sound_dataset"  # Directory with audio files to process (class subdirectories)
     no_birds_dir: "augmented_dataset/no_birds"  # Directory with no_birds samples
     ground_truth: null  # Auto-generated from folder structure
-    output_dir: "benchmark_results/"  # Base output directory
+    output_dir: "results/"  # Base output directory
     
     # Model paths
     student_model: "best_distillation_model.pt"  # Student model checkpoint
@@ -22,8 +22,8 @@ benchmark:
     
     # Derived paths (auto-generated)
     segments_dir: "${benchmark.paths.output_dir}/segments"
-    predictions_dir: "benchmark_results/predictions"
-    comparison_dir: "benchmark_results/comparison"
+    predictions_dir: "results/predictions"
+    comparison_dir: "results/comparison"
 
 # Audio segmentation configuration
 segmentation:

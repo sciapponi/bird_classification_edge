@@ -319,8 +319,7 @@ def main(cfg: DictConfig) -> None:
         )
         
         # Save predictions
-        benchmark_dir = os.path.join(original_cwd, "benchmark") 
-        output_path = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir, "student_predictions.csv")
+        output_path = os.path.join(original_cwd, cfg.benchmark.paths.predictions_dir, "student_predictions.csv")
         
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         predictions_df.to_csv(output_path, index=False)

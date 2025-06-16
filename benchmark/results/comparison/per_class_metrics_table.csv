@@ -1,0 +1,5 @@
+Class,Support,Student_Precision,Student_Recall,Student_F1,BirdNET_Precision,BirdNET_Recall,BirdNET_F1,Precision_Diff,Recall_Diff,F1_Diff
+Apus_apus,1,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000,+0.0000,+0.0000,+0.0000
+Bubo_bubo,1,0.0000,0.0000,0.0000,1.0000,1.0000,1.0000,+1.0000,+1.0000,+1.0000
+Certhia_brachydactyla,1,1.0000,1.0000,1.0000,0.0000,0.0000,0.0000,-1.0000,-1.0000,-1.0000
+no_birds,0,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,+0.0000,+0.0000,+0.0000

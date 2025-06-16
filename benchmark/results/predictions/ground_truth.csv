@@ -1,0 +1,4 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Apus_apus/A Mauersegler III.mp3,Apus_apus,bird,Apus_apus,/workspace/benchmark/../bird_sound_dataset/Apus_apus/A Mauersegler III.mp3
+../bird_sound_dataset/Bubo_bubo/XC902463-Gufo-reale-Sciarbo-12.5.24.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC902463-Gufo-reale-Sciarbo-12.5.24.mp3
+../bird_sound_dataset/Certhia_brachydactyla/XC630183-Boomkruiper 20210320-01a.mp3,Certhia_brachydactyla,bird,Certhia_brachydactyla,/workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC630183-Boomkruiper 20210320-01a.mp3

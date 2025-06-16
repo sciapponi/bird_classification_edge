@@ -734,8 +734,7 @@ def main(cfg: DictConfig) -> None:
     
     try:
         # Load predictions
-        benchmark_dir = os.path.join(original_cwd, "benchmark")
-        predictions_dir = os.path.join(benchmark_dir, cfg.benchmark.paths.predictions_dir)
+        predictions_dir = os.path.join(original_cwd, cfg.benchmark.paths.predictions_dir)
         
         student_path = os.path.join(predictions_dir, "student_predictions.csv")
         birdnet_path = os.path.join(predictions_dir, "birdnet_predictions.csv")
