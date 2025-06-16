@@ -33,6 +33,7 @@ RUN mkdir -p /app/benchmark/benchmark_results && chmod -R 777 /app/benchmark/ben
 # Set environment variables for audio processing
 ENV PYTHONPATH="/app:$PYTHONPATH"
 ENV MATPLOTLIB_BACKEND="Agg"
+ENV PYTHONIOENCODING=UTF-8
 
 # Non è più necessario creare utenti/gruppi o cambiare USER
 # I comandi verranno eseguiti come root (o l'utente predefinito dell'immagine base)

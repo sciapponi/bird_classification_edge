@@ -1,0 +1,64 @@
+FROM nvidia/cuda:11.8-cudnn8-devel-ubuntu20.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONIOENCODING=utf-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    git \
+    wget \
+    curl \
+    unzip \
+    sox \
+    libsox-fmt-all \
+    ffmpeg \
+    portaudio19-dev \
+    libasound2-dev \
+    libsndfile1 \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python3 as default python
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Upgrade pip
+RUN python -m pip install --upgrade pip
+
+# Install PyTorch with CUDA support first (to avoid conflicts)
+RUN pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 torchaudio==2.0.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+
+# Create workspace directory
+WORKDIR /workspace
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt /workspace/
+COPY benchmark/requirements.txt /workspace/benchmark_requirements.txt
+
+# Install Python packages
+RUN pip install -r requirements.txt
+RUN pip install -r benchmark_requirements.txt
+
+# Install additional packages for benchmark
+RUN pip install numba resampy
+
+# Create user (CHANGE THESE VALUES ACCORDING TO YOUR `id` COMMAND OUTPUT)
+ARG USER_ID=1000
+ARG USER_GROUP_ID=1000
+RUN groupadd -g $USER_GROUP_ID docker_user && \
+    useradd -u $USER_ID -g $USER_GROUP_ID -ms /bin/bash docker_user
+
+# Set proper permissions for workspace
+RUN chown -R docker_user:docker_user /workspace
+
+# Switch to user
+USER docker_user
+
+# Set default command
+CMD ["/bin/bash"] 

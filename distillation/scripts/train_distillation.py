@@ -5,7 +5,6 @@ Training script for knowledge distillation using BirdNET as teacher.
 
 import os
 import sys
-import torch
 import torch.nn as nn
 import numpy as np
 import hydra
@@ -439,6 +438,7 @@ class DistillationTrainer:
         # Save results and summary
         self.save_results(self.test_acc, report_dict)
         self.save_model_summary(report_str)
+        return self.test_acc, report_dict
     
     def save_training_plots(self):
         """Saves training history plots."""
@@ -527,48 +527,47 @@ class DistillationTrainer:
 
 @hydra.main(version_base=None, config_path="../configs", config_name="distillation_config")
 def main(cfg: DictConfig):
-    """Main function to run distillation training."""
-    
+    """Main function to run the distillation training."""
+    import torch
+    torch.cuda.is_available()
+
     # --- Setup Output Directory and Logging ---
     output_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
     
-    # Configure file logging in addition to console logging
+    # Configure file logging
     log_file = os.path.join(output_dir, "distillation_train.log")
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - [%(levelname)s] - %(message)s')
     file_handler.setFormatter(formatter)
-    
-    # Add handler to the root logger to catch logs from all modules
-    # This might log hydra's own logs too. For cleaner logs, get specific logger.
-    root_logger = logging.getLogger()
-    root_logger.addHandler(file_handler)
+    logging.getLogger().addHandler(file_handler)
     
     logger.info(f"Hydra output directory: {output_dir}")
     logger.info("Full config:\n" + OmegaConf.to_yaml(cfg))
-
-    soft_labels_path = cfg.dataset.soft_labels_path
     
-    # Check if soft_labels_path exists
+    # Construct absolute path for soft labels
+    original_cwd = hydra.utils.get_original_cwd()
+    soft_labels_path = os.path.join(original_cwd, cfg.dataset.soft_labels_path)
+
     if not os.path.exists(soft_labels_path):
         logger.error(f"Soft labels path does not exist: {soft_labels_path}")
         sys.exit(1)
         
     logger.info(f"Using soft labels from: {soft_labels_path}")
     
-    # --- Trainer Initialization ---
-    trainer = DistillationTrainer(config=cfg, soft_labels_path=soft_labels_path, output_dir=output_dir)
-    
-    # --- Run Training and Testing ---
+    # Initialize and run trainer
     try:
+        trainer = DistillationTrainer(config=cfg, soft_labels_path=soft_labels_path, output_dir=output_dir)
         trainer.train()
-        trainer.test()
+        test_acc, report_dict = trainer.test()
+        trainer.save_results(test_acc, report_dict)
+    
+        logger.info(f"--- Distillation Training Completed ---")
+        logger.info(f"Final test accuracy: {test_acc:.4f}")
+        logger.info(f"Results and plots saved to: {output_dir}")
     except Exception as e:
         logger.exception(f"An error occurred during training or testing: {e}")
         sys.exit(1)
-    
-    logger.info("Script finished successfully.")
-    
 
 if __name__ == "__main__":
     main() 

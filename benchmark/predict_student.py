@@ -6,24 +6,23 @@ This script generates predictions using the trained student model
 on audio files directly without additional preprocessing.
 """
 
+import torch
+import torch.nn.functional as F
 import os
 import sys
 import logging
-import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 import hydra
+
+# Add project root to path BEFORE other project imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from models import Improved_Phi_GRU_ATT
+
+# Keep only essential, non-conflicting imports at the global level
 from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
-import torch
-import torch.nn.functional as F
-import librosa
-import numpy as np
 
-# Add project root to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from models import Improved_Phi_GRU_ATT
 
 logger = logging.getLogger(__name__)
 
@@ -56,14 +55,15 @@ class StudentModelPredictor:
             # Debug environment variables
             cuda_devices = os.environ.get('CUDA_VISIBLE_DEVICES', '')
             logger.info(f"Environment CUDA_VISIBLE_DEVICES: '{cuda_devices}'")
-            logger.info(f"PyTorch CUDA available: {torch.cuda.is_available()}")
-            if torch.cuda.is_available():
+            # This check now happens before librosa is ever imported
+            is_available = torch.cuda.is_available()
+            logger.info(f"PyTorch CUDA available: {is_available}")
+            if is_available:
                 logger.info(f"PyTorch CUDA device count: {torch.cuda.device_count()}")
                 for i in range(torch.cuda.device_count()):
                     logger.info(f"CUDA device {i}: {torch.cuda.get_device_name(i)}")
             
-            # Use GPU if available (like the distillation script does)
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.device = torch.device("cuda" if is_available else "cpu")
         else:
             self.device = torch.device(device)
         
@@ -147,6 +147,10 @@ class StudentModelPredictor:
         Returns:
             Preprocessed audio tensor
         """
+        # --- LOCAL IMPORT ---
+        import librosa
+        import numpy as np
+
         try:
             # Load audio with librosa
             y, sr = librosa.load(audio_path, sr=32000, duration=3.0)
@@ -235,8 +239,8 @@ class StudentModelPredictor:
 
 
 def predict_from_dataframe(predictor: StudentModelPredictor, 
-                          ground_truth_df: pd.DataFrame,
-                          audio_base_path: str = "") -> pd.DataFrame:
+                          ground_truth_df: "pd.DataFrame",
+                          audio_base_path: str = "") -> "pd.DataFrame":
     """
     Generate predictions for audio files listed in a ground truth DataFrame.
     
@@ -248,6 +252,9 @@ def predict_from_dataframe(predictor: StudentModelPredictor,
     Returns:
         DataFrame with predictions added
     """
+    # --- LOCAL IMPORT ---
+    import pandas as pd
+
     predictions = []
     
     # Progress bar for student model predictions
@@ -274,7 +281,10 @@ def predict_from_dataframe(predictor: StudentModelPredictor,
 @hydra.main(version_base=None, config_path="config", config_name="benchmark")
 def main(cfg: DictConfig) -> None:
     """Main function for student model prediction."""
-    
+    # --- LOCAL IMPORT ---
+    import hydra
+    import pandas as pd
+
     # Get original working directory (before Hydra changes it)
     from hydra.core.hydra_config import HydraConfig
     original_cwd = HydraConfig.get().runtime.cwd

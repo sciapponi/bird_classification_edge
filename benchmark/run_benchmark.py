@@ -1,4 +1,3 @@
-import torch
 #!/usr/bin/env python3
 """
 Bird Classification Benchmark Runner
@@ -320,7 +319,13 @@ def run_comparison(cfg: DictConfig, student_df: pd.DataFrame, birdnet_df: pd.Dat
 @hydra.main(version_base=None, config_path="config", config_name="benchmark")
 def main(cfg: DictConfig) -> None:
     """Main benchmark function."""
+    import torch
     
+    # Force immediate CUDA initialization to prevent conflicts with other libraries 
+    # (e.g., tensorflow from birdnetlib or numba from librosa).
+    # This call ensures PyTorch "wins the race" for the GPU.
+    torch.cuda.is_available()
+
     # Get original working directory
     original_cwd = hydra.utils.get_original_cwd()
     
@@ -336,7 +341,7 @@ def main(cfg: DictConfig) -> None:
     logger.info(f"Hydra output directory: {os.getcwd()}")
     
     # ========================================
-    # STEP 1: Audio Discovery
+    # STEP 1: Audio Discovery (Always runs)
     # ========================================
     logger.info("\n" + "=" * 40)
     logger.info("📁 STEP 1: Audio Discovery")

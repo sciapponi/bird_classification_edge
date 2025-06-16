@@ -1,6 +1,5 @@
 from datasets import BirdSoundDataset, ESC50Dataset, download_and_extract_esc50
 from torch.utils.data import DataLoader, ConcatDataset
-import torch
 from tqdm import tqdm
 from utils import check_model, check_forward_pass, count_precise_macs
 import torch.nn as nn
@@ -55,6 +54,11 @@ def train(cfg: DictConfig):
     Args:
         cfg: Hydra configuration
     """
+    import torch
+    
+    # Force immediate CUDA initialization to prevent conflicts
+    torch.cuda.is_available()
+
     # Set up logging
     log = logging.getLogger(__name__)
     experiment_name = cfg.experiment_name
@@ -899,7 +903,6 @@ if __name__ == '__main__':
     # e non sono già coperti dagli import all'inizio del file.
     from datasets import BirdSoundDataset, ESC50Dataset, download_and_extract_esc50
     from torch.utils.data import DataLoader, ConcatDataset
-    import torch
     from tqdm import tqdm
     from utils import check_model, check_forward_pass, count_precise_macs
     import torch.nn as nn
