@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.8-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.8.0-devel-ubuntu20.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -43,7 +43,6 @@ COPY benchmark/requirements.txt /workspace/benchmark_requirements.txt
 
 # Install Python packages
 RUN pip install -r requirements.txt
-RUN pip install -r benchmark_requirements.txt
 
 # Install additional packages for benchmark
 RUN pip install numba resampy
@@ -60,5 +59,5 @@ RUN chown -R docker_user:docker_user /workspace
 # Switch to user
 USER docker_user
 
-# Set default command
+# Set default command (will be overridden by run script)
 CMD ["/bin/bash"] 

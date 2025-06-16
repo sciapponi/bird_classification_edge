@@ -1,334 +1,645 @@
 # Bird Sound Classification on Edge Devices
 
-This repository contains a bird sound classification system designed to run on edge devices. It includes functionality for dataset preparation, augmentation, and training.
+This repository contains a comprehensive bird sound classification system designed to run on edge devices. It includes functionality for dataset preparation, augmentation, training, knowledge distillation, and benchmarking.
 
 ## Table of Contents
 
+- [Quick Start](#quick-start)
 - [Installation and Setup](#installation-and-setup)
 - [Project Structure](#project-structure)
 - [Standard Training Workflow](#standard-training-workflow)
 - [Advanced Workflow: Knowledge Distillation](#advanced-workflow-knowledge-distillation)
+- [Model Benchmarking System](#model-benchmarking-system)
 - [Docker Execution](#docker-execution)
+- [Configuration Reference](#configuration-reference)
+
+## Quick Start
+
+**Get started in 3 steps:**
+
+1. **Setup Environment:**
+   ```bash
+   git clone <repository_url>
+   cd bird_classification_edge
+   python3 -m venv venv && source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+2. **Prepare Dataset:**
+   ```bash
+   # Place your bird recordings in bird_sound_dataset/species_name/
+   # Generate "no birds" samples
+   python generate_no_birds_samples.py
+   ```
+
+3. **Train Model:**
+   ```bash
+   # Standard training
+   python train.py
+   
+   # Or with knowledge distillation
+   python extract_soft_labels.py
+   python train_distillation.py
+   ```
+
+4. **Benchmark Your Model:**
+   ```bash
+   # Quick test (10 files)
+   ./run_docker_benchmark.sh my_test 1 debug.files_limit=10
+   
+   # Full benchmark
+   ./run_docker_benchmark.sh my_benchmark 1
+   ```
 
 ## Installation and Setup
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository_url>
-    cd bird_classification_edge
-    ```
+### Prerequisites
+- Python 3.8+
+- CUDA-capable GPU (recommended)
+- Docker (for containerized execution)
 
-2.  **Create and activate a virtual environment:**
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
+### 1. Clone and Setup Environment
+```bash
+git clone <repository_url>
+cd bird_classification_edge
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+### 2. Dataset Preparation
+- **Bird Recordings**: Place in `bird_sound_dataset/`, organized by species folders
+- **Environmental Sounds**: ESC-50 dataset downloads automatically on first run
+- **No-Birds Samples**: Generate using `python generate_no_birds_samples.py`
 
-4.  **Download Datasets:**
-    -   Place your bird recordings in `bird_sound_dataset/`, organized by species folders.
-    -   The ESC-50 dataset for environmental sounds will be downloaded automatically on the first run if not found in `esc-50/`.
+### 3. Verify Installation
+```bash
+# Test basic functionality
+python train.py training.epochs=1 debug.files_limit=10
+```
 
 ## Project Structure
 
-The codebase is organized into a modular structure:
-
 ```
-.
-├── datasets/                # Dataset handling modules
-│   ├── __init__.py          # Package initialization
-│   ├── audio_utils.py       # Audio processing utilities
-│   ├── bird_dataset.py      # Bird sound dataset implementation
-│   ├── empty_segment_dataset.py  # Empty/silent segment extraction
-│   ├── esc50_dataset.py     # ESC-50 environmental sound dataset
-│   ├── dataset_factory.py   # Combined dataset creation
-│   └── test_datasets.py     # Testing functionality
-├── distillation/            # Knowledge distillation package
-│   ├── scripts/             # Executable scripts for distillation
-│   │   ├── extract_soft_labels.py  # Extract soft labels from BirdNET
-│   │   └── train_distillation.py   # Train with knowledge distillation
-│   ├── datasets/            # Dataset classes with soft labels
-│   │   └── distillation_dataset.py # Loads both hard and soft labels
-│   ├── losses/              # Distillation loss functions
-│   │   └── distillation_loss.py    # Combined hard + soft loss
-│   ├── configs/             # Distillation configurations
-│   │   ├── distillation_config.yaml # Main distillation config
-│   │   └── test_distillation.yaml   # Quick test configuration
-│   └── README.md            # Distillation package documentation
-├── generate_no_birds_samples.py  # Script to generate "no_birds" class samples (offline mode)
-├── train.py                 # Main training script
-├── extract_soft_labels.py   # Convenience wrapper for distillation extraction
-├── train_distillation.py    # Convenience wrapper for distillation training
-├── config/                  # Configuration files
-│   └── bird_classification.yaml  # Main configuration
-└── [other project files]
+bird_classification_edge/
+├── Audio Data
+│   ├── bird_sound_dataset/          # Your bird recordings (by species)
+│   ├── augmented_dataset/           # Generated "no birds" samples
+│   └── esc-50/                      # ESC-50 environmental sounds
+│
+├── Core Training
+│   ├── train.py                     # Main training script
+│   ├── models.py                    # Neural network architectures
+│   ├── modules.py                   # Model components (GRU, attention, etc.)
+│   └── config/                      # Training configurations
+│
+├── Datasets
+│   ├── datasets/
+│   │   ├── bird_dataset.py          # Bird sound dataset loader
+│   │   ├── esc50_dataset.py         # ESC-50 environmental sounds
+│   │   ├── empty_segment_dataset.py # Silent segment extraction
+│   │   ├── dataset_factory.py       # Combined dataset creation
+│   │   └── audio_utils.py           # Audio processing utilities
+│   └── generate_no_birds_samples.py # Offline "no birds" generation
+│
+├── Knowledge Distillation
+│   ├── distillation/
+│   │   ├── scripts/                 # Distillation execution scripts
+│   │   ├── datasets/                # Soft label dataset loaders
+│   │   ├── losses/                  # Distillation loss functions
+│   │   └── configs/                 # Distillation configurations
+│   ├── extract_soft_labels.py       # Extract BirdNET soft labels
+│   └── train_distillation.py        # Train with knowledge distillation
+│
+├── Benchmarking
+│   ├── benchmark/
+│   │   ├── run_benchmark.py         # Main benchmark orchestrator
+│   │   ├── predict_student.py       # Student model predictions
+│   │   ├── predict_birdnet.py       # BirdNET reference predictions
+│   │   ├── compare_predictions.py   # Performance comparison & metrics
+│   │   └── config/                  # Benchmark configurations
+│   └── run_docker_benchmark.sh      # Docker benchmark execution
+│
+├── Docker & Deployment
+│   ├── Dockerfile                   # Main training container
+│   ├── Dockerfile.benchmark         # Benchmark container
+│   ├── run_docker_*.sh              # Docker execution scripts
+│   └── docker-compose.yml           # Multi-container orchestration
+│
+└── Documentation
+    ├── README.md                    # This file
+    ├── benchmark/README.md          # Benchmark system guide
+    └── distillation/README.md       # Knowledge distillation guide
 ```
 
 ## Standard Training Workflow
 
-This is the primary workflow for training the model without knowledge distillation. It uses the standard dataset and `CrossEntropyLoss`.
+Train a bird classification model using standard supervised learning.
 
-### 1. Configure Your Training
-
--   Edit the main configuration file: `config/bird_classification.yaml`.
--   Adjust parameters like `epochs`, `batch_size`, `learning_rate`.
--   Select the desired bird species under `dataset.allowed_bird_classes`.
+### 1. Configure Training
+Edit `config/bird_classification.yaml`:
+```yaml
+training:
+  epochs: 100
+  batch_size: 32
+  
+dataset:
+  allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris"]
+  load_pregenerated_no_birds: true  # Use pre-generated samples
+  
+optimizer:
+  lr: 0.001
+```
 
 ### 2. Handle "No Birds" Samples
 
-You can choose one of two modes in your configuration file:
-
--   **Offline Mode (Recommended):** First, generate a fixed set of "no-bird" samples.
-    ```bash
-    python generate_no_birds_samples.py
-    ```
-    Then, in `config/bird_classification.yaml`, set `load_pregenerated_no_birds: true`.
-
--   **Online Mode:** Set `load_pregenerated_no_birds: false`. "No-bird" samples will be generated on-the-fly during training setup.
-
-### 3. Run the Training Script
+**Option A: Offline Generation (Recommended)**
 ```bash
-# Run training with the configuration from your .yaml file
+# Generate fixed set of "no birds" samples
+python generate_no_birds_samples.py \
+  --num_samples 500 \
+  --esc50_ratio 0.5 \
+  --energy_threshold_factor 1.5
+
+# Configure to use pre-generated samples
+# Set load_pregenerated_no_birds: true in config
+```
+
+**Option B: Online Generation**
+```bash
+# Set load_pregenerated_no_birds: false in config
+# Samples generated during training setup
+```
+
+### 3. Train the Model
+```bash
+# Basic training
 python train.py
 
-# Override any parameter from the command line
+# With parameter overrides
 python train.py training.epochs=50 optimizer.lr=0.001 dataset.num_workers=8
+
+# GPU selection
+CUDA_VISIBLE_DEVICES=1 python train.py
 ```
+
+### 4. Monitor Training
+- Logs: `logs/` directory
+- Models: Saved as `*.pt` files
+- Metrics: Displayed during training
 
 ## Advanced Workflow: Knowledge Distillation
 
-This workflow uses a large "teacher" model (BirdNET) to train our smaller "student" model, improving its accuracy and generalization.
+Improve model performance using BirdNET as a teacher model.
 
-### How it Works
+### How Knowledge Distillation Works
 The student model learns from two sources:
-1.  **Hard Labels:** The ground truth (e.g., "This is `Bubo_bubo`").
-2.  **Soft Labels:** The teacher's detailed probabilities (e.g., "70% `Bubo_bubo`, 20% `Apus_apus`").
+1. **Hard Labels**: Ground truth species labels
+2. **Soft Labels**: Teacher model's probability distributions
 
-This is controlled by a `DistillationLoss` function: `L_total = (1-α) * L_hard + α * L_soft`.
+This is controlled by: `L_total = (1-α) × L_hard + α × L_soft`
 
 ### Workflow Steps
 
-#### Step 1: Extract Soft Labels from the Teacher
-Run the extraction script to have BirdNET analyze your dataset and produce `soft_labels.json`.
-
+#### Step 1: Extract Soft Labels from BirdNET
 ```bash
-# Extract soft labels for all classes defined in distillation/species.txt
+# Extract for all species in distillation/species.txt
 python extract_soft_labels.py --output_path soft_labels_complete
+
+# Extract for custom species subset
+python extract_soft_labels.py \
+  --species_list distillation/species_4.txt \
+  --output_path soft_labels_4_classes
 ```
 
-#### Step 2: Train the Student with Distillation
-Run the distillation training script. It will use the configuration in `distillation/configs/distillation_config.yaml`.
-
+#### Step 2: Train with Distillation
 ```bash
-# Ensure soft_labels_path in the config points to the correct directory
+# Use default configuration
 python train_distillation.py
+
+# With custom parameters
+python train_distillation.py \
+  training.alpha=0.7 \
+  training.temperature=4.0 \
+  training.epochs=50
 ```
 
-### Training on a Custom Subset of Classes
+### Custom Species Training
+To train on a subset of species:
 
-If you want to train on fewer classes, you must generate new soft labels that match.
+1. **Create Species List:**
+   ```bash
+   # Create distillation/species_custom.txt
+   echo "Poecile montanus" > distillation/species_custom.txt
+   echo "Certhia familiaris" >> distillation/species_custom.txt
+   echo "Apus apus" >> distillation/species_custom.txt
+   echo "Bubo bubo" >> distillation/species_custom.txt
+   ```
 
-1.  **Create a Custom Species List:** Create a new file, e.g., `distillation/species_4.txt`, with only the species you want.
-    ```
-    # distillation/species_4.txt
-    Poecile montanus
-    Certhia familiaris
-    Apus apus
-    Bubo bubo
-    ```
-2.  **Generate Matching Soft Labels:** Run the extraction script pointing to your new list and a new output folder.
-    ```bash
-    python extract_soft_labels.py \
-        --species_list distillation/species_4.txt \
-        --output_path soft_labels_4_classes
-    ```
-3.  **Configure and Train:** Update `distillation/configs/distillation_config.yaml` to point `soft_labels_path` to `soft_labels_4_classes` and list the same 4 species under `allowed_bird_classes`. Then run `python train_distillation.py`.
+2. **Extract Matching Soft Labels:**
+   ```bash
+   python extract_soft_labels.py \
+     --species_list distillation/species_custom.txt \
+     --output_path soft_labels_custom
+   ```
+
+3. **Update Configuration:**
+   ```yaml
+   # distillation/configs/distillation_config.yaml
+   dataset:
+     soft_labels_path: "soft_labels_custom"
+     allowed_bird_classes: ["Poecile_montanus", "Certhia_familiaris", "Apus_apus", "Bubo_bubo"]
+   ```
+
+4. **Train:**
+   ```bash
+   python train_distillation.py
+   ```
+
+## Model Benchmarking System
+
+Comprehensive system to compare your trained model with BirdNET as a reference.
+
+### What the Benchmark Does
+
+1. **Audio Discovery**: Automatically scans your dataset and generates ground truth
+2. **Student Predictions**: Generates predictions using your trained model  
+3. **BirdNET Predictions**: Generates reference predictions using BirdNET
+4. **Performance Analysis**: Creates detailed metrics, visualizations, and reports
+
+### Quick Start Examples
+
+#### Docker Execution (Recommended)
+
+**Quick Test (Development):**
+```bash
+# Test with 10 files to verify everything works
+./run_docker_benchmark.sh my_test_gpu1 1 debug.files_limit=10
+
+# Test with small subset
+./run_docker_benchmark.sh my_test_gpu1 1 debug.test_with_subset=true
+```
+
+**Production Benchmarks:**
+```bash
+# Full benchmark (may take hours!)
+./run_docker_benchmark.sh my_benchmark_gpu1 1 debug.dev_mode=false
+
+# Manageable subset (recommended)
+./run_docker_benchmark.sh my_benchmark_gpu1 1 debug.files_limit=1000
+```
+
+**Custom Configurations:**
+```bash
+# Use specific model
+./run_docker_benchmark.sh my_benchmark_gpu1 1 \
+  benchmark.paths.student_model=my_custom_model.pt
+
+# Adjust confidence thresholds
+./run_docker_benchmark.sh my_benchmark_gpu1 1 \
+  student_model.inference.confidence_threshold=0.2 \
+  birdnet.confidence_threshold=0.1
+
+# Multiple parameters
+./run_docker_benchmark.sh my_benchmark_gpu1 1 \
+  benchmark.paths.student_model=custom_model.pt \
+  debug.files_limit=500 \
+  student_model.inference.confidence_threshold=0.15 \
+  comparison.save_plots=true
+```
+
+#### Local Environment Execution
+```bash
+cd benchmark
+source ../venv/bin/activate
+python run_benchmark.py --config-name=quick_start
+
+# With overrides
+python run_benchmark.py --config-name=quick_start \
+  debug.files_limit=100 \
+  benchmark.paths.student_model=../my_model.pt
+```
+
+### Benchmark Results
+
+All results are automatically saved in `benchmark/benchmark_results/`:
+
+```
+benchmark_results/
+├── predictions/                    # Raw prediction files
+│   ├── ground_truth.csv           # Auto-generated ground truth
+│   ├── student_predictions.csv    # Your model's predictions  
+│   └── birdnet_predictions.csv    # BirdNET reference predictions
+│
+├── comparison/                     # Analysis and visualizations
+│   ├── comparison_report.txt      # Human-readable summary
+│   ├── comparison_report.json     # Complete metrics in JSON
+│   ├── detailed_cases.csv         # Per-file prediction details
+│   ├── confusion_matrices.png     # Side-by-side confusion matrices
+│   ├── agreement_analysis.png     # Model agreement visualization
+│   ├── per_class_accuracy.png     # Per-species accuracy comparison
+│   ├── metrics_comparison_table.csv  # Overall metrics comparison
+│   └── per_class_metrics_table.csv   # Detailed per-class metrics
+│
+└── hydra_outputs/                  # Execution logs and configs
+    └── [timestamp]/
+        ├── main.log               # Complete execution log
+        └── .hydra/
+            ├── config.yaml        # Final configuration used
+            └── overrides.yaml     # Parameters overridden
+```
+
+### Configuration Options
+
+#### Quick Test Configuration
+```bash
+# Minimal test with 3 files
+debug.test_with_subset=true debug.subset_size=3
+
+# Test with custom file limit
+debug.files_limit=50
+
+# Use different model
+benchmark.paths.student_model=path/to/your/model.pt
+
+# Adjust confidence thresholds
+student_model.inference.confidence_threshold=0.1
+birdnet.confidence_threshold=0.1
+```
+
+#### Production Configuration
+```bash
+# Full dataset evaluation
+debug.dev_mode=false debug.files_limit=null
+
+# High-confidence predictions only
+student_model.inference.confidence_threshold=0.5
+birdnet.confidence_threshold=0.3
+
+# Custom output directory
+benchmark.paths.output_dir=results_high_confidence
+
+# Performance optimization
+student_model.inference.batch_size=32
+```
+
+### Understanding the Metrics
+
+The benchmark provides comprehensive evaluation:
+
+- **Overall Accuracy**: Total correct predictions / total predictions
+- **Per-Class Metrics**: Precision, recall, F1-score for each bird species
+- **Confusion Matrices**: Visual representation of classification errors
+- **Agreement Analysis**: 
+  - Both models correct
+  - Only student correct  
+  - Only BirdNET correct
+  - Both models incorrect
+- **Confidence Distributions**: Model confidence in predictions
+- **Error Analysis**: Detailed breakdown of misclassifications
+
+### Customization Examples
+
+#### Adding New Species
+1. Update training config: `config/bird_classification.yaml`
+2. Retrain your model with new species
+3. Benchmark automatically detects new classes
+
+#### Performance Optimization
+```bash
+# Faster testing with file limits
+debug.files_limit=100
+
+# Memory optimization
+student_model.inference.batch_size=16
+
+# Skip visualization for speed
+comparison.save_plots=false
+```
+
+#### Advanced Analysis
+```bash
+# Very low confidence threshold (catch more predictions)
+student_model.inference.confidence_threshold=0.01
+birdnet.confidence_threshold=0.01
+
+# Focus on high-confidence analysis
+student_model.inference.confidence_threshold=0.8
+birdnet.confidence_threshold=0.5
+```
+
+### Troubleshooting
+
+**Common Issues:**
+
+| Problem | Solution |
+|---------|----------|
+| "No audio files found" | Verify `bird_sound_dataset/` and `augmented_dataset/no_birds/` exist |
+| "Model loading failed" | Check model path in config: `benchmark.paths.student_model` |
+| "BirdNET species not found" | Some species may not be in BirdNET's database |
+| GPU memory issues | Reduce batch size: `student_model.inference.batch_size=8` |
+| Docker permission issues | Ensure user has Docker access and GPU permissions |
+
+**Performance Tips:**
+- Use `debug.files_limit=100` for rapid iteration
+- BirdNET is slower than student models - consider subsets for quick tests
+- Results are cached to avoid recomputation
+- Use Docker for consistent environment across different machines
 
 ## Docker Execution
 
-The knowledge distillation pipeline is fully runnable in Docker, ideal for server deployment.
+Containerized execution for consistent, reproducible training and benchmarking.
 
-### 1. Build the Docker Image
+### 1. Build Docker Images
 ```bash
+# Main training image
 docker build -t bird_classification_edge .
+
+# Benchmark-specific image
+docker build -f Dockerfile.benchmark -t bird_classification_benchmark .
 ```
 
-### 2. Run the Workflow
+### 2. Available Docker Scripts
 
--   **Step 1: Extract Soft Labels:**
-    ```bash
-    # Use GPU 0 for extraction
-    ./run_docker_soft_labels.sh my_extraction_gpu0 GPU_ID=0
-    
-    # Run on a Mac (CPU only)
-    ./run_docker_soft_labels.sh my_extraction_mac MAC
-    ```
-    This saves results to `soft_labels_complete/`.
+| Script | Purpose | Example Usage |
+|--------|---------|---------------|
+| `run_docker_soft_labels.sh` | Extract BirdNET soft labels | `./run_docker_soft_labels.sh my_extraction 0` |
+| `run_docker_distillation.sh` | Knowledge distillation training | `./run_docker_distillation.sh my_training 0` |
+| `run_docker_benchmark.sh` | **Model benchmarking** | `./run_docker_benchmark.sh my_benchmark 1` |
+| `run_docker_training.sh` | Standard training | `./run_docker_training.sh my_training 0` |
 
--   **Step 2: Run Distillation Training:**
-    ```bash
-    # Use GPU 0 for training
-    ./run_docker_distillation.sh my_training_gpu0 GPU_ID=0
+### 3. Docker Workflow Examples
 
-    # Override parameters. Note: For distillation, some top-level params like batch_size
-    # are in the 'training' block, while dataset params are in the 'dataset' block.
-    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50 dataset.num_workers=8
-    ```
-For more details on server usage, GPU management, and troubleshooting, see the comments within the `run_docker_*.sh` scripts.
+#### Complete Knowledge Distillation Pipeline
+```bash
+# Step 1: Extract soft labels from BirdNET
+./run_docker_soft_labels.sh extraction_gpu0 0
+# Results saved to soft_labels_complete/
 
-## Data Augmentation and "No Birds" Class Workflow
+# Step 2: Train with knowledge distillation
+./run_docker_distillation.sh training_gpu0 0 training.epochs=50
+# Model saved as best_distillation_model.pt
 
-The system supports two main approaches for handling the "no_birds" class samples, controlled via `config/bird_classification.yaml`:
-
-### Mode 1: Offline Generation of "No Birds" Samples (Recommended for Reproducibility and Speed)
-
-1.  **Generate "No Birds" Class Samples (Offline):**
-    This step uses `generate_no_birds_samples.py` to create and save audio files for the "no_birds" class.
-    ```bash
-    python generate_no_birds_samples.py --bird_dir path/to/birds --output_dir augmented_dataset/no_birds --energy_threshold 2.0
-    ```
-    This script:
-    - Creates a balanced set of "no_birds" samples from two sources:
-        - **ESC-50 environmental sounds** (rain, footsteps, engines, etc.)
-        - **Empty/silent segments** extracted from your bird recordings
-    - Saves these to the specified output directory (e.g., `augmented_dataset/no_birds/`).
-
-2.  **Configure Training to Load Pre-generated Samples:**
-    In `config/bird_classification.yaml`, set:
-    ```yaml
-    dataset:
-      load_pregenerated_no_birds: true
-      pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # Or your custom path
-      # num_no_bird_samples: 100 # Optionally, specify how many to load if fewer than available
-    ```
-
-### Mode 2: On-the-Fly Generation of "No Birds" Samples
-
-1.  **Configure Training for On-the-Fly Generation:**
-    In `config/bird_classification.yaml`, set:
-    ```yaml
-    dataset:
-      load_pregenerated_no_birds: false
-      num_no_bird_samples: 100 # Desired total number of "no_birds" samples per epoch/dataset creation
-      esc50_no_bird_ratio: 0.5   # Proportion from ESC-50 vs. empty segments
-    ```
-    In this mode, `train.py` (via `datasets/dataset_factory.py`) will dynamically generate "no_birds" samples during dataset setup using ESC-50 sounds and by extracting silent segments from your bird recordings. No prior execution of `generate_no_birds_samples.py` is strictly needed for the "no_birds" class itself, though you still need your base bird recordings and the ESC-50 dataset.
-
-### Dataset Structure (Example after Offline Generation)
-
-```
-bird_sound_dataset/         # Original dataset
-  ├── species1/             # Bird class folders
-  │   ├── recording1.wav
-  │   └── ...
-  └── species2/
-      └── ...
-
-augmented_dataset/          # Directory for pre-generated data (if using offline mode)
-  └── no_birds/             # The "no birds" class samples
-      ├── esc50_0000.wav    # Environmental sounds
-      ├── ...
-      ├── empty_0000.wav    # Silent segments
-      └── ...
+# Step 3: Benchmark against BirdNET
+./run_docker_benchmark.sh benchmark_gpu1 1 debug.files_limit=1000
+# Results in benchmark/benchmark_results/
 ```
 
-### Common Augmentations Applied During Training (Both Modes)
+#### GPU Management
+```bash
+# Use specific GPU
+./run_docker_benchmark.sh my_benchmark 2  # Uses GPU 2
 
-Once the base bird sounds and "no_birds" samples (either loaded or generated on-the-fly) are ready, `train.py` applies further augmentations in real-time if enabled in the configuration (`dataset.augmentation.enabled: true`):
-- Bird call extraction (if `dataset.extract_calls: true`)
-- Background mixing with controlled SNR (using ESC-50 sounds as background)
-- Time/frequency masking
-- Speed perturbation
-- Time shifting
+# CPU-only execution (Mac/no GPU)
+./run_docker_soft_labels.sh my_extraction MAC  # Special MAC flag
+```
 
-## Key Components
+#### Parameter Overrides
+```bash
+# Training parameters
+./run_docker_distillation.sh my_training 0 \
+  training.epochs=100 \
+  training.batch_size=64 \
+  optimizer.lr=0.0005
 
-### `generate_no_birds_samples.py`
-Script to generate and save "no_birds" class samples offline. Useful for creating a fixed set of negative samples.
+# Benchmark parameters  
+./run_docker_benchmark.sh my_benchmark 1 \
+  debug.files_limit=500 \
+  student_model.inference.confidence_threshold=0.2 \
+  benchmark.paths.student_model=custom_model.pt
+```
 
-### `datasets/dataset_factory.py` (`create_combined_dataset` function)
-This is the core function called by `train.py` to prepare the training, validation, and test datasets. It now supports:
-- Loading pre-generated "no_birds" samples from disk.
-- Generating "no_birds" samples on-the-fly from ESC-50 and silent segments of bird recordings.
-The choice is controlled by `load_pregenerated_no_birds` in the configuration.
+## Configuration Reference
 
-### `datasets/empty_segment_dataset.py` (`EmptySegmentDataset` class)
-A dataset class that finds and extracts segments with low energy (likely no bird calls) from audio recordings. Used by both `generate_no_birds_samples.py` (offline) and `dataset_factory.py` (if generating on-the-fly).
+### Main Training Configuration (`config/bird_classification.yaml`)
 
-## Key Configuration Parameters (`config/bird_classification.yaml`)
-
-Below are some important parameters in `config/bird_classification.yaml` related to dataset handling and the "no_birds" class:
-
+#### Dataset Parameters
 ```yaml
 dataset:
-  # General dataset settings
-  num_workers: 4                       # Number of parallel data loading processes. Increase to use more CPU cores and speed up data preparation.
-  bird_data_dir: "bird_sound_dataset"  # Path to bird sound data
-  esc50_dir: "ESC-50-master"           # Path to ESC-50 dataset
+  bird_data_dir: "bird_sound_dataset"
+  allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris", "Poecile_montanus"]
   
   # "No Birds" class handling
-  load_pregenerated_no_birds: false    # true: Load from disk; false: Generate on-the-fly
-  pregenerated_no_birds_dir: "augmented_dataset/no_birds/" # Path if loading from disk
-  num_no_bird_samples: 100             # Target number for "no_birds" samples (used in both modes)
-                                       # For pre-generated, if available samples < this, all are used.
-                                       # If 0 when loading pre-generated, all available samples are used.
-  esc50_no_bird_ratio: 0.5             # Proportion from ESC-50 (vs. empty) if generating on-the-fly
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: "augmented_dataset/no_birds/"
+  num_no_bird_samples: 100
+  esc50_no_bird_ratio: 0.5
+  
+  # Audio processing
+  target_sr: 22050
+  clip_duration: 3.0
+  extract_calls: true
+  
+  # Data loading
+  num_workers: 4
+  split_ratios: [0.7, 0.15, 0.15]  # train/val/test
+```
 
-  # Augmentation parameters (applied in real-time by BirdSoundDataset)
+#### Training Parameters
+```yaml
+training:
+  epochs: 100
+  batch_size: 32
+  patience: 15
+  checkpoint_every: 10
+  
+optimizer:
+  type: "Adam"
+  lr: 0.001
+  weight_decay: 1e-4
+  
+model:
+  n_classes: 5  # 4 bird species + 1 no_birds
+  dropout: 0.3
+```
+
+#### Augmentation Settings
+```yaml
+dataset:
   augmentation:
-    enabled: true                      # Whether to use real-time augmentation
-    # ... other augmentation params (noise_level, time_mask_param, etc.)
-
-  # Bird call extraction parameters
-  extract_calls: true                  # Whether to extract bird calls from audio
-  # ... other params (min_peak_distance, etc.)
+    enabled: true
+    noise_level: 0.005
+    time_mask_param: 80
+    freq_mask_param: 80
+    mixup_alpha: 0.2
 ```
 
-## Script Parameters
+### Benchmark Configuration (`benchmark/config/`)
 
-### `generate_no_birds_samples.py` (for Offline Mode)
+#### Quick Start Config (`quick_start.yaml`)
+```yaml
+benchmark:
+  paths:
+    audio_dir: "../bird_sound_dataset"
+    no_birds_dir: "../augmented_dataset/no_birds"
+    student_model: "../best_distillation_model.pt"
+    student_config: "../config/bird_classification.yaml"
+    output_dir: "benchmark_results"
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--bird_dir` | bird_sound_dataset | Directory containing bird sound recordings |
-| `--esc50_dir` | *auto-downloaded* | Directory containing ESC-50 dataset |
-| `--output_dir` | augmented_dataset | Directory to save generated samples |
-| `--num_samples` | 100 | Number of "no birds" samples to generate |
-| `--esc50_ratio` | 0.5 | Proportion of samples from ESC-50 vs. empty segments |
-| `--files_per_class` | None | Maximum files to scan per bird class (for testing) |
-| `--energy_threshold`| 1.5 | Energy threshold factor for detecting silence (higher = more segments) |
-
-## Docker Execution
-
-The knowledge distillation pipeline is fully runnable in Docker, ideal for server deployment.
-
-### 1. Build the Docker Image
-```bash
-docker build -t bird_classification_edge .
+debug:
+  dev_mode: true
+  files_limit: 100
+  test_with_subset: false
+  
+student_model:
+  inference:
+    device: "cuda"
+    batch_size: 32
+    confidence_threshold: 0.1
 ```
 
-### 2. Run the Workflow
+#### Full Benchmark Config (`benchmark.yaml`)
+```yaml
+benchmark:
+  paths:
+    audio_dir: "../bird_sound_dataset"
+    student_model: "../best_distillation_model.pt"
+    output_dir: "benchmark_results"
 
--   **Step 1: Extract Soft Labels:**
-    ```bash
-    # Use GPU 0 for extraction
-    ./run_docker_soft_labels.sh my_extraction_gpu0 GPU_ID=0
-    
-    # Run on a Mac (CPU only)
-    ./run_docker_soft_labels.sh my_extraction_mac MAC
-    ```
-    This saves results to `soft_labels_complete/`.
+debug:
+  dev_mode: false
+  files_limit: null  # No limit
+  
+comparison:
+  save_plots: true
+  save_detailed_json: true
+  plot_style: "seaborn"
+```
 
--   **Step 2: Run Distillation Training:**
-    ```bash
-    # Use GPU 0 for training
-    ./run_docker_distillation.sh my_training_gpu0 GPU_ID=0
+### Knowledge Distillation Configuration (`distillation/configs/`)
 
-    # Override parameters
-    ./run_docker_distillation.sh my_training_run GPU_ID=1 training.epochs=50 dataset.num_workers=8
-    ```
-For more details on server usage, GPU management, and troubleshooting, see the comments within the `run_docker_*.sh` scripts. 
+```yaml
+# distillation_config.yaml
+training:
+  alpha: 0.5        # Balance between hard and soft loss
+  temperature: 4.0  # Softmax temperature for distillation
+  epochs: 100
+  
+dataset:
+  soft_labels_path: "soft_labels_complete"
+  allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris", "Poecile_montanus"]
+```
+
+---
+
+## 📚 Additional Resources
+
+- **Benchmark System**: See `benchmark/README.md` for detailed benchmarking guide
+- **Knowledge Distillation**: See `distillation/README.md` for distillation specifics
+- **Dataset Preparation**: See examples in `datasets/test_datasets.py`
+- **Model Architecture**: Detailed in `models.py` and `modules.py`
+
+## 🤝 Contributing
+
+1. Follow the modular structure when adding new features
+2. Add comprehensive documentation for new components
+3. Include tests in `datasets/test_datasets.py` for new dataset classes
+4. Update relevant README files for significant changes
+
+## 📄 License
+
+[Add your license information here]
+
+---
+
+**Need Help?** Check the troubleshooting sections in each component's documentation or review the extensive logging output for debugging information.
