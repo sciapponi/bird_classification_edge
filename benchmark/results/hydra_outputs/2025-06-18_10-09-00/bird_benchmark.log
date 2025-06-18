@@ -244,3 +244,6 @@
 [2025-06-18 10:39:57,782][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC631615-210324_0841_Haubenmeise.mp3, using fallback preprocessing
 [2025-06-18 10:40:14,533][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC938876-Mésangehuppé_23042024_forêtdumassacre-17h-cris-bavardage-posé.mp3, using fallback preprocessing
 [2025-06-18 10:40:17,316][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC738136-Mesange_huppee_24.4.21_Savas.mp3, using fallback preprocessing
+[2025-06-18 10:40:21,345][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC192951-30421 - 2 x mp3.mp3, using fallback preprocessing
+[2025-06-18 10:40:25,189][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC685862-2021_09_22_04_04_10_MOT_SP.mp3, using fallback preprocessing
+[2025-06-18 10:40:30,791][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC927586-240201_0343-Haubenmeise-Burgdorfer-Holz.mp3, using fallback preprocessing
