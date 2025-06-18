@@ -1,0 +1,238 @@
+[2025-06-18 10:31:18,651][__main__][INFO] - ============================================================
+[2025-06-18 10:31:18,652][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-18 10:31:18,652][__main__][INFO] - ============================================================
+[2025-06-18 10:31:18,652][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-18 10:31:18,652][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-18 10:31:18,652][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-18 10:31:18,652][__main__][INFO] -    • Both models see identical audio data
+[2025-06-18 10:31:18,652][__main__][INFO] - ============================================================
+[2025-06-18 10:31:18,652][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-18_10-31-16
+[2025-06-18 10:31:18,652][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-18_10-31-16
+[2025-06-18 10:31:18,652][__main__][INFO] - 
+========================================
+[2025-06-18 10:31:18,652][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-18 10:31:18,652][__main__][INFO] - ========================================
+[2025-06-18 10:31:18,652][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-18 10:31:18,652][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-18 10:31:18,687][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-18 10:31:18,687][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-18 10:31:18,721][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-18 10:31:18,721][__main__][INFO] - Processing species: Apus_apus
+[2025-06-18 10:31:18,742][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-18 10:31:18,742][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-18 10:31:18,763][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-18 10:31:18,763][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-18 10:31:18,836][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-18 10:31:18,836][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-18 10:31:18,847][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-18 10:31:18,847][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-18 10:31:18,874][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-18 10:31:18,874][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-18 10:31:18,910][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-18 10:31:18,910][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-18 10:31:18,929][__main__][INFO] - Found 836 no_birds files
+[2025-06-18 10:31:18,949][__main__][INFO] - 🔍 LIMITED TO 1000 files for testing
+[2025-06-18 10:31:18,949][__main__][INFO] - Total audio files discovered: 996
+[2025-06-18 10:31:18,950][__main__][INFO] - Class distribution:
+[2025-06-18 10:31:18,950][__main__][INFO] -   Periparus_ater: 268 files
+[2025-06-18 10:31:18,950][__main__][INFO] -   Certhia_brachydactyla: 128 files
+[2025-06-18 10:31:18,950][__main__][INFO] -   Certhia_familiaris: 122 files
+[2025-06-18 10:31:18,950][__main__][INFO] -   Poecile_montanus: 115 files
+[2025-06-18 10:31:18,950][__main__][INFO] -   Lophophanes_cristatus: 96 files
+[2025-06-18 10:31:18,950][__main__][INFO] -   Bubo_bubo: 79 files
+[2025-06-18 10:31:18,950][__main__][INFO] -   no_birds: 77 files
+[2025-06-18 10:31:18,951][__main__][INFO] -   Apus_apus: 74 files
+[2025-06-18 10:31:18,951][__main__][INFO] -   Emberiza_cia: 37 files
+[2025-06-18 10:31:18,959][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-18 10:31:18,960][__main__][INFO] - 
+========================================
+[2025-06-18 10:31:18,960][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-18 10:31:18,960][__main__][INFO] - ========================================
+[2025-06-18 10:31:18,960][__main__][INFO] - Starting student model predictions
+[2025-06-18 10:31:19,915][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-18 10:31:20,332][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-18 10:31:20,332][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-18 10:31:20,332][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-18 10:31:20,333][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-18 10:31:20,356][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/benchmark/../config/bird_classification.yaml
+[2025-06-18 10:31:20,538][benchmark.predict_student][INFO] - Loaded model from: /workspace/benchmark/../best_distillation_model.pt
+[2025-06-18 10:31:20,540][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-18 10:31:20,541][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-18 10:31:20,541][benchmark.predict_student][INFO] - Confidence threshold: 0.1
+[2025-06-18 10:31:38,960][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC910923-Swift-06-06-24.mp3, using fallback preprocessing
+[2025-06-18 10:31:41,620][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC559198-falciot 17 2.mp3, using fallback preprocessing
+[2025-06-18 10:31:42,490][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573646-apus 5 2.mp3, using fallback preprocessing
+[2025-06-18 10:31:45,083][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC956188-241129_0395-Uhu-(M&W)-BuHo-1715-(sehr-leise).mp3, using fallback preprocessing
+[2025-06-18 10:32:13,938][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC819598-ZOOM0066_TrLR_Certhia_brachydactyla_cut1.wav, using fallback preprocessing
+[2025-06-18 10:32:34,539][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC129288-8031_11.04.2013, Н. Азяпово, 9-25, королёк С.mp3, using fallback preprocessing
+[2025-06-18 10:32:37,177][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC311607-LS11CerthiaFamiliaris.mp3, using fallback preprocessing
+[2025-06-18 10:32:42,923][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC598433-XC-biOsmid3C001-04equII (8).mp3, using fallback preprocessing
+[2025-06-18 10:32:48,942][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC373620-3436-01_000-05ku mp3.mp3, using fallback preprocessing
+[2025-06-18 10:32:57,207][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC716525-20220418_Bruant_fou_cri_col_du_Rousset_Vercors.mp3, using fallback preprocessing
+[2025-06-18 10:32:59,351][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC947754-Emberiza-cia_241113_114033_00.wav, using fallback preprocessing
+[2025-06-18 10:33:12,063][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC195426-Crested Tit Lophophanes cristatus scoticus.mp3, using fallback preprocessing
+[2025-06-18 10:33:12,114][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC600119-20.11.3.WS.012450.01.mp3, using fallback preprocessing
+[2025-06-18 10:33:42,158][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC747083-220808_001_090601_ZwarteMees.mp3, using fallback preprocessing
+[2025-06-18 10:34:37,152][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC404523-Willow Tit Call Bagmere Reserve Cheshire UK 15 Feb 2018.mp3, using fallback preprocessing
+[2025-06-18 10:34:43,514][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0442.wav, using fallback preprocessing
+[2025-06-18 10:34:43,535][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0082.wav, using fallback preprocessing
+[2025-06-18 10:34:43,555][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0121.wav, using fallback preprocessing
+[2025-06-18 10:34:43,591][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0276.wav, using fallback preprocessing
+[2025-06-18 10:34:43,610][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0217.wav, using fallback preprocessing
+[2025-06-18 10:34:43,662][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0306.wav, using fallback preprocessing
+[2025-06-18 10:34:43,682][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0135.wav, using fallback preprocessing
+[2025-06-18 10:34:43,748][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0308.wav, using fallback preprocessing
+[2025-06-18 10:34:43,812][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0179.wav, using fallback preprocessing
+[2025-06-18 10:34:43,832][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0267.wav, using fallback preprocessing
+[2025-06-18 10:34:43,852][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0077.wav, using fallback preprocessing
+[2025-06-18 10:34:43,871][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0286.wav, using fallback preprocessing
+[2025-06-18 10:34:43,923][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0424.wav, using fallback preprocessing
+[2025-06-18 10:34:43,956][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0346.wav, using fallback preprocessing
+[2025-06-18 10:34:43,975][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0361.wav, using fallback preprocessing
+[2025-06-18 10:34:43,993][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0458.wav, using fallback preprocessing
+[2025-06-18 10:34:44,015][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0447.wav, using fallback preprocessing
+[2025-06-18 10:34:44,057][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0123.wav, using fallback preprocessing
+[2025-06-18 10:34:44,116][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0085.wav, using fallback preprocessing
+[2025-06-18 10:34:44,134][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0197.wav, using fallback preprocessing
+[2025-06-18 10:34:44,153][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0047.wav, using fallback preprocessing
+[2025-06-18 10:34:44,171][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0207.wav, using fallback preprocessing
+[2025-06-18 10:34:44,190][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0258.wav, using fallback preprocessing
+[2025-06-18 10:34:44,194][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/empty_0258.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-18 10:34:44,209][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0223.wav, using fallback preprocessing
+[2025-06-18 10:34:44,228][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0312.wav, using fallback preprocessing
+[2025-06-18 10:34:44,280][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0123.wav, using fallback preprocessing
+[2025-06-18 10:34:44,299][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0455.wav, using fallback preprocessing
+[2025-06-18 10:34:44,332][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0327.wav, using fallback preprocessing
+[2025-06-18 10:34:44,351][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0457.wav, using fallback preprocessing
+[2025-06-18 10:34:44,370][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0180.wav, using fallback preprocessing
+[2025-06-18 10:34:44,389][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0273.wav, using fallback preprocessing
+[2025-06-18 10:34:44,424][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0060.wav, using fallback preprocessing
+[2025-06-18 10:34:44,443][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0370.wav, using fallback preprocessing
+[2025-06-18 10:34:44,462][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0256.wav, using fallback preprocessing
+[2025-06-18 10:34:44,496][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0169.wav, using fallback preprocessing
+[2025-06-18 10:34:44,532][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0144.wav, using fallback preprocessing
+[2025-06-18 10:34:44,551][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0106.wav, using fallback preprocessing
+[2025-06-18 10:34:44,570][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0278.wav, using fallback preprocessing
+[2025-06-18 10:34:44,653][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0249.wav, using fallback preprocessing
+[2025-06-18 10:34:44,687][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0200.wav, using fallback preprocessing
+[2025-06-18 10:34:44,706][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0200.wav, using fallback preprocessing
+[2025-06-18 10:34:44,725][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0438.wav, using fallback preprocessing
+[2025-06-18 10:34:44,744][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0436.wav, using fallback preprocessing
+[2025-06-18 10:34:44,762][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0384.wav, using fallback preprocessing
+[2025-06-18 10:34:44,782][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0463.wav, using fallback preprocessing
+[2025-06-18 10:34:44,802][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0006.wav, using fallback preprocessing
+[2025-06-18 10:34:44,880][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0128.wav, using fallback preprocessing
+[2025-06-18 10:34:44,914][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0050.wav, using fallback preprocessing
+[2025-06-18 10:34:44,958][__main__][INFO] - Student predictions saved to: /workspace/benchmark/results/predictions/student_predictions.csv
+[2025-06-18 10:34:44,959][__main__][INFO] - ✅ Student prediction completed
+[2025-06-18 10:34:44,959][__main__][INFO] -   Total predictions: 996
+[2025-06-18 10:34:44,959][__main__][INFO] -   Average confidence: 0.639
+[2025-06-18 10:34:44,959][__main__][INFO] -   Top prediction: Periparus_ater (272 files)
+[2025-06-18 10:34:44,960][__main__][INFO] - 
+========================================
+[2025-06-18 10:34:44,961][__main__][INFO] - 🦅 STEP 3: BirdNET Aligned Predictions
+[2025-06-18 10:34:44,961][__main__][INFO] - ========================================
+[2025-06-18 10:34:44,961][__main__][INFO] - Starting BirdNET predictions with ALIGNED preprocessing
+[2025-06-18 10:34:44,961][__main__][INFO] - 🎯 Using identical preprocessing pipeline as student model:
+[2025-06-18 10:34:44,961][__main__][INFO] -    - Segment duration: 3.0s
+[2025-06-18 10:34:44,961][__main__][INFO] -    - Sample rate: 32000 Hz
+[2025-06-18 10:34:44,961][__main__][INFO] -    - Bandpass filter: 150.0-16000.0 Hz
+[2025-06-18 10:34:44,961][__main__][INFO] -    - Extract calls: True
+[2025-06-18 10:34:44,993][benchmark.predict_birdnet][INFO] - BirdNET initialized with 8 target species
+[2025-06-18 10:34:44,993][benchmark.predict_birdnet][INFO] - Target species: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus']
+[2025-06-18 10:34:44,993][benchmark.predict_birdnet][INFO] - Confidence threshold: 0.1
+[2025-06-18 10:34:44,993][benchmark.predict_birdnet][INFO] - Segmented mode: True, Duration: 3.0s
+[2025-06-18 10:34:44,993][benchmark.predict_birdnet][INFO] - Using BirdNET prediction method: aligned (3s segments)
+[2025-06-18 10:35:10,543][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:35:23,243][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:35:31,305][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:35:40,896][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:35:57,734][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:36:09,140][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:36:14,172][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:36:24,548][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:36:27,991][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:36:47,407][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:37:02,124][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:37:18,095][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:37:20,719][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:23,046][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:30,822][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:30,958][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:31,332][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:31,578][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:31,822][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:32,835][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:33,016][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:33,199][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:33,380][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:33,886][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:34,406][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:34,567][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:34,698][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:34,947][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,191][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,320][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,449][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,589][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,723][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,849][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:35,977][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:36,250][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:36,379][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:36,507][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:36,754][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:36,881][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:37,011][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:37,138][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:37,537][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:37,670][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:37,913][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:38,169][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:38,297][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:38,427][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,030][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,282][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,412][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,541][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,669][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,797][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:39,924][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:40,057][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:40,183][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:40,422][benchmark.predict_birdnet][WARNING] - Filter frequencies too high for sample rate 32000
+[2025-06-18 10:38:40,940][__main__][INFO] - BirdNET predictions saved to: /workspace/benchmark/results/predictions/birdnet_predictions.csv
+[2025-06-18 10:38:40,941][__main__][INFO] - ✅ BirdNET ALIGNED prediction completed
+[2025-06-18 10:38:40,941][__main__][INFO] -   Total predictions: 996
+[2025-06-18 10:38:40,942][__main__][INFO] -   Average confidence: 0.641
+[2025-06-18 10:38:40,942][__main__][INFO] -   Top prediction: no_birds (214 files)
+[2025-06-18 10:38:40,942][__main__][INFO] -   Preprocessing methods used:
+[2025-06-18 10:38:40,942][__main__][INFO] -     extract_calls: 996 files
+[2025-06-18 10:38:40,942][benchmark.predict_birdnet][INFO] - Cleaned up temporary species list file
+[2025-06-18 10:38:40,945][__main__][INFO] - 
+========================================
+[2025-06-18 10:38:40,945][__main__][INFO] - 📊 STEP 4: Metrics and Comparison
+[2025-06-18 10:38:40,946][__main__][INFO] - ========================================
+[2025-06-18 10:38:40,946][__main__][INFO] - Starting model comparison
+[2025-06-18 10:38:40,950][__main__][INFO] - Comparing 996 predictions
+[2025-06-18 10:38:40,950][benchmark.compare_predictions][INFO] - Comparing model predictions
+[2025-06-18 10:38:41,042][benchmark.compare_predictions][INFO] - JSON report saved to: /workspace/benchmark/results/comparison/comparison_report.json
+[2025-06-18 10:38:41,042][benchmark.compare_predictions][INFO] - Text summary saved to: /workspace/benchmark/results/comparison/comparison_summary.txt
+[2025-06-18 10:38:41,046][benchmark.compare_predictions][INFO] - Detailed cases saved to: /workspace/benchmark/results/comparison/detailed_cases.csv
+[2025-06-18 10:38:41,047][benchmark.compare_predictions][INFO] - Metrics comparison table saved to: /workspace/benchmark/results/comparison/metrics_comparison_table.csv
+[2025-06-18 10:38:41,048][benchmark.compare_predictions][INFO] - Per-class metrics table saved to: /workspace/benchmark/results/comparison/per_class_metrics_table.csv
+[2025-06-18 10:38:42,494][benchmark.compare_predictions][INFO] - Confusion matrices saved to: /workspace/benchmark/results/comparison/confusion_matrices.png
+[2025-06-18 10:38:43,257][benchmark.compare_predictions][INFO] - Agreement analysis saved to: /workspace/benchmark/results/comparison/agreement_analysis.png
+[2025-06-18 10:38:43,865][benchmark.compare_predictions][INFO] - Per-class comparison saved to: /workspace/benchmark/results/comparison/per_class_accuracy.png
+[2025-06-18 10:38:45,856][benchmark.compare_predictions][INFO] - Comprehensive metrics comparison saved to: /workspace/benchmark/results/comparison/comprehensive_metrics_comparison.png
+[2025-06-18 10:38:45,857][__main__][INFO] - Comparison results saved to: /workspace/benchmark/results/comparison
+[2025-06-18 10:38:45,857][__main__][INFO] - 
+============================================================
+[2025-06-18 10:38:45,857][__main__][INFO] - 🎉 ALIGNED BENCHMARK COMPLETED SUCCESSFULLY!
+[2025-06-18 10:38:45,857][__main__][INFO] - ============================================================
+[2025-06-18 10:38:45,857][__main__][INFO] - ✅ Fair comparison achieved:
+[2025-06-18 10:38:45,857][__main__][INFO] -    • Both models used identical preprocessing
+[2025-06-18 10:38:45,857][__main__][INFO] -    • Both models analyzed same 3-second segments
+[2025-06-18 10:38:45,857][__main__][INFO] -    • Performance gap should be <5% (realistic)
+[2025-06-18 10:38:45,857][__main__][INFO] - 📊 Check results/comparison/ for detailed analysis
+[2025-06-18 10:38:45,857][__main__][INFO] - ============================================================
