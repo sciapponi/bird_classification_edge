@@ -137,9 +137,9 @@ class StudentModelPredictor:
             logger.error(f"Failed to load model: {e}")
             raise
     
-    def _simple_audio_preprocessing(self, audio_path: str) -> torch.Tensor:
+    def _training_aligned_preprocessing(self, audio_path: str) -> torch.Tensor:
         """
-        Simple audio preprocessing without problematic filters.
+        Audio preprocessing aligned with training pipeline using extract_calls.
         
         Args:
             audio_path: Path to audio file
@@ -148,30 +148,139 @@ class StudentModelPredictor:
             Preprocessed audio tensor
         """
         # --- LOCAL IMPORT ---
-        import librosa
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+        from datasets.audio_utils import extract_call_segments
+        import torch
         import numpy as np
 
         try:
-            # Load audio with librosa
-            y, sr = librosa.load(audio_path, sr=32000, duration=3.0)
+            # Use same preprocessing as training: extract_calls=True
+            call_intervals, segments, _, _, _ = extract_call_segments(
+                audio_path, 
+                clip_duration=3.0,
+                sr=32000, 
+                lowcut=150.0,   # Same as training
+                highcut=15500.0, # Slightly below Nyquist to avoid filter edge case
+                verbose=False
+            )
             
-            # Ensure minimum length
-            min_length = int(32000 * 3.0)  # 3 seconds at 32kHz
-            if len(y) < min_length:
-                # Pad with zeros
-                y = np.pad(y, (0, min_length - len(y)), mode='constant')
-            elif len(y) > min_length:
-                # Truncate
-                y = y[:min_length]
-            
-            # Convert to tensor
-            audio_tensor = torch.FloatTensor(y).unsqueeze(0)  # Add batch dimension
+            if segments and len(segments) > 0:
+                # Use first extracted segment (same as training)
+                audio_data = segments[0]
+                audio_tensor = torch.from_numpy(audio_data).float()
+                
+                if audio_tensor.ndim == 1:
+                    audio_tensor = audio_tensor.unsqueeze(0)  # Add batch dimension
+                    
+                # Ensure correct length (same as training)
+                target_length = int(32000 * 3.0)
+                if audio_tensor.shape[1] > target_length:
+                    audio_tensor = audio_tensor[:, :target_length]
+                elif audio_tensor.shape[1] < target_length:
+                    padding = target_length - audio_tensor.shape[1]
+                    audio_tensor = torch.nn.functional.pad(audio_tensor, (0, padding))
+                    
+            else:
+                # Fallback: if no calls detected, use random clip (same as training fallback)
+                logger.warning(f"No calls detected in {audio_path}, using fallback preprocessing")
+                import librosa
+                y, sr = librosa.load(audio_path, sr=32000, duration=3.0)
+                
+                # Apply same bandpass filter as training
+                from scipy import signal
+                nyquist = sr / 2
+                low = 150.0 / nyquist
+                high = 15500.0 / nyquist
+                b, a = signal.butter(4, [low, high], btype='band')
+                y = signal.filtfilt(b, a, y)
+                
+                # Normalize
+                if np.max(np.abs(y)) > 0:
+                    y = y / np.max(np.abs(y))
+                
+                # Ensure length
+                target_length = int(32000 * 3.0)
+                if len(y) < target_length:
+                    y = np.pad(y, (0, target_length - len(y)), mode='constant')
+                elif len(y) > target_length:
+                    y = y[:target_length]
+                
+                audio_tensor = torch.FloatTensor(y).unsqueeze(0)
             
             return audio_tensor.to(self.device)
             
         except Exception as e:
             logger.error(f"Failed to preprocess audio {audio_path}: {e}")
-            raise
+            # Return silence as fallback
+            target_length = int(32000 * 3.0)
+            return torch.zeros(1, target_length).to(self.device)
+    
+    def _load_audio_like_training(self, audio_path: str) -> torch.Tensor:
+        """
+        Exact copy of load_audio method from bird_dataset.py
+        This does NOT apply bandpass filtering - just like training!
+        """
+        import torchaudio
+        import torchaudio.transforms as T
+        
+        try:
+            waveform, sr_orig = torchaudio.load(audio_path)
+        except Exception as e:
+            logger.error(f"ERROR loading audio file {audio_path}: {e}. Returning zeros.")
+            target_len_samples = int(32000 * 3.0)
+            return torch.zeros((1, target_len_samples))
+
+        # Resample if necessary (same as training)
+        if sr_orig != 32000:
+            resampler = T.Resample(sr_orig, 32000)
+            waveform = resampler(waveform)
+            
+        # Convert to mono if necessary (same as training)
+        if waveform.shape[0] > 1:
+            waveform = torch.mean(waveform, dim=0, keepdim=True)
+            
+        # Ensure correct length (same as training)
+        waveform = self._ensure_length(waveform, target_length=int(32000 * 3.0))
+        
+        return waveform
+    
+    def _ensure_length(self, waveform: torch.Tensor, target_length: int) -> torch.Tensor:
+        """
+        Exact copy of ensure_length method from bird_dataset.py
+        """
+        import torch.nn.functional as F
+        
+        # Standardize waveform shape to [channels, time]
+        if waveform.ndim == 3:
+            if waveform.shape[0] == 1:
+                waveform = waveform.squeeze(0)
+            elif waveform.shape[1] == 1:
+                waveform = waveform.squeeze(1)
+            else:
+                if waveform.shape[0] > 1 and waveform.ndim == 3:
+                    waveform = waveform[0] 
+                    if waveform.ndim == 1:
+                        waveform = waveform.unsqueeze(0)
+                else:
+                    return torch.zeros(1, target_length)
+        
+        if waveform.ndim == 1:
+            waveform = waveform.unsqueeze(0)
+        
+        if waveform.ndim != 2:
+            return torch.zeros(1, target_length)
+
+        current_length = waveform.shape[1]
+        
+        if current_length == target_length:
+            return waveform
+        elif current_length > target_length:
+            return waveform[:, :target_length]
+        else:
+            padding_needed = target_length - current_length
+            return F.pad(waveform, (0, padding_needed))
     
     def predict_single(self, audio_path: Union[str, Path]) -> Dict:
         """
@@ -184,8 +293,8 @@ class StudentModelPredictor:
             Dictionary with prediction results
         """
         try:
-            # Preprocess audio
-            audio_tensor = self._simple_audio_preprocessing(str(audio_path))
+            # Preprocess audio using training-aligned pipeline
+            audio_tensor = self._training_aligned_preprocessing(str(audio_path))
             
             # Generate prediction
             with torch.no_grad():

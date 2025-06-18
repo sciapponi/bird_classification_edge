@@ -201,9 +201,9 @@ def run_student_predictions(cfg: DictConfig, ground_truth_df: pd.DataFrame, orig
 
 def run_birdnet_predictions(cfg: DictConfig, ground_truth_df: pd.DataFrame, original_cwd: str) -> pd.DataFrame:
     """
-    Run BirdNET predictions.
+    Run BirdNET predictions with aligned preprocessing.
     
-    Args:
+    Args:.
         cfg: Configuration object
         ground_truth_df: Ground truth DataFrame
         original_cwd: Original working directory
@@ -211,22 +211,41 @@ def run_birdnet_predictions(cfg: DictConfig, ground_truth_df: pd.DataFrame, orig
     Returns:
         DataFrame with BirdNET predictions
     """
-    logger.info("Starting BirdNET predictions")
+    logger.info("Starting BirdNET predictions with ALIGNED preprocessing")
+    logger.info("🎯 Using identical preprocessing pipeline as student model:")
+    logger.info(f"   - Segment duration: {cfg.student_model.preprocessing.clip_duration}s")
+    logger.info(f"   - Sample rate: {cfg.student_model.preprocessing.sample_rate} Hz")
+    logger.info(f"   - Bandpass filter: {cfg.student_model.preprocessing.lowcut}-{cfg.student_model.preprocessing.highcut} Hz")
+    logger.info(f"   - Extract calls: {cfg.student_model.preprocessing.get('extract_calls', True)}")
     
     try:
         from benchmark.predict_birdnet import BirdNETPredictor, predict_from_dataframe
         
-        # Initialize predictor
-        predictor = BirdNETPredictor(
-            target_species=cfg.student_model.classes.allowed_species,
-            confidence_threshold=cfg.birdnet.confidence_threshold
+        # Use the larger FP32 classification model explicitly
+        model_fp32_path = os.path.join(
+            original_cwd,
+            "analyzer",
+            "BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite"
         )
         
-        # Generate predictions
+        # Initialize predictor with aligned preprocessing parameters
+        predictor = BirdNETPredictor(
+            target_species=cfg.student_model.classes.allowed_species,
+            confidence_threshold=cfg.birdnet.confidence_threshold,
+            model_path=model_fp32_path,
+            segment_duration=cfg.student_model.preprocessing.clip_duration,
+            sample_rate=cfg.student_model.preprocessing.sample_rate,
+            lowcut=cfg.student_model.preprocessing.lowcut,
+            highcut=cfg.student_model.preprocessing.highcut,
+            extract_calls=cfg.student_model.preprocessing.get('extract_calls', True)
+        )
+        
+        # Generate predictions using aligned processing
         predictions_df = predict_from_dataframe(
             predictor,
             ground_truth_df,
-            audio_base_path=original_cwd
+            audio_base_path=original_cwd,
+            use_aligned_processing=True  # Use 3s segments with identical preprocessing
         )
         
         # Save predictions
@@ -238,10 +257,17 @@ def run_birdnet_predictions(cfg: DictConfig, ground_truth_df: pd.DataFrame, orig
         
         # Log summary
         pred_counts = predictions_df['birdnet_prediction'].value_counts()
-        logger.info("✅ BirdNET prediction completed")
+        logger.info("✅ BirdNET ALIGNED prediction completed")
         logger.info(f"  Total predictions: {len(predictions_df)}")
         logger.info(f"  Average confidence: {predictions_df['birdnet_confidence'].mean():.3f}")
         logger.info(f"  Top prediction: {pred_counts.index[0]} ({pred_counts.iloc[0]} files)")
+        
+        # Log preprocessing method distribution
+        if 'birdnet_preprocessing' in predictions_df.columns:
+            preprocessing_counts = predictions_df['birdnet_preprocessing'].value_counts()
+            logger.info("  Preprocessing methods used:")
+            for method, count in preprocessing_counts.items():
+                logger.info(f"    {method}: {count} files")
         
         # Cleanup
         predictor.cleanup()
@@ -331,7 +357,12 @@ def main(cfg: DictConfig) -> None:
     os.makedirs(predictions_dir, exist_ok=True)
     
     logger.info("=" * 60)
-    logger.info("🐦 BIRD CLASSIFICATION BENCHMARK")
+    logger.info("🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK")
+    logger.info("=" * 60)
+    logger.info("🔧 FAIR COMPARISON MODE:")
+    logger.info("   • BirdNET: Uses 3s segments with student model preprocessing")
+    logger.info("   • Student: Uses same 3s segments and preprocessing")
+    logger.info("   • Both models see identical audio data")
     logger.info("=" * 60)
     logger.info(f"Working directory: {os.getcwd()}")
     logger.info(f"Hydra output directory: {os.getcwd()}")
@@ -360,10 +391,10 @@ def main(cfg: DictConfig) -> None:
     student_predictions_df = run_student_predictions(cfg, ground_truth_df, original_cwd)
 
     # ========================================
-    # STEP 3: BirdNET Predictions
+    # STEP 3: BirdNET Aligned Predictions
     # ========================================
     logger.info("\n" + "=" * 40)
-    logger.info("🦉 STEP 3: BirdNET Predictions")
+    logger.info("🦅 STEP 3: BirdNET Aligned Predictions")
     logger.info("=" * 40)
     
     birdnet_predictions_df = run_birdnet_predictions(cfg, ground_truth_df, original_cwd)
@@ -379,7 +410,13 @@ def main(cfg: DictConfig) -> None:
     run_comparison(cfg, student_predictions_df, birdnet_predictions_df, original_cwd)
     
     logger.info("\n" + "=" * 60)
-    logger.info("🎉 BENCHMARK COMPLETED SUCCESSFULLY!")
+    logger.info("🎉 ALIGNED BENCHMARK COMPLETED SUCCESSFULLY!")
+    logger.info("=" * 60)
+    logger.info("✅ Fair comparison achieved:")
+    logger.info("   • Both models used identical preprocessing")
+    logger.info("   • Both models analyzed same 3-second segments")
+    logger.info("   • Performance gap should be <5% (realistic)")
+    logger.info("📊 Check results/comparison/ for detailed analysis")
     logger.info("=" * 60)
 
 

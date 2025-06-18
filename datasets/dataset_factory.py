@@ -7,6 +7,7 @@ different data sources for bird sound classification.
 
 import os
 import random
+import torch
 from torch.utils.data import Dataset, ConcatDataset, Subset
 import torchaudio # Import torchaudio
 from pathlib import Path # Import Path
@@ -128,27 +129,53 @@ def create_no_birds_dataset(num_samples,
             print(f"  WARNING: No pre-generated 'no birds' files found in {pregenerated_dir}.")
             return None # Return None if no pregenerated samples found
         
-        # Select a subset if num_samples is restrictive
-        if num_samples > 0:
-            if len(pregen_dataset) < num_samples:
-                print(f"  WARNING: Requested {num_samples} pre-generated, but only {len(pregen_dataset)} available. Using all.")
-                actual_num_samples = len(pregen_dataset)
-            else:
-                actual_num_samples = num_samples
-            
-            if actual_num_samples > 0:
-                pregen_indices = random.sample(range(len(pregen_dataset)), actual_num_samples)
-                final_pregen_dataset = Subset(pregen_dataset, pregen_indices)
-                datasets_to_add.append(final_pregen_dataset)
-                actual_total_no_birds = len(final_pregen_dataset)
-                print(f"  Added {actual_total_no_birds} pre-generated 'no birds' samples.")
-            else:
-                 print("  No pre-generated samples to add (num_samples=0).")
-                 return None # Return None if 0 samples requested
-        else: # Use all available pre-generated samples
-             datasets_to_add.append(pregen_dataset)
-             actual_total_no_birds = len(pregen_dataset)
-             print(f"  Added all {actual_total_no_birds} available pre-generated 'no birds' samples.")
+        # FIXED: Apply train/val/test split to pregenerated samples
+        # Use consistent split ratios (70/15/15) and seed for reproducibility
+        total_pregen = len(pregen_dataset)
+        split_seed = 42  # Use consistent seed for reproducible splits
+        
+        # Calculate split sizes
+        import math
+        val_split = 0.15
+        test_split = 0.15
+        
+        num_val = math.floor(val_split * total_pregen)
+        num_test = math.floor(test_split * total_pregen)  
+        num_train = total_pregen - num_val - num_test
+        
+        print(f"  Total pre-generated samples: {total_pregen}")
+        print(f"  Split: Train={num_train}, Val={num_val}, Test={num_test}")
+        
+        # Create deterministic split using seed
+        rng = random.Random(split_seed)
+        all_indices = list(range(total_pregen))
+        rng.shuffle(all_indices)
+        
+        # Split indices
+        if subset == "training":
+            subset_indices = all_indices[:num_train]
+        elif subset == "validation":
+            subset_indices = all_indices[num_train:num_train + num_val]
+        elif subset == "testing":
+            subset_indices = all_indices[num_train + num_val:]
+        else:
+            raise ValueError(f"Invalid subset: {subset}")
+        
+        print(f"  Using {len(subset_indices)} samples for subset '{subset}'")
+        
+        # Apply num_samples limit if specified
+        if num_samples > 0 and len(subset_indices) > num_samples:
+            print(f"  Limiting to {num_samples} samples as requested")
+            subset_indices = subset_indices[:num_samples]
+        
+        if len(subset_indices) > 0:
+            final_pregen_dataset = Subset(pregen_dataset, subset_indices)
+            datasets_to_add.append(final_pregen_dataset)
+            actual_total_no_birds = len(final_pregen_dataset)
+            print(f"  Added {actual_total_no_birds} pre-generated 'no birds' samples for {subset}.")
+        else:
+            print(f"  No pre-generated samples available for subset '{subset}'.")
+            return None
 
     else: # Generate on-the-fly
         num_esc50_target = int(num_samples * esc50_no_bird_ratio)
@@ -350,121 +377,29 @@ def create_combined_dataset(bird_data_dir, esc50_dir, allowed_bird_classes=None,
     )
     print(f"Created bird sound dataset with {len(bird_dataset)} samples. Augmentation: {apply_bird_augmentation}")
 
-    # --- Create "No Birds" Samples ---
+        # --- Create "No Birds" Samples ---
     datasets_to_combine = [bird_dataset]
     
-    if load_pregenerated_no_birds:
-        print(f"Loading pre-generated 'no birds' samples from {pregenerated_no_birds_dir}...")
-        pregen_no_birds_dataset = PreGeneratedNoBirdsDataset(
-            root_dir=pregenerated_no_birds_dir,
-            no_birds_label=NO_BIRDS_LABEL,
-            target_sr=target_sr,
-            clip_duration=clip_duration
-        )
-        
-        if len(pregen_no_birds_dataset) == 0:
-            print(f"WARNING: No pre-generated 'no birds' files found in {pregenerated_no_birds_dir}. "
-                  f"Consider running generate_no_birds_samples.py or setting load_pregenerated_no_birds=False.")
-        
-        # If num_no_bird_samples is specified, select a subset
-        # Otherwise, use all available pre-generated samples
-        if num_no_bird_samples > 0 and len(pregen_no_birds_dataset) > 0:
-            if len(pregen_no_birds_dataset) < num_no_bird_samples:
-                print(f"  WARNING: Requested {num_no_bird_samples} pre-generated 'no birds' samples, "
-                      f"but only {len(pregen_no_birds_dataset)} available. Using all available.")
-                actual_num_samples = len(pregen_no_birds_dataset)
-            else:
-                actual_num_samples = num_no_bird_samples
-            
-            if actual_num_samples > 0:
-                pregen_indices = random.sample(range(len(pregen_no_birds_dataset)), actual_num_samples)
-                final_pregen_no_birds_dataset = Subset(pregen_no_birds_dataset, pregen_indices)
-                datasets_to_combine.append(final_pregen_no_birds_dataset)
-                print(f"  Added {len(final_pregen_no_birds_dataset)} pre-generated 'no birds' samples.")
-            else:
-                print(f"  No pre-generated 'no birds' samples to add (either none found or num_samples=0).")
-        elif len(pregen_no_birds_dataset) > 0: # num_no_bird_samples is 0 or not restrictive, use all
-            datasets_to_combine.append(pregen_no_birds_dataset)
-            print(f"  Added all {len(pregen_no_birds_dataset)} available pre-generated 'no birds' samples.")
-        else:
-            print(f"  No pre-generated 'no birds' samples to add.")
-
-    else: # Generate 'no birds' samples on-the-fly
-        num_esc50_no_birds = int(num_no_bird_samples * esc50_no_bird_ratio)
-        num_empty_segments_no_birds = num_no_bird_samples - num_esc50_no_birds
-
-        print(f"Targeting {num_no_bird_samples} 'no birds' samples (on-the-fly): "
-              f"{num_esc50_no_birds} from ESC-50, {num_empty_segments_no_birds} from empty segments.")
-
-        # 1. Get "no birds" samples from ESC-50
-        if num_esc50_no_birds > 0:
-            if len(esc50_background_dataset) < num_esc50_no_birds:
-                print(f"WARNING: Requested {num_esc50_no_birds} ESC-50 'no birds' samples, "
-                      f"but only {len(esc50_background_dataset)} available. Using all available.")
-                num_esc50_no_birds = len(esc50_background_dataset)
-
-            if num_esc50_no_birds > 0:
-                 # Randomly select indices from the base ESC-50 dataset
-                 esc50_indices = random.sample(range(len(esc50_background_dataset)), num_esc50_no_birds)
-                 # Create a subset using torch.utils.data.Subset
-                 esc50_subset = Subset(esc50_background_dataset, esc50_indices) 
-                 # Wrap subset to assign the correct "no birds" label
-                 esc50_no_birds_dataset = LabelAdapterDataset(esc50_subset, NO_BIRDS_LABEL)
-                 datasets_to_combine.append(esc50_no_birds_dataset)
-                 print(f"Added {len(esc50_no_birds_dataset)} 'no birds' samples from ESC-50.")
-            else:
-                 print("Skipping ESC-50 'no birds' samples as none are available or requested.")
-
-        # 2. Get "no birds" samples from empty segments
-        if num_empty_segments_no_birds > 0:
-            print("Creating dataset of empty segments from bird recordings...")
-            
-            # If we have a custom_file_dict, use only those files for finding empty segments
-            if custom_file_dict is not None:
-                print("Using custom file list for finding empty segments")
-                # Flatten the file list for EmptySegmentDataset
-                all_audio_files = []
-                for class_files in custom_file_dict.values():
-                    all_audio_files.extend(class_files)
-                
-                # Create a custom empty segment dataset that processes specific files
-                empty_segment_full_dataset = EmptySegmentDataset(
-                    bird_data_dir=bird_data_dir,
-                    allowed_bird_classes=allowed_bird_classes,
-                    no_birds_label=NO_BIRDS_LABEL,
-                    clip_duration=clip_duration,
-                    sr=target_sr,
-                    lowcut=2000,
-                    highcut=10000,
-                    max_segments_per_file=5,
-                    custom_audio_files=all_audio_files
-                )
-            else:
-                # Standard empty segment extraction from all files
-                empty_segment_full_dataset = EmptySegmentDataset(
-                    bird_data_dir=bird_data_dir,
-                    allowed_bird_classes=allowed_bird_classes,
-                    no_birds_label=NO_BIRDS_LABEL,
-                    clip_duration=clip_duration,
-                    sr=target_sr,
-                    lowcut=2000,
-                    highcut=10000,
-                    max_segments_per_file=5
-                )
-            
-            # Check if we found enough empty segments
-            if len(empty_segment_full_dataset) < num_empty_segments_no_birds:
-                print(f"WARNING: Requested {num_empty_segments_no_birds} empty segments, "
-                      f"but only found {len(empty_segment_full_dataset)}. Using all available.")
-                num_empty_segments_no_birds = len(empty_segment_full_dataset)
-
-            if num_empty_segments_no_birds > 0:
-                empty_indices = random.sample(range(len(empty_segment_full_dataset)), num_empty_segments_no_birds)
-                empty_subset = Subset(empty_segment_full_dataset, empty_indices)
-                datasets_to_combine.append(empty_subset)
-                print(f"Added {len(empty_subset)} 'no birds' samples from empty segments.")
-            else:
-                print("Skipping empty segment 'no birds' samples as none are available or requested.")
+    # Use the fixed create_no_birds_dataset function that properly handles splits
+    no_birds_dataset = create_no_birds_dataset(
+        num_samples=num_no_bird_samples,
+        no_birds_label=NO_BIRDS_LABEL,
+        esc50_dir=esc50_dir,
+        bird_data_dir=bird_data_dir,
+        allowed_bird_classes=allowed_bird_classes,
+        subset=subset,
+        target_sr=target_sr,
+        clip_duration=clip_duration,
+        esc50_no_bird_ratio=esc50_no_bird_ratio,
+        load_pregenerated=load_pregenerated_no_birds,
+        pregenerated_dir=pregenerated_no_birds_dir
+    )
+    
+    if no_birds_dataset is not None:
+        datasets_to_combine.append(no_birds_dataset)
+        print(f"  Added {len(no_birds_dataset)} 'no birds' samples to combined dataset.")
+    else:
+        print(f"  No 'no birds' samples added to combined dataset.")
 
     # Combine all datasets
     combined_dataset = ConcatDataset(datasets_to_combine)
@@ -473,24 +408,12 @@ def create_combined_dataset(bird_data_dir, esc50_dir, allowed_bird_classes=None,
     total_samples = len(combined_dataset)
     print(f"  - Bird samples: {len(bird_dataset)}")
     
-    # Adjust printing of 'no birds' samples based on the mode
+    # Calculate 'no birds' sample count
     no_birds_sample_count = 0
-    if load_pregenerated_no_birds:
-        if len(datasets_to_combine) > 1 and isinstance(datasets_to_combine[-1], (Subset, PreGeneratedNoBirdsDataset)):
-            no_birds_sample_count = len(datasets_to_combine[-1])
-            print(f"  - Pre-generated 'no birds': {no_birds_sample_count}")
-    else:
-        # This part needs to be careful about indices if only one type of on-the-fly no_birds is generated
-        idx_offset = 1
-        if num_esc50_no_birds > 0 and len(datasets_to_combine) > idx_offset:
-            actual_esc50_count = len(datasets_to_combine[idx_offset])
-            print(f"  - ESC-50 'no birds' (on-the-fly): {actual_esc50_count}")
-            no_birds_sample_count += actual_esc50_count
-            idx_offset +=1
-        if num_empty_segments_no_birds > 0 and len(datasets_to_combine) > idx_offset:
-            actual_empty_count = len(datasets_to_combine[idx_offset])
-            print(f"  - Empty segment 'no birds' (on-the-fly): {actual_empty_count}")
-            no_birds_sample_count += actual_empty_count
+    if len(datasets_to_combine) > 1:
+        no_birds_sample_count = len(datasets_to_combine[1])  # The no_birds_dataset
+        mode_text = "Pre-generated" if load_pregenerated_no_birds else "On-the-fly"
+        print(f"  - {mode_text} 'no birds': {no_birds_sample_count}")
             
     print(f"--- Combined dataset '{subset}' created successfully with {total_samples} total samples. ({no_birds_sample_count} 'no birds' samples) ---")
     return combined_dataset 

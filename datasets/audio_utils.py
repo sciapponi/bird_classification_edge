@@ -28,6 +28,14 @@ def butter_bandpass(lowcut, highcut, fs, order=4):
     nyquist = 0.5 * fs
     low = lowcut / nyquist
     high = highcut / nyquist
+    
+    # Validate filter parameters to avoid "Digital filter critical frequencies must be 0 < Wn < 1"
+    # Allow high=1.0 but not > 1.0, as scipy can handle the edge case
+    if low <= 0 or high <= 0 or low >= 1 or high > 1 or low >= high:
+        raise ValueError(f"Invalid filter parameters: lowcut={lowcut}Hz, highcut={highcut}Hz, fs={fs}Hz. "
+                        f"Normalized frequencies: low={low:.4f}, high={high:.4f}. "
+                        f"Must be 0 < low < high <= 1")
+    
     b, a = butter(order, [low, high], btype='band')
     return b, a
 
@@ -45,8 +53,12 @@ def apply_bandpass_filter(data, lowcut, highcut, fs, order=4):
     Returns:
         ndarray: Filtered audio signal
     """
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    return filtfilt(b, a, data)
+    try:
+        b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+        return filtfilt(b, a, data)
+    except ValueError as e:
+        print(f"WARNING: Bandpass filter failed, returning original data: {e}")
+        return data
 
 def compute_adaptive_parameters(y, sr, lowcut, highcut):
     """
@@ -85,8 +97,8 @@ def compute_adaptive_parameters(y, sr, lowcut, highcut):
 
     return adaptive_prominence, adaptive_energy_threshold
 
-def extract_call_segments(audio_path, output_folder=None, clip_duration=3.0, sr=22050,
-                         lowcut=2000, highcut=10000, min_peak_distance=1.0, height_percentile=75,
+def extract_call_segments(audio_path, output_folder=None, clip_duration=3.0, sr=32000,
+                         lowcut=150.0, highcut=16000.0, min_peak_distance=1.0, height_percentile=75,
                          verbose=False, save_clips=False):
     """
     Detects bird calls by applying a bandpass filter and using an adaptive threshold
@@ -197,8 +209,8 @@ def extract_call_segments(audio_path, output_folder=None, clip_duration=3.0, sr=
         print(f"ERROR processing call extraction for {audio_path}: {str(e)}")
         return [], [], None, None, 0
 
-def extract_empty_segments(audio_path, clip_duration=3.0, sr=22050,
-                           lowcut=2000, highcut=10000, energy_threshold_factor=0.5,
+def extract_empty_segments(audio_path, clip_duration=3.0, sr=32000,
+                           lowcut=150.0, highcut=16000.0, energy_threshold_factor=0.5,
                            max_segments_per_file=5, verbose=False):
     """
     Detects segments with low energy (likely no bird calls) and extracts them.

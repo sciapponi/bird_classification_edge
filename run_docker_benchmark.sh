@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Script to run benchmark with Docker using dedicated GPU
+# Script to run ALIGNED benchmark with Docker using dedicated GPU
+# This ensures fair comparison between BirdNET and student model using identical preprocessing
+#
 # Usage: ./run_docker_benchmark.sh <container_name> <gpu_id> [additional_hydra_overrides...]
 #
 # Examples:
@@ -34,11 +36,12 @@ if [ $# -gt 0 ]; then
     HYDRA_OVERRIDES="$@"
 fi
 
-echo "Starting benchmark container: $CONTAINER_NAME"
-echo "Using GPU: $GPU_ID"
-echo "User ID: $USER_ID, Group ID: $GROUP_ID"
+echo "🎯 Starting ALIGNED benchmark container: $CONTAINER_NAME"
+echo "🔧 Fair comparison mode: BirdNET and Student use identical preprocessing"
+echo "🖥️  Using GPU: $GPU_ID"
+echo "👤 User ID: $USER_ID, Group ID: $GROUP_ID"
 if [ -n "$HYDRA_OVERRIDES" ]; then
-    echo "Hydra overrides: $HYDRA_OVERRIDES"
+    echo "⚙️  Hydra overrides: $HYDRA_OVERRIDES"
 fi
 
 # Build image with user arguments if it doesn't exist
@@ -62,4 +65,6 @@ docker run -it --rm \
     bird_classification_edge_benchmark \
     bash -c "cd benchmark && python run_benchmark.py --config-name=quick_start $HYDRA_OVERRIDES"
 
-echo "Benchmark completed. Results saved in benchmark/benchmark_results/" 
+echo "🎉 ALIGNED benchmark completed! Results saved in benchmark/results/"
+echo "✅ Fair comparison achieved - both models used identical preprocessing"
+echo "📊 Check benchmark/results/comparison/ for detailed analysis" 

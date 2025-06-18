@@ -1,0 +1,194 @@
+benchmark:
+  name: bird_classification_benchmark
+  description: Comparison between student model and BirdNET
+  paths:
+    audio_dir: ../bird_sound_dataset
+    no_birds_dir: ../augmented_dataset/no_birds
+    ground_truth: null
+    output_dir: results
+    student_model: ../best_distillation_model.pt
+    student_config: ../config/bird_classification.yaml
+    segments_dir: ${benchmark.paths.output_dir}/segments
+    predictions_dir: results/predictions
+    comparison_dir: results/comparison
+segmentation:
+  duration: 3.0
+  overlap: 0.0
+  sample_rate: 32000
+  min_duration_ratio: 0.9
+  supported_formats:
+  - .wav
+  - .mp3
+  - .flac
+  - .ogg
+  - .m4a
+  - .aac
+  force_mono: true
+  min_amplitude_threshold: 0.001
+  max_noise_ratio: 0.8
+student_model:
+  architecture:
+    num_classes: 9
+    spectrogram_type: combined_log_linear
+    n_mel_bins: 64
+    n_linear_filters: 64
+    hidden_dim: 64
+    n_fft: 1024
+    hop_length: 320
+    matchbox:
+      base_filters: 32
+      num_layers: 3
+      kernel_size: 5
+      stride: 1
+      dropout: 0.05
+      breakpoint: 4000
+      transition_width: 100
+  preprocessing:
+    sample_rate: 32000
+    clip_duration: 3.0
+    lowcut: 150.0
+    highcut: 16000.0
+  inference:
+    device: auto
+    batch_size: 32
+    confidence_threshold: 0.1
+    use_amp: false
+  classes:
+    allowed_species:
+    - Bubo_bubo
+    - Certhia_familiaris
+    - Apus_apus
+    - Certhia_brachydactyla
+    - Emberiza_cia
+    - Lophophanes_cristatus
+    - Periparus_ater
+    - Poecile_montanus
+    has_no_birds_class: true
+    no_birds_label: no_birds
+birdnet:
+  confidence_threshold: 0.1
+  sensitivity: 1.25
+  disable_location_filter: true
+  disable_time_filter: true
+  location:
+    latitude: null
+    longitude: null
+  temporal:
+    week: -1
+    date: null
+  target_species: ${student_model.classes.allowed_species}
+  species_list: null
+  overlap: 0.0
+  chunk_size: 10
+comparison:
+  metrics:
+    calculate_accuracy: true
+    calculate_precision: true
+    calculate_recall: true
+    calculate_f1: true
+    calculate_confusion_matrix: true
+    calculate_per_class_metrics: true
+    calculate_agreement_analysis: true
+    averaging_methods:
+    - micro
+    - macro
+    - weighted
+  ground_truth:
+    format: auto
+    label_column: label
+    segment_column: segment_name
+    positive_values:
+    - 1
+    - '1'
+    - true
+    - 'true'
+    - 'yes'
+    negative_values:
+    - 0
+    - '0'
+    - false
+    - 'false'
+    - 'no'
+    - null
+  agreement:
+    exact_match: true
+    partial_match: false
+    confidence_weighting: false
+    categories:
+      both_correct: both_correct
+      student_only: student_only_correct
+      birdnet_only: birdnet_only_correct
+      both_incorrect: both_incorrect
+  visualization:
+    figsize:
+    - 16
+    - 8
+    dpi: 300
+    style: seaborn-v0_8
+    color_palette: viridis
+    confusion_matrix:
+      normalize: null
+      colormap: Blues
+      show_values: true
+    agreement_plot:
+      pie_chart: true
+      bar_chart: true
+      per_class_comparison: true
+  save_plots: true
+  save_detailed_json: true
+output:
+  naming:
+    student_predictions: student_predictions.csv
+    birdnet_predictions: birdnet_predictions.csv
+    segments_metadata: segments_metadata.csv
+    comparison_report: comparison_report.json
+    comparison_summary: comparison_summary.txt
+    detailed_cases: detailed_cases.csv
+  plots:
+    confusion_matrices: confusion_matrices.png
+    agreement_analysis: agreement_analysis.png
+    per_class_accuracy: per_class_accuracy.png
+    confidence_distribution: confidence_distribution.png
+  formats:
+    save_json: true
+    save_csv: true
+    save_plots: true
+    save_summary: true
+  compression:
+    compress_audio: false
+    compression_format: flac
+logging:
+  level: INFO
+  log_to_file: true
+  log_file: ${benchmark.paths.output_dir}/benchmark.log
+  show_progress_bars: true
+  progress_bar_style: tqdm
+  log_predictions: false
+  log_preprocessing: false
+  log_model_loading: true
+performance:
+  use_multiprocessing: true
+  num_workers: 4
+  max_memory_usage: 8GB
+  cleanup_intermediate: true
+  cache_predictions: true
+  cache_preprocessed_audio: false
+  cache_dir: ${benchmark.paths.output_dir}/.cache
+validation:
+  check_audio_integrity: true
+  validate_ground_truth: true
+  validate_model_compatibility: true
+  verify_segment_count: true
+  check_prediction_consistency: true
+  continue_on_error: false
+  max_error_rate: 0.1
+debug:
+  dev_mode: true
+  test_with_subset: true
+  subset_size: 3
+  enable_profiling: false
+  profile_memory: false
+  profile_time: false
+  random_seed: 42
+  deterministic: true
+  files_limit: 50

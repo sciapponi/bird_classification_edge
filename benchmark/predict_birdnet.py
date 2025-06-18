@@ -15,12 +15,18 @@ from typing import Dict, List, Optional, Union
 import hydra
 from omegaconf import DictConfig
 from tqdm import tqdm
+import numpy as np
+import librosa
+import soundfile as sf
+import tempfile
+from scipy import signal
 
 # Add project root to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from birdnetlib import Recording
 from birdnetlib.analyzer import Analyzer
+from datasets.audio_utils import extract_call_segments
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +34,19 @@ logger = logging.getLogger(__name__)
 class BirdNETPredictor:
     """
     Generates predictions using BirdNET-Analyzer with species filtering.
+    Supports both full-file analysis and segmented analysis for fair comparison.
     """
     
     def __init__(self, 
                  target_species: List[str],
                  confidence_threshold: float = 0.1,
-                 species_list_path: Optional[str] = None):
+                 species_list_path: Optional[str] = None,
+                 model_path: Optional[str] = None,
+                 segment_duration: float = 3.0,
+                 sample_rate: int = 32000,
+                 lowcut: float = 150.0,
+                 highcut: float = 16000.0,
+                 extract_calls: bool = True):
         """
         Initialize BirdNET predictor.
         
@@ -41,9 +54,22 @@ class BirdNETPredictor:
             target_species: List of target species (underscore format)
             confidence_threshold: Minimum confidence for predictions
             species_list_path: Path to custom species list file
+            model_path: Path to the TFLite classification model (FP32 preferred for highest accuracy). 
+                If None, BirdNET's default path is used.
+            segment_duration: Duration of audio segments for aligned comparison
+            sample_rate: Sample rate for preprocessing
+            lowcut: Low frequency cutoff for bandpass filter
+            highcut: High frequency cutoff for bandpass filter
+            extract_calls: Whether to use call extraction (align with student model)
         """
         self.target_species = target_species
         self.confidence_threshold = confidence_threshold
+        self.model_path = model_path
+        self.segment_duration = segment_duration
+        self.sample_rate = sample_rate
+        self.lowcut = lowcut
+        self.highcut = highcut
+        self.extract_calls = extract_calls
         
         # Convert target species to BirdNET format (spaces instead of underscores)
         self.birdnet_species = [species.replace('_', ' ') for species in target_species]
@@ -70,7 +96,9 @@ class BirdNETPredictor:
         # Apply patch and initialize analyzer
         builtins.open = utf8_open
         try:
-            self.analyzer = Analyzer(custom_species_list_path=self.species_list_path)
+            self.analyzer = Analyzer(
+                custom_species_list_path=self.species_list_path
+            )
         finally:
             # Restore original open function
             builtins.open = original_open
@@ -89,6 +117,7 @@ class BirdNETPredictor:
         logger.info(f"BirdNET initialized with {len(self.target_species)} target species")
         logger.info(f"Target species: {self.target_species}")
         logger.info(f"Confidence threshold: {confidence_threshold}")
+        logger.info(f"Segmented mode: {extract_calls}, Duration: {segment_duration}s")
     
     def _create_species_list(self, species_labels):
         """Create temporary species list file for BirdNET filtering"""
@@ -96,6 +125,10 @@ class BirdNETPredictor:
             'Bubo_bubo': 'Bubo bubo_Eurasian Eagle-Owl',
             'Apus_apus': 'Apus apus_Common Swift', 
             'Certhia_familiaris': 'Certhia familiaris_Eurasian Treecreeper',
+            'Certhia_brachydactyla': 'Certhia brachydactyla_Short-toed Treecreeper',
+            'Emberiza_cia': 'Emberiza cia_Rock Bunting',
+            'Lophophanes_cristatus': 'Lophophanes cristatus_Crested Tit',
+            'Periparus_ater': 'Periparus ater_Coal Tit',
             'Poecile_montanus': 'Poecile montanus_Willow Tit',
             'no_birds': 'no_birds'  # Keep as is for no_birds
         }
@@ -113,6 +146,208 @@ class BirdNETPredictor:
         
         return self.temp_species_file
     
+    def _preprocess_audio_segment(self, audio_path: str) -> Optional[str]:
+        """
+        Preprocess audio with identical pipeline to student model.
+        
+        Args:
+            audio_path: Path to original audio file
+            
+        Returns:
+            Path to preprocessed temporary file or None if failed
+        """
+        try:
+            if self.extract_calls:
+                # Use call extraction like student model
+                call_intervals, segments, original_audio, sr, duration = extract_call_segments(
+                    audio_path,
+                    clip_duration=self.segment_duration,
+                    sr=self.sample_rate,
+                    lowcut=self.lowcut,
+                    highcut=self.highcut,
+                    verbose=False
+                )
+                
+                if segments and len(segments) > 0:
+                    # Use first extracted segment
+                    audio_segment = segments[0]
+                    logger.debug(f"Using extracted call segment from {audio_path}")
+                else:
+                    # Fallback to random 3s clip with bandpass filter
+                    logger.debug(f"No calls found in {audio_path}, using fallback preprocessing")
+                    audio_segment = self._fallback_preprocessing(audio_path)
+                    if audio_segment is None:
+                        return None
+            else:
+                # Use random 3s clip with bandpass filter
+                audio_segment = self._fallback_preprocessing(audio_path)
+                if audio_segment is None:
+                    return None
+            
+            # Save preprocessed segment to temporary file
+            temp_file = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
+            sf.write(temp_file.name, audio_segment, self.sample_rate)
+            temp_file.close()
+            
+            return temp_file.name
+            
+        except Exception as e:
+            logger.error(f"Failed to preprocess {audio_path}: {e}")
+            return None
+    
+    def _fallback_preprocessing(self, audio_path: str) -> Optional[np.ndarray]:
+        """
+        Fallback preprocessing: random 3s clip with bandpass filter.
+        Identical to student model preprocessing when extract_calls=False.
+        """
+        try:
+            # Load audio
+            y, sr = librosa.load(audio_path, sr=self.sample_rate)
+            
+            # Apply bandpass filter (same as student model)
+            nyquist = sr / 2
+            low = self.lowcut / nyquist
+            high = self.highcut / nyquist
+            
+            if low >= 1.0 or high >= 1.0:
+                logger.warning(f"Filter frequencies too high for sample rate {sr}")
+                # Skip filtering if frequencies are invalid
+                y_filtered = y
+            else:
+                b, a = signal.butter(4, [low, high], btype='band')
+                y_filtered = signal.filtfilt(b, a, y)
+            
+            # Extract 3-second segment
+            target_length = int(self.segment_duration * sr)
+            
+            if len(y_filtered) >= target_length:
+                # Random start position
+                max_start = len(y_filtered) - target_length
+                start_idx = np.random.randint(0, max_start + 1) if max_start > 0 else 0
+                segment = y_filtered[start_idx:start_idx + target_length]
+            else:
+                # Pad if too short
+                segment = np.pad(y_filtered, (0, target_length - len(y_filtered)), mode='constant')
+            
+            # Normalize
+            if np.max(np.abs(segment)) > 0:
+                segment = segment / np.max(np.abs(segment))
+            
+            return segment
+            
+        except Exception as e:
+            logger.error(f"Fallback preprocessing failed for {audio_path}: {e}")
+            return None
+
+    def predict_single_aligned(self, audio_path: Union[str, Path]) -> Dict:
+        """
+        Generate BirdNET prediction using aligned preprocessing (3s segments).
+        This method ensures fair comparison with the student model.
+        
+        Args:
+            audio_path: Path to audio file
+            
+        Returns:
+            Dictionary with prediction results
+        """
+        temp_file = None
+        try:
+            # Preprocess audio with identical pipeline to student model
+            temp_file = self._preprocess_audio_segment(str(audio_path))
+            
+            if temp_file is None:
+                logger.warning(f"Preprocessing failed for {audio_path}, returning no_birds")
+                return {
+                    'audio_path': str(audio_path),
+                    'predicted_class': "no_birds",
+                    'confidence': 0.0,
+                    'all_detections': [],
+                    'species_confidences': {},
+                    'num_detections': 0,
+                    'preprocessing_method': 'failed'
+                }
+            
+            # Create recording object with preprocessed segment
+            recording = Recording(
+                self.analyzer,
+                temp_file,
+                min_conf=self.confidence_threshold
+            )
+            
+            # Disable location and time filters for fair comparison
+            recording.lat = None
+            recording.lon = None
+            recording.date = None
+            recording.week = -1
+            
+            # Analyze recording
+            recording.analyze()
+            
+            # Process detections
+            all_detections = []
+            species_confidences = {}
+            
+            for detection in recording.detections:
+                scientific_name = detection['scientific_name']
+                confidence = detection['confidence']
+                
+                # Convert to project format
+                project_species = scientific_name.replace(' ', '_')
+                
+                detection_info = {
+                    'scientific_name': scientific_name,
+                    'project_species': project_species,
+                    'common_name': detection['common_name'],
+                    'confidence': float(confidence),
+                    'start_time': detection.get('start_time', 0.0),
+                    'end_time': detection.get('end_time', self.segment_duration)
+                }
+                
+                all_detections.append(detection_info)
+                
+                # Keep highest confidence for each species
+                if project_species not in species_confidences or confidence > species_confidences[project_species]:
+                    species_confidences[project_species] = confidence
+            
+            # Determine top prediction
+            if species_confidences:
+                top_species = max(species_confidences.keys(), key=lambda x: species_confidences[x])
+                top_confidence = species_confidences[top_species]
+            else:
+                # No detections - classify as no_birds
+                top_species = "no_birds"
+                top_confidence = 0.0
+            
+            return {
+                'audio_path': str(audio_path),
+                'predicted_class': top_species,
+                'confidence': top_confidence,
+                'all_detections': all_detections,
+                'species_confidences': species_confidences,
+                'num_detections': len(all_detections),
+                'preprocessing_method': 'extract_calls' if self.extract_calls else 'random_clip'
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to predict {audio_path}: {e}")
+            return {
+                'audio_path': str(audio_path),
+                'predicted_class': "no_birds",
+                'confidence': 0.0,
+                'all_detections': [],
+                'species_confidences': {},
+                'num_detections': 0,
+                'error': str(e),
+                'preprocessing_method': 'error'
+            }
+        finally:
+            # Clean up temporary file
+            if temp_file and os.path.exists(temp_file):
+                try:
+                    os.unlink(temp_file)
+                except:
+                    pass
+
     def predict_single(self, audio_path: Union[str, Path]) -> Dict:
         """
         Generate BirdNET prediction for a single audio file.
@@ -227,7 +462,8 @@ class BirdNETPredictor:
 
 def predict_from_dataframe(predictor: BirdNETPredictor, 
                           ground_truth_df: pd.DataFrame,
-                          audio_base_path: str = "") -> pd.DataFrame:
+                          audio_base_path: str = "",
+                          use_aligned_processing: bool = True) -> pd.DataFrame:
     """
     Generate predictions for audio files listed in a ground truth DataFrame.
     
@@ -235,20 +471,27 @@ def predict_from_dataframe(predictor: BirdNETPredictor,
         predictor: BirdNET predictor instance
         ground_truth_df: DataFrame with 'audio_path' column
         audio_base_path: Base path to prepend to audio paths
+        use_aligned_processing: Whether to use aligned 3s segmented processing
         
     Returns:
         DataFrame with predictions added
     """
     predictions = []
     
+    # Choose prediction method
+    predict_method = predictor.predict_single_aligned if use_aligned_processing else predictor.predict_single
+    method_name = "aligned (3s segments)" if use_aligned_processing else "full file"
+    
+    logger.info(f"Using BirdNET prediction method: {method_name}")
+    
     # Progress bar for BirdNET predictions
     for _, row in tqdm(ground_truth_df.iterrows(), 
                       total=len(ground_truth_df), 
-                      desc="🦅 BirdNET predictions", 
+                      desc=f"🦅 BirdNET predictions ({method_name})", 
                       unit="files"):
         audio_path = os.path.join(audio_base_path, row['audio_path']) if audio_base_path else row['audio_path']
         
-        prediction = predictor.predict_single(audio_path)
+        prediction = predict_method(audio_path)
         
         predictions.append({
             'audio_path': row['audio_path'],
@@ -256,7 +499,8 @@ def predict_from_dataframe(predictor: BirdNETPredictor,
             'birdnet_prediction': prediction['predicted_class'],
             'birdnet_confidence': prediction['confidence'],
             'birdnet_detections': prediction['num_detections'],
-            'birdnet_all_species': prediction['species_confidences']
+            'birdnet_all_species': prediction['species_confidences'],
+            'birdnet_preprocessing': prediction.get('preprocessing_method', 'unknown')
         })
     
     return pd.DataFrame(predictions)
@@ -273,10 +517,23 @@ def main(cfg: DictConfig) -> None:
     logger.info("Starting BirdNET prediction")
     logger.info(f"Configuration: {cfg.birdnet}")
     
-    # Initialize predictor
+    # Use the larger FP32 classification model explicitly
+    model_fp32_path = os.path.join(
+        original_cwd,
+        "analyzer",
+        "BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite"
+    )
+    
+    # Configure BirdNET with aligned preprocessing parameters
     predictor = BirdNETPredictor(
         target_species=cfg.student_model.classes.allowed_species,
-        confidence_threshold=cfg.birdnet.confidence_threshold
+        confidence_threshold=cfg.birdnet.confidence_threshold,
+        model_path=model_fp32_path,
+        segment_duration=cfg.student_model.preprocessing.clip_duration,
+        sample_rate=cfg.student_model.preprocessing.sample_rate,
+        lowcut=cfg.student_model.preprocessing.lowcut,
+        highcut=cfg.student_model.preprocessing.highcut,
+        extract_calls=cfg.student_model.preprocessing.get('extract_calls', True)
     )
     
     try:
@@ -290,11 +547,12 @@ def main(cfg: DictConfig) -> None:
         ground_truth_df = pd.read_csv(ground_truth_path)
         logger.info(f"Loaded ground truth with {len(ground_truth_df)} samples")
         
-        # Generate predictions
+        # Generate predictions using aligned processing
         predictions_df = predict_from_dataframe(
             predictor, 
             ground_truth_df, 
-            audio_base_path=original_cwd
+            audio_base_path=original_cwd,
+            use_aligned_processing=True  # Use 3s segments with identical preprocessing
         )
         
         # Save predictions

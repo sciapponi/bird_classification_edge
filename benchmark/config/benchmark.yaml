@@ -66,6 +66,7 @@ student_model:
     clip_duration: 3.0
     lowcut: 150.0
     highcut: 16000.0
+    extract_calls: true  # Use call extraction for aligned comparison
     
   # Prediction parameters
   inference:

@@ -5,6 +5,7 @@ Training script for knowledge distillation using BirdNET as teacher.
 
 import os
 import sys
+import torch
 import torch.nn as nn
 import numpy as np
 import hydra
@@ -118,6 +119,10 @@ class DistillationTrainer:
         self.hard_losses = []
         self.soft_losses = []
         self.learning_rates = []  # Track learning rates
+        
+        # Filter parameters history (for combined_log_linear)
+        self.breakpoint_history = []
+        self.transition_width_history = []
         
         logger.info(f"Initialized trainer on device: {self.device}")
         logger.info(f"Outputs will be saved to: {self.output_dir}")
@@ -371,12 +376,22 @@ class DistillationTrainer:
             self.train_epoch()
             val_loss, val_acc = self.validate_epoch()
             
+            # Track filter parameters if using combined_log_linear
+            if (self.config.model.get('spectrogram_type') == 'combined_log_linear' and 
+                hasattr(self.model, 'combined_log_linear_spec') and 
+                self.model.combined_log_linear_spec is not None):
+                current_breakpoint = self.model.combined_log_linear_spec.breakpoint.item()
+                current_transition_width = self.model.combined_log_linear_spec.transition_width.item()
+                self.breakpoint_history.append(current_breakpoint)
+                self.transition_width_history.append(current_transition_width)
+                logger.info(f"Epoch {self.epoch} - Filter params: Breakpoint={current_breakpoint:.2f}Hz, Transition Width={current_transition_width:.2f}")
+            
             # Update learning rate scheduler
             if self.scheduler:
                 if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                         self.scheduler.step(val_loss)
-                    else:
-                        self.scheduler.step()
+                else:
+                    self.scheduler.step()
             
             # Check for best model
             if val_loss < self.best_val_loss:
@@ -448,10 +463,21 @@ class DistillationTrainer:
 
         epochs = range(1, len(self.train_losses) + 1)
         
-        plt.figure(figsize=(12, 10))
+        # Determine if we have filter parameters to plot
+        has_filter_params = (len(self.breakpoint_history) > 0 and 
+                           len(self.transition_width_history) > 0 and 
+                           len(self.breakpoint_history) == len(self.train_losses))
+        
+        # Adjust figure size and subplot layout based on available data
+        if has_filter_params:
+            plt.figure(figsize=(15, 12))
+            subplot_rows, subplot_cols = 3, 2
+        else:
+            plt.figure(figsize=(12, 10))
+            subplot_rows, subplot_cols = 2, 2
         
         # Plot Loss
-        plt.subplot(2, 2, 1)
+        plt.subplot(subplot_rows, subplot_cols, 1)
         plt.plot(epochs, self.train_losses, '.-', label='Train Loss')
         plt.plot(epochs, self.val_losses, '.-', label='Val Loss')
         plt.title('Training & Validation Loss')
@@ -461,7 +487,7 @@ class DistillationTrainer:
         plt.legend()
         
         # Plot Accuracy
-        plt.subplot(2, 2, 2)
+        plt.subplot(subplot_rows, subplot_cols, 2)
         plt.plot(epochs, self.train_accs, '.-', label='Train Accuracy')
         plt.plot(epochs, self.val_accs, '.-', label='Val Accuracy')
         plt.title('Training & Validation Accuracy')
@@ -471,7 +497,7 @@ class DistillationTrainer:
         plt.legend()
         
         # Plot Hard/Soft Loss
-        plt.subplot(2, 2, 3)
+        plt.subplot(subplot_rows, subplot_cols, 3)
         plt.plot(epochs, self.hard_losses, '.-', label='Hard Loss (Train)')
         plt.plot(epochs, self.soft_losses, '.-', label='Soft Loss (Train)')
         plt.title('Distillation Loss Components')
@@ -481,7 +507,7 @@ class DistillationTrainer:
         plt.legend()
         
         # Plot Learning Rate
-        plt.subplot(2, 2, 4)
+        plt.subplot(subplot_rows, subplot_cols, 4)
         plt.plot(epochs, self.learning_rates, '.-', label='Learning Rate')
         plt.title('Learning Rate')
         plt.xlabel('Epochs')
@@ -489,11 +515,56 @@ class DistillationTrainer:
         plt.grid(True)
         plt.legend()
         
+        # Plot Filter Parameters (if available)
+        if has_filter_params:
+            # Plot Breakpoint Evolution
+            plt.subplot(subplot_rows, subplot_cols, 5)
+            plt.plot(epochs, self.breakpoint_history, '.-', label='Breakpoint (Hz)', color='green')
+            plt.title('Differentiable Filter Breakpoint Evolution')
+            plt.xlabel('Epochs')
+            plt.ylabel('Breakpoint (Hz)')
+            plt.grid(True)
+            plt.legend()
+            
+            # Plot Transition Width Evolution
+            plt.subplot(subplot_rows, subplot_cols, 6)
+            plt.plot(epochs, self.transition_width_history, '.-', label='Transition Width', color='purple')
+            plt.title('Differentiable Filter Transition Width Evolution')
+            plt.xlabel('Epochs')
+            plt.ylabel('Transition Width')
+        plt.grid(True)
+        plt.legend()
+        
         plt.tight_layout()
         plot_path = self.output_dir / "training_history.png"
-        plt.savefig(plot_path)
+        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
         plt.close()
         logger.info(f"Saved training plots to {plot_path}")
+        
+        # Save filter parameters evolution as separate CSV if available
+        if has_filter_params:
+            filter_params_path = self.output_dir / "filter_parameters_evolution.csv"
+            import pandas as pd
+            df = pd.DataFrame({
+                'epoch': list(epochs),
+                'breakpoint_hz': self.breakpoint_history,
+                'transition_width': self.transition_width_history
+            })
+            df.to_csv(filter_params_path, index=False)
+            logger.info(f"Saved filter parameters evolution to {filter_params_path}")
+            
+            # Generate advanced plots if available
+            try:
+                from pathlib import Path
+                import sys
+                sys.path.append(str(Path(__file__).parent))
+                from advanced_plots import DistillationAnalyzer
+                
+                analyzer = DistillationAnalyzer(str(self.output_dir))
+                advanced_plots = analyzer.generate_all_plots()
+                logger.info(f"Generated {len(advanced_plots)} advanced analysis plots")
+            except Exception as e:
+                logger.warning(f"Could not generate advanced plots: {e}")
 
     def save_results(self, test_acc, report_dict):
         """Saves test results to a JSON file."""

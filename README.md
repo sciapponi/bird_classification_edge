@@ -59,13 +59,13 @@ This repository contains a comprehensive bird sound classification system design
 - Docker (for containerized execution)
 
 ### 1. Clone and Setup Environment
-```bash
-git clone <repository_url>
-cd bird_classification_edge
-python3 -m venv venv
+    ```bash
+    git clone <repository_url>
+    cd bird_classification_edge
+    python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+    pip install -r requirements.txt
+    ```
 
 ### 2. Dataset Preparation
 - **Bird Recordings**: Place in `bird_sound_dataset/`, organized by species folders
@@ -166,10 +166,10 @@ python generate_no_birds_samples.py \
 ```
 
 **Option B: Online Generation**
-```bash
+    ```bash
 # Set load_pregenerated_no_birds: false in config
 # Samples generated during training setup
-```
+    ```
 
 ### 3. Train the Model
 ```bash
@@ -234,11 +234,11 @@ To train on a subset of species:
    echo "Certhia familiaris" >> distillation/species_custom.txt
    echo "Apus apus" >> distillation/species_custom.txt
    echo "Bubo bubo" >> distillation/species_custom.txt
-   ```
+    ```
 
 2. **Extract Matching Soft Labels:**
-   ```bash
-   python extract_soft_labels.py \
+    ```bash
+    python extract_soft_labels.py \
      --species_list distillation/species_custom.txt \
      --output_path soft_labels_custom
    ```
@@ -439,6 +439,22 @@ birdnet.confidence_threshold=0.5
 | "BirdNET species not found" | Some species may not be in BirdNET's database |
 | GPU memory issues | Reduce batch size: `student_model.inference.batch_size=8` |
 | Docker permission issues | Ensure user has Docker access and GPU permissions |
+| **"LexerNoViableAltException: 1"** | **Use correct script syntax: `GPU_ID=1` not just `1`** |
+| **"ModuleNotFoundError: hydra"** | **Use Docker scripts or activate virtual environment** |
+
+**Docker Script Syntax Reference:**
+```bash
+# ✅ CORRECT - All scripts except benchmark
+./run_docker_training.sh container_name GPU_ID=1 [hydra_overrides...]
+./run_docker_distillation.sh container_name GPU_ID=1 [hydra_overrides...]
+./run_docker_soft_labels.sh container_name GPU_ID=1 [additional_args...]
+
+# ✅ CORRECT - Benchmark script (different syntax)
+./run_docker_benchmark.sh container_name 1 [hydra_overrides...]
+
+# ❌ WRONG - This causes Hydra parsing errors
+./run_docker_distillation.sh container_name 1  # Don't do this!
+```
 
 **Performance Tips:**
 - Use `debug.files_limit=100` for rapid iteration
@@ -463,21 +479,21 @@ docker build -f Dockerfile.benchmark -t bird_classification_benchmark .
 
 | Script | Purpose | Example Usage |
 |--------|---------|---------------|
-| `run_docker_soft_labels.sh` | Extract BirdNET soft labels | `./run_docker_soft_labels.sh my_extraction 0` |
-| `run_docker_distillation.sh` | Knowledge distillation training | `./run_docker_distillation.sh my_training 0` |
+| `run_docker_soft_labels.sh` | Extract BirdNET soft labels | `./run_docker_soft_labels.sh my_extraction GPU_ID=0` |
+| `run_docker_distillation.sh` | Knowledge distillation training | `./run_docker_distillation.sh my_training GPU_ID=0` |
 | `run_docker_benchmark.sh` | **Model benchmarking** | `./run_docker_benchmark.sh my_benchmark 1` |
-| `run_docker_training.sh` | Standard training | `./run_docker_training.sh my_training 0` |
+| `run_docker_training.sh` | Standard training | `./run_docker_training.sh my_training GPU_ID=0` |
 
 ### 3. Docker Workflow Examples
 
 #### Complete Knowledge Distillation Pipeline
-```bash
+    ```bash
 # Step 1: Extract soft labels from BirdNET
-./run_docker_soft_labels.sh extraction_gpu0 0
+./run_docker_soft_labels.sh extraction_gpu0 GPU_ID=0
 # Results saved to soft_labels_complete/
 
 # Step 2: Train with knowledge distillation
-./run_docker_distillation.sh training_gpu0 0 training.epochs=50
+./run_docker_distillation.sh training_gpu0 GPU_ID=0 training.epochs=50
 # Model saved as best_distillation_model.pt
 
 # Step 3: Benchmark against BirdNET
@@ -486,21 +502,29 @@ docker build -f Dockerfile.benchmark -t bird_classification_benchmark .
 ```
 
 #### GPU Management
-```bash
+    ```bash
 # Use specific GPU
 ./run_docker_benchmark.sh my_benchmark 2  # Uses GPU 2
+./run_docker_training.sh my_training GPU_ID=2  # Uses GPU 2
+./run_docker_distillation.sh my_distill GPU_ID=2  # Uses GPU 2
 
 # CPU-only execution (Mac/no GPU)
 ./run_docker_soft_labels.sh my_extraction MAC  # Special MAC flag
+./run_docker_training.sh my_training MAC  # CPU-only training
 ```
 
 #### Parameter Overrides
-```bash
+    ```bash
 # Training parameters
-./run_docker_distillation.sh my_training 0 \
+./run_docker_distillation.sh my_training GPU_ID=0 \
   training.epochs=100 \
   training.batch_size=64 \
   optimizer.lr=0.0005
+
+# Standard training parameters
+./run_docker_training.sh my_training GPU_ID=0 \
+  training.epochs=50 \
+  optimizer.lr=0.001
 
 # Benchmark parameters  
 ./run_docker_benchmark.sh my_benchmark 1 \
@@ -514,8 +538,8 @@ docker build -f Dockerfile.benchmark -t bird_classification_benchmark .
 ### Main Training Configuration (`config/bird_classification.yaml`)
 
 #### Dataset Parameters
-```yaml
-dataset:
+    ```yaml
+    dataset:
   bird_data_dir: "bird_sound_dataset"
   allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris", "Poecile_montanus"]
   

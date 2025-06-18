@@ -263,8 +263,9 @@ def create_distillation_dataloader(config, soft_labels_path, split='train'):
         dataset, 
         batch_size=config.get('batch_size', 16), # Get batch_size from dataset config section
         shuffle=(split == 'train'),
-        num_workers=4,  # Use 4 parallel workers for data loading
-        pin_memory=True # Essential for fast CPU-to-GPU transfer
+        num_workers=8,  # Increased from 4 to 8 for better I/O parallelism
+        pin_memory=True, # Essential for fast CPU-to-GPU transfer
+        persistent_workers=True  # Keep workers alive between epochs
     )
     
     return dataloader, dataset
