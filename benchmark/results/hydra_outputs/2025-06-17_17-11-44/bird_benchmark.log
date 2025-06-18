@@ -1,0 +1,828 @@
+[2025-06-17 17:11:46,220][__main__][INFO] - ============================================================
+[2025-06-17 17:11:46,221][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-17 17:11:46,222][__main__][INFO] - ============================================================
+[2025-06-17 17:11:46,222][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-17 17:11:46,222][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-17 17:11:46,222][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-17 17:11:46,222][__main__][INFO] -    • Both models see identical audio data
+[2025-06-17 17:11:46,222][__main__][INFO] - ============================================================
+[2025-06-17 17:11:46,222][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_17-11-44
+[2025-06-17 17:11:46,222][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_17-11-44
+[2025-06-17 17:11:46,222][__main__][INFO] - 
+========================================
+[2025-06-17 17:11:46,222][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-17 17:11:46,222][__main__][INFO] - ========================================
+[2025-06-17 17:11:46,222][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-17 17:11:46,222][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-17 17:11:46,245][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-17 17:11:46,245][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-17 17:11:46,268][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-17 17:11:46,269][__main__][INFO] - Processing species: Apus_apus
+[2025-06-17 17:11:46,282][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-17 17:11:46,282][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-17 17:11:46,297][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-17 17:11:46,297][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-17 17:11:46,345][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-17 17:11:46,345][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-17 17:11:46,352][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-17 17:11:46,352][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-17 17:11:46,371][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-17 17:11:46,371][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-17 17:11:46,395][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-17 17:11:46,395][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-17 17:11:46,409][__main__][INFO] - Found 836 no_birds files
+[2025-06-17 17:11:46,417][__main__][INFO] - Total audio files discovered: 10822
+[2025-06-17 17:11:46,418][__main__][INFO] - Class distribution:
+[2025-06-17 17:11:46,419][__main__][INFO] -   Periparus_ater: 2902 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Certhia_brachydactyla: 1396 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Lophophanes_cristatus: 1045 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   no_birds: 836 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-17 17:11:46,419][__main__][INFO] -   Emberiza_cia: 403 files
+[2025-06-17 17:11:46,460][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-17 17:11:46,460][__main__][INFO] - 
+========================================
+[2025-06-17 17:11:46,460][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-17 17:11:46,460][__main__][INFO] - ========================================
+[2025-06-17 17:11:46,460][__main__][INFO] - Starting student model predictions
+[2025-06-17 17:11:47,184][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-17 17:11:47,505][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-17 17:11:47,506][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-17 17:11:47,506][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-17 17:11:47,506][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-17 17:11:47,522][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/benchmark/../config/bird_classification.yaml
+[2025-06-17 17:11:47,681][benchmark.predict_student][INFO] - Loaded model from: /workspace/benchmark/../best_distillation_model.pt
+[2025-06-17 17:11:47,683][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-17 17:11:47,683][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-17 17:11:47,683][benchmark.predict_student][INFO] - Confidence threshold: 0.1
+[2025-06-17 17:12:08,205][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC759943-Fyrremejse,-Kasted-mose,-17-8-2022.wav, using fallback preprocessing
+[2025-06-17 17:12:12,014][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC864150-PARMON130824.wav, using fallback preprocessing
+[2025-06-17 17:12:16,374][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/1761.mp3, using fallback preprocessing
+[2025-06-17 17:12:27,072][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406068-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1220pm.mp3, using fallback preprocessing
+[2025-06-17 17:12:31,323][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540988-WillowTitCall Bagmere 1327pm 11022019.mp3, using fallback preprocessing
+[2025-06-17 17:12:35,047][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406069-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1400pm.mp3, using fallback preprocessing
+[2025-06-17 17:12:36,010][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409237-Willow Tit Calls Bagmere Nature Reserve 18 March 2018 at 0826am.mp3, using fallback preprocessing
+[2025-06-17 17:12:42,195][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC709923-220306_0218 Weidenmeise Beerbusch.mp3, using fallback preprocessing
+[2025-06-17 17:12:45,728][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC529772-Willow Tit call very good 2020 02 11 Combe Wood_1822_short.mp3, using fallback preprocessing
+[2025-06-17 17:12:51,642][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC677476-20210928 1455 mees onbekend kleine wielen.mp3, using fallback preprocessing
+[2025-06-17 17:12:58,056][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC709922-220305_0216 Weidenmeise Beerbusch.mp3, using fallback preprocessing
+[2025-06-17 17:13:07,012][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC826687-Mésange-Boréale-Hameau-du-Villaron-Bessans.mp3, using fallback preprocessing
+[2025-06-17 17:13:13,456][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC858258-MVI_7260.mp3, using fallback preprocessing
+[2025-06-17 17:13:13,524][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC456181-B17h05m33s19may2018_plus_37m59s_Presumed_OBP_call_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:13:18,120][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540990-WillowTitCall Bagmere 1338pm 11022019.mp3, using fallback preprocessing
+[2025-06-17 17:13:19,551][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC551311-7.mp3, using fallback preprocessing
+[2025-06-17 17:13:21,358][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC820983-DM672185-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-17 17:13:32,252][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405837-Willow Tit Call Bagmere Nature Reserve 27 February 2018 at 1146am.mp3, using fallback preprocessing
+[2025-06-17 17:13:32,802][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC126801-8002 8.03.2013, Заволжье, 10-00, Poecile montanus в.mp3, using fallback preprocessing
+[2025-06-17 17:13:34,638][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC404523-Willow Tit Call Bagmere Reserve Cheshire UK 15 Feb 2018.mp3, using fallback preprocessing
+[2025-06-17 17:13:37,425][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406067-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1221pm.mp3, using fallback preprocessing
+[2025-06-17 17:13:40,379][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540987-WillowTitCall Bagmere 1326pm 11022019.mp3, using fallback preprocessing
+[2025-06-17 17:13:40,646][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC327315-1359_319-02hipan mp3.mp3, using fallback preprocessing
+[2025-06-17 17:13:45,396][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC305538-x5090_059-04hiequ mp3.mp3, using fallback preprocessing
+[2025-06-17 17:14:19,587][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405835-Willow Tit Call Bagmere Nature Reserve 26 February 2018 at 0854am.mp3, using fallback preprocessing
+[2025-06-17 17:14:40,419][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC487533-xc-wa006478-000053-Parus-montanus.mp3, using fallback preprocessing
+[2025-06-17 17:14:43,454][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409119-Willow Tit Contact Call Bagmere Nature Reserve 16 March 2018 at 1008am.mp3, using fallback preprocessing
+[2025-06-17 17:14:49,458][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC313250-5124_053-04audj mp3.mp3, using fallback preprocessing
+[2025-06-17 17:14:55,787][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405649-Willow Tit Call Bagmere Reserve Cheshire UK 22 Feb 2018 at 1342pm.mp3, using fallback preprocessing
+[2025-06-17 17:15:09,506][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC719730-Poecile_montanus.mp3, using fallback preprocessing
+[2025-06-17 17:15:12,014][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540995-WillowTitCall Bagmere 1348pm 11022019.mp3, using fallback preprocessing
+[2025-06-17 17:15:12,048][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409236-Willow Tit Calls Bagmere Nature Reserve 18 March 2018 at 0825am.mp3, using fallback preprocessing
+[2025-06-17 17:15:31,166][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC438295-B10h09m21s15may2018_plus_37m51s_WillowTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:15:45,101][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405762-Willow Tit Call Bagmere Reserve Cheshire UK 24 Feb 2018 at 1358pm.mp3, using fallback preprocessing
+[2025-06-17 17:15:59,323][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC893592-Gdesbois_19052023.wav, using fallback preprocessing
+[2025-06-17 17:16:01,661][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC788091-24-03-23-(grimpereau-des-bois,-chant,-Wanne).wav, using fallback preprocessing
+[2025-06-17 17:16:06,911][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC906149-raspinell-pirinenc-cant-(19.32)-xeno-cant.wav, using fallback preprocessing
+[2025-06-17 17:16:29,891][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC747092-220809_001_090803_Taigaboomkruiper.mp3, using fallback preprocessing
+[2025-06-17 17:16:31,532][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC786266-DM671512-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-17 17:16:43,562][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC129288-8031_11.04.2013, Н. Азяпово, 9-25, королёк С.mp3, using fallback preprocessing
+[2025-06-17 17:16:49,639][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC628993-Treecreeper 14 March 2021 1143 Lea Cottage.mp3, using fallback preprocessing
+[2025-06-17 17:16:50,941][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC828620-DM672234-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-17 17:17:09,784][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/Rampichino alpestre S.Anna 6 gen 2012.mp3, using fallback preprocessing
+[2025-06-17 17:17:12,687][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC703964-20220212_0918_bois.mp3, using fallback preprocessing
+[2025-06-17 17:17:16,862][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC901109-Certhia-familiaris-caucasica-240420_004,-A-call.mp3, using fallback preprocessing
+[2025-06-17 17:17:32,999][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC773189-180071.mp3, using fallback preprocessing
+[2025-06-17 17:18:05,108][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC405755-Eurasian Treecreeper Calls Bagmere Nature Reserve 24 Feb 2018 at 1154am.mp3, using fallback preprocessing
+[2025-06-17 17:18:21,586][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/1454.mp3, using fallback preprocessing
+[2025-06-17 17:18:25,975][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/3121.mp3, using fallback preprocessing
+[2025-06-17 17:18:36,081][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC420325-Certhia familiaris_song_2018.05.11_15.50_01.mp3, using fallback preprocessing
+[2025-06-17 17:18:39,667][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC745314-luch 2 2.mp3, using fallback preprocessing
+[2025-06-17 17:18:41,544][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC598433-XC-biOsmid3C001-04equII (8).mp3, using fallback preprocessing
+[2025-06-17 17:18:42,871][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC901108-Certhia-familiaris-caucasica-240420_002,C1call.mp3, using fallback preprocessing
+[2025-06-17 17:19:09,007][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC536596-Ag. euroasi.mp3, using fallback preprocessing
+[2025-06-17 17:19:09,420][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC373620-3436-01_000-05ku mp3.mp3, using fallback preprocessing
+[2025-06-17 17:19:10,683][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/1797.mp3, using fallback preprocessing
+[2025-06-17 17:19:11,651][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC575844-m 12 5.mp3, using fallback preprocessing
+[2025-06-17 17:19:24,214][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC311607-LS11CerthiaFamiliaris.mp3, using fallback preprocessing
+[2025-06-17 17:19:30,713][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC937640-Certhia-familiaris-240918_001,-Кашхатау,-опушка,-5-часов-утра,росы-нет,1call.mp3, using fallback preprocessing
+[2025-06-17 17:19:36,046][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC683148-XC) 2021-10-20 Gävner Höhe (MONO-141) 11.30h indet hoch 40x hp 1000-6db.mp3, using fallback preprocessing
+[2025-06-17 17:19:58,193][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC405760-Eurasian Treecreeper Unusual Calls Bagmere Nature Reserve 24 Feb 2018 at 1446pm.mp3, using fallback preprocessing
+[2025-06-17 17:20:07,352][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC942752-2024-06-28_11_10[1].wav, using fallback preprocessing
+[2025-06-17 17:20:07,770][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC792385-swift.wav, using fallback preprocessing
+[2025-06-17 17:20:10,237][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC925446-TORNS2407302135.wav, using fallback preprocessing
+[2025-06-17 17:20:10,263][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC863320-13-07-23-(martinet-noir,-mas-d-Agon).wav, using fallback preprocessing
+[2025-06-17 17:20:15,530][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC845752-13-07-23-(martinet-noir,-mas-d-Agon-2).wav, using fallback preprocessing
+[2025-06-17 17:20:18,226][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC410765-DM670691_Ms_juv_aus-ornitho.mp3, using fallback preprocessing
+[2025-06-17 17:20:32,260][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC740585-Default_20220730-212303-0.mp3, using fallback preprocessing
+[2025-06-17 17:20:32,888][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC774661-common-swift-(2).mp3, using fallback preprocessing
+[2025-06-17 17:20:33,429][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC647122-vencejos (online-audio-converter.com).mp3, using fallback preprocessing
+[2025-06-17 17:20:34,079][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC730139-220607-0608_Tornseglare.mp3, using fallback preprocessing
+[2025-06-17 17:20:37,511][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC723217-220423_001_240619_Gierzwaluw.mp3, using fallback preprocessing
+[2025-06-17 17:20:39,421][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573649-apus 5 3.mp3, using fallback preprocessing
+[2025-06-17 17:20:47,976][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC580072-swift 30-07-20.mp3, using fallback preprocessing
+[2025-06-17 17:20:48,158][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC579677-Swift and Goldcrest.mp3, using fallback preprocessing
+[2025-06-17 17:20:58,886][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC572782-falciot 29 1.mp3, using fallback preprocessing
+[2025-06-17 17:21:09,292][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC553096-20200502Gierzwaluwbijnacht2Versterkt.mp3, using fallback preprocessing
+[2025-06-17 17:21:10,020][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC820733-DM672157-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-17 17:21:26,966][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573645-apus 5 1.mp3, using fallback preprocessing
+[2025-06-17 17:21:27,507][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC647394-20210511_0425 NoId XC.mp3, using fallback preprocessing
+[2025-06-17 17:21:27,540][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC414319-Vier-Abwehr-Duette.mp3, using fallback preprocessing
+[2025-06-17 17:21:33,845][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC649741-210513_001_130925_Gierzwaluw.mp3, using fallback preprocessing
+[2025-06-17 17:21:37,449][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC579356-24th July Swift.mp3, using fallback preprocessing
+[2025-06-17 17:21:37,995][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC582111-swift 11-08-20.mp3, using fallback preprocessing
+[2025-06-17 17:21:43,523][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC652985-2021-05-29 Common Swift 2123.mp3, using fallback preprocessing
+[2025-06-17 17:21:43,742][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573508-20200705_0415 jerzyk ok.mp3, using fallback preprocessing
+[2025-06-17 17:21:46,353][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC550691-20200426_0415_unid.mp3, using fallback preprocessing
+[2025-06-17 17:21:46,438][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573646-apus 5 2.mp3, using fallback preprocessing
+[2025-06-17 17:22:09,816][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC383114-170816_02_Common Swift nestling_Norwich_15 August 2017.mp3, using fallback preprocessing
+[2025-06-17 17:22:10,579][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC649748-210513_001_131528_Gierzwaluw.mp3, using fallback preprocessing
+[2025-06-17 17:22:13,375][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC290017-CommonSwift_GwassiHills_29Oct2015_1300.mp3, using fallback preprocessing
+[2025-06-17 17:22:13,463][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC528511-Common Swift Driel 180504 0140u.mp3, using fallback preprocessing
+[2025-06-17 17:22:21,343][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC647305-aa.mp3, using fallback preprocessing
+[2025-06-17 17:22:23,532][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC576490-apus_apus_bialystok_podlaskie_2020.07.17_0630.mp3, using fallback preprocessing
+[2025-06-17 17:22:23,881][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC910923-Swift-06-06-24.mp3, using fallback preprocessing
+[2025-06-17 17:22:42,061][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC447351-Swift good 2014 07 13 Grays_0062_stereo.mp3, using fallback preprocessing
+[2025-06-17 17:22:45,496][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC559198-falciot 17 2.mp3, using fallback preprocessing
+[2025-06-17 17:22:45,733][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC567634-falciot 12 2.mp3, using fallback preprocessing
+[2025-06-17 17:22:48,777][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC663393-jerzyki Zakole.mp3, using fallback preprocessing
+[2025-06-17 17:22:57,463][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC931418-Uhu_2024-03-19_04-47_Backnang-Steinbach_2_Audiomoth.wav, using fallback preprocessing
+[2025-06-17 17:22:59,245][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC958942-Uhu_2023-10-29_03-55_Aichtal_Audiomoth.wav, using fallback preprocessing
+[2025-06-17 17:23:03,319][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC943047-202408122322-Hou-ho.wav, using fallback preprocessing
+[2025-06-17 17:23:03,901][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC902432-berguv.wav, using fallback preprocessing
+[2025-06-17 17:23:30,409][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC653490-BU210601.mp3, using fallback preprocessing
+[2025-06-17 17:23:47,045][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC381210-.mp3, using fallback preprocessing
+[2025-06-17 17:23:58,560][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC531659-Fragment equalitzat i amplificat 200301_0678 Duc, reclam (Freixenet de Segarra).mp3, using fallback preprocessing
+[2025-06-17 17:24:42,260][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC488890-Eagle_owl_chicks_L13_2019-07-14.mp3, using fallback preprocessing
+[2025-06-17 17:24:53,594][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC621873-210214_01ext B anon ev Hornuggla.mp3, using fallback preprocessing
+[2025-06-17 17:25:18,795][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC901984-Bubo-bubo-240418_025,р.-Чегем,горы,-Лечинкай,18-37--00-41,E.mp3, using fallback preprocessing
+[2025-06-17 17:26:30,867][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC956188-241129_0395-Uhu-(M&W)-BuHo-1715-(sehr-leise).mp3, using fallback preprocessing
+[2025-06-17 17:27:49,629][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC942258-HIBGRA.mp3, using fallback preprocessing
+[2025-06-17 17:28:41,337][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC783695-230302_Grand-duc_d-_Europe_chant.mp3, using fallback preprocessing
+[2025-06-17 17:29:15,465][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC434388-Mist1_tr4_cane-strano.mp3, using fallback preprocessing
+[2025-06-17 17:29:51,244][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC898784-mora_240428-1020.wav, using fallback preprocessing
+[2025-06-17 17:29:57,016][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC784413-230305_1262-S-O-2--8h-petit-passereau-sp.wav, using fallback preprocessing
+[2025-06-17 17:29:58,162][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC818627-Mésange_noire_Periparus_ater_calls_Bavella.wav, using fallback preprocessing
+[2025-06-17 17:29:59,295][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC841016-Mésange-noire.wav, using fallback preprocessing
+[2025-06-17 17:30:04,927][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC495963-GF.mp3, using fallback preprocessing
+[2025-06-17 17:30:05,848][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC518026-coal tit.mp3, using fallback preprocessing
+[2025-06-17 17:30:40,476][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC573683-coal tit 12 3.mp3, using fallback preprocessing
+[2025-06-17 17:30:41,801][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC621135-159-030_15-adjust.mp3, using fallback preprocessing
+[2025-06-17 17:30:55,079][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC438085-B08h01m51s15may2018_plus_23m52s_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:30:55,198][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC901205-Periparus-ater-240420_003,Адылсу,В.mp3, using fallback preprocessing
+[2025-06-17 17:31:32,770][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC129274-8014_11.04.2013, Ермучаш, 6-50, московка 1.mp3, using fallback preprocessing
+[2025-06-17 17:31:35,390][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC894147-2023_06_15_Mésange_noire_cri_tres_aigue_point_9_RNN_HPV_10h48_for_XC.mp3, using fallback preprocessing
+[2025-06-17 17:31:39,423][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC573682-coal tit 12 2.mp3, using fallback preprocessing
+[2025-06-17 17:31:48,805][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC747343-220811_003_120657_ZwarteMees1.mp3, using fallback preprocessing
+[2025-06-17 17:32:03,365][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC522550-200127-CT clip.mp3, using fallback preprocessing
+[2025-06-17 17:32:17,262][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC504881-191030_1097_CoalTit_10h13_fcall.mp3, using fallback preprocessing
+[2025-06-17 17:32:18,424][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC457938-B07h23m02s22may2018_plus_01m03s_CoalTit_call_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:33:12,133][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC438090-B08h01m51s15may2018_Plus_26m18s_RichardsPipit_single_short_call_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:33:41,250][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC457945-B17h11m38s24may2018_plus_17m00s_CoalTit_call_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:33:43,663][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC454857-B11h34m45s17may2018_plus_50m40s_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:33:54,005][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC438086-B08h01m51s15may2018_plus_24m01s_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:34:01,904][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC775317-Coal-Tit-1-2023.mp3, using fallback preprocessing
+[2025-06-17 17:34:13,891][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC664810-AnyConv.com__FullSizeRender 15.mp3, using fallback preprocessing
+[2025-06-17 17:34:14,015][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC695402-Zwarte Mezen telpost de Hamert 210923_3106.mp3, using fallback preprocessing
+[2025-06-17 17:34:38,213][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC573684-coal tit 12 4.mp3, using fallback preprocessing
+[2025-06-17 17:35:33,887][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC558833-200414_1995_COTI.mp3, using fallback preprocessing
+[2025-06-17 17:35:34,068][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC286356-159-030_Q3.mp3, using fallback preprocessing
+[2025-06-17 17:35:37,076][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC747344-220811_003_120657_ZwarteMees2.mp3, using fallback preprocessing
+[2025-06-17 17:35:39,216][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC575888-mi 12 11.mp3, using fallback preprocessing
+[2025-06-17 17:35:49,682][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC456087-B18h06m34s19may2018_plus_12m36s_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:36:12,785][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC279510-30957_119i-08 mp3.mp3, using fallback preprocessing
+[2025-06-17 17:36:27,485][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC672508-210902_0159 Unbestimmt 3.mp3, using fallback preprocessing
+[2025-06-17 17:36:48,988][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC457341-130615_001.mp3, using fallback preprocessing
+[2025-06-17 17:36:51,353][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC872317-mall-1-ar.mp3, using fallback preprocessing
+[2025-06-17 17:36:55,358][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC548876-coal alarm.mp3, using fallback preprocessing
+[2025-06-17 17:36:57,989][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC628682-Coal Tit 31 January 2021 Rock Cottage 1037.mp3, using fallback preprocessing
+[2025-06-17 17:37:06,978][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC482860-Coal Tit_calls_20190606_091157_prepared.mp3, using fallback preprocessing
+[2025-06-17 17:37:09,972][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC938885-Mésangenoire_23042024_forêtdumassacre-16h-cris-exitation.mp3, using fallback preprocessing
+[2025-06-17 17:37:37,875][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC901168-Periparus-ater-michalowskii-240420_002,AB-song.mp3, using fallback preprocessing
+[2025-06-17 17:37:39,401][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC573603-coal tit 5 1.mp3, using fallback preprocessing
+[2025-06-17 17:38:11,958][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC894145-2023_06_15_Mésange_noire_chant_point_9_RNN_HPV_10h48_for_XC.mp3, using fallback preprocessing
+[2025-06-17 17:39:06,080][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC522302-555570b-mp3 (15).mp3, using fallback preprocessing
+[2025-06-17 17:39:08,689][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC438084-B08h01m51s15may2018_plus_23m36s_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:39:34,596][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC751228-Röst_229-1-1-1-1.mp3, using fallback preprocessing
+[2025-06-17 17:39:37,611][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC747083-220808_001_090601_ZwarteMees.mp3, using fallback preprocessing
+[2025-06-17 17:39:40,801][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC575895-mii 12 2.mp3, using fallback preprocessing
+[2025-06-17 17:39:56,352][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC952579-Peri_Ater_Riva.mp3, using fallback preprocessing
+[2025-06-17 17:39:56,450][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC952579-Peri_Ater_Riva.mp3: 
+[2025-06-17 17:40:13,048][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC457941-B17h11m05s24may2018_plus_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:40:17,987][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC413352-mesange noire tak.mp3, using fallback preprocessing
+[2025-06-17 17:40:28,281][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC438091-B08h01m51s15may2018_plus_27m24s_CoalTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-17 17:40:33,417][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Periparus_ater/XC649624-DM670906 (mp3cut.net).mp3, using fallback preprocessing
+[2025-06-17 17:40:53,899][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC950372-241018_3664-(08.04)-sit-negre-Xeno.wav, using fallback preprocessing
+[2025-06-17 17:40:55,290][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC839404-Bruantfou_12092023_montToubkal_17h-cris-posé.wav, using fallback preprocessing
+[2025-06-17 17:40:56,396][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC947754-Emberiza-cia_241113_114033_00.wav, using fallback preprocessing
+[2025-06-17 17:41:08,002][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC612635-32_05_30_emberiza_cia.mp3, using fallback preprocessing
+[2025-06-17 17:41:15,223][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC692179-ZOOM0003mont.mp3, using fallback preprocessing
+[2025-06-17 17:41:26,640][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC657903-210616_0700_cri_zaamin.mp3, using fallback preprocessing
+[2025-06-17 17:41:40,689][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC597222-30_56_42_emberiza_cia_1.mp3, using fallback preprocessing
+[2025-06-17 17:41:51,641][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Emberiza_cia/XC716525-20220418_Bruant_fou_cri_col_du_Rousset_Vercors.mp3, using fallback preprocessing
+[2025-06-17 17:42:11,885][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC943968-Haubenmeise_2024-01-16_06-06_Korb_Buocher-Höhe_Audiomoth_49.wav, using fallback preprocessing
+[2025-06-17 17:42:16,416][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC779931-10-02-23-(mésange-huppée,-cri,-Mol).wav, using fallback preprocessing
+[2025-06-17 17:42:20,724][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC950288-241020_0392-unbestimmter-Ruf-Burgdorfer-Holz-1555.mp3, using fallback preprocessing
+[2025-06-17 17:42:20,977][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC195426-Crested Tit Lophophanes cristatus scoticus.mp3, using fallback preprocessing
+[2025-06-17 17:42:21,560][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC631623-210324_0853_Haubenmeise.mp3, using fallback preprocessing
+[2025-06-17 17:42:39,471][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC600119-20.11.3.WS.012450.01.mp3, using fallback preprocessing
+[2025-06-17 17:42:44,553][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC283137-150929_01XC.mp3, using fallback preprocessing
+[2025-06-17 17:42:49,031][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC460330-190228-155416chapimpoupa.mp3, using fallback preprocessing
+[2025-06-17 17:43:02,394][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC148627-DM650012_Lophophanes_cristatus.mp3, using fallback preprocessing
+[2025-06-17 17:43:07,602][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC113379-20 - 1 - 2rkrk mp3.mp3, using fallback preprocessing
+[2025-06-17 17:43:11,457][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC631615-210324_0841_Haubenmeise.mp3, using fallback preprocessing
+[2025-06-17 17:43:29,273][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC938876-Mésangehuppé_23042024_forêtdumassacre-17h-cris-bavardage-posé.mp3, using fallback preprocessing
+[2025-06-17 17:43:32,172][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC738136-Mesange_huppee_24.4.21_Savas.mp3, using fallback preprocessing
+[2025-06-17 17:43:36,430][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC192951-30421 - 2 x mp3.mp3, using fallback preprocessing
+[2025-06-17 17:43:40,563][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC685862-2021_09_22_04_04_10_MOT_SP.mp3, using fallback preprocessing
+[2025-06-17 17:43:46,760][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC927586-240201_0343-Haubenmeise-Burgdorfer-Holz.mp3, using fallback preprocessing
+[2025-06-17 17:43:56,094][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC696041-Mésange_huppée_cri_bois_de_Carnoët_11h39_30_12_2021_for_XC.mp3, using fallback preprocessing
+[2025-06-17 17:43:56,845][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC745324-22 9.mp3, using fallback preprocessing
+[2025-06-17 17:44:00,773][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC294489-Kuifmees, alarm, 0630 uur 271015 Arnhem-zuid.mp3, using fallback preprocessing
+[2025-06-17 17:44:05,037][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC501963-260819_0415.mp3, using fallback preprocessing
+[2025-06-17 17:44:07,932][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC696340-tome.mp3, using fallback preprocessing
+[2025-06-17 17:44:14,449][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Lophophanes_cristatus/XC759490-Kuifmees-5-nov.mp3, using fallback preprocessing
+[2025-06-17 17:45:08,230][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC819598-ZOOM0066_TrLR_Certhia_brachydactyla_cut1.wav, using fallback preprocessing
+[2025-06-17 17:45:09,626][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC946395-Certhia-brachydactyla+1015_081932-3-6-1bf.wav, using fallback preprocessing
+[2025-06-17 17:45:10,802][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC779577-Unknown-1.wav, using fallback preprocessing
+[2025-06-17 17:45:13,304][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC447642-Short-toed Treecreeper call good 2018 02 01 nr Kapellebrug_193_short.mp3, using fallback preprocessing
+[2025-06-17 17:45:17,851][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC486196-190628-114520trepadeirasul.mp3, using fallback preprocessing
+[2025-06-17 17:45:19,285][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC566335-raspinell 8610.mp3, using fallback preprocessing
+[2025-06-17 17:45:29,146][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC828775-Boomkruiper02.mp3, using fallback preprocessing
+[2025-06-17 17:45:32,322][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC854858-boomkruipers_fort3_1144_16122021NHPF.mp3, using fallback preprocessing
+[2025-06-17 17:45:34,358][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC746962-220805_001_060511_Boomkruiper2.mp3, using fallback preprocessing
+[2025-06-17 17:45:34,734][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC696040-Grimpereau_des_jardins_chant_bois_de_Carnoët_11h39_30_12_2021_for_XC.mp3, using fallback preprocessing
+[2025-06-17 17:45:42,175][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC570272-raspinell 20 2.mp3, using fallback preprocessing
+[2025-06-17 17:45:43,241][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC565950-raspinell 767.mp3, using fallback preprocessing
+[2025-06-17 17:45:49,215][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC277495-certhia brachydactyla parque de maría luisa 23-05-2015.mp3, using fallback preprocessing
+[2025-06-17 17:45:54,838][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC599474-181120_0043ÜÜ-01a-ö-06NN.mp3, using fallback preprocessing
+[2025-06-17 17:46:10,779][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC496631-grimpereeau des jardins serie de cris en U.mp3, using fallback preprocessing
+[2025-06-17 17:46:12,955][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC670147-hw230821 0828u.mp3, using fallback preprocessing
+[2025-06-17 17:46:14,255][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC486198-190628-115235trepadeirasul.mp3, using fallback preprocessing
+[2025-06-17 17:46:18,918][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC566331-raspinell 867.mp3, using fallback preprocessing
+[2025-06-17 17:46:20,896][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC574922-shorttoedtree 7 1.mp3, using fallback preprocessing
+[2025-06-17 17:46:25,316][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC826567-Grimpereau-des-jardins-faune.mp3, using fallback preprocessing
+[2025-06-17 17:46:51,488][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC647268-pełzaczo.mp3, using fallback preprocessing
+[2025-06-17 17:47:04,688][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC692504-cb denny.mp3, using fallback preprocessing
+[2025-06-17 17:47:06,524][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC742049-Ficedula hypoleuca_2022.08.07_11.22_01.mp3, using fallback preprocessing
+[2025-06-17 17:47:14,734][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC533221-070320 1921 boomkruiper.mp3, using fallback preprocessing
+[2025-06-17 17:47:16,687][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC359269-170226_0403 ampl noisered cut.mp3, using fallback preprocessing
+[2025-06-17 17:47:16,732][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC565951-raspinell 768 highp.mp3, using fallback preprocessing
+[2025-06-17 17:47:20,752][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC565946-raspinell 764.mp3, using fallback preprocessing
+[2025-06-17 17:47:24,574][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC651157-2021_05_11_short_toed_treecreeper3.mp3, using fallback preprocessing
+[2025-06-17 17:47:58,893][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC503391-jjjjjjhigINDiS_31949all-02 mp3 (4).mp3, using fallback preprocessing
+[2025-06-17 17:48:05,563][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC746961-220805_001_060511_Boomkruiper1.mp3, using fallback preprocessing
+[2025-06-17 17:48:11,649][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC566332-raspinell 868.mp3, using fallback preprocessing
+[2025-06-17 17:48:15,644][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC601603-201017_002_180227_Koperwiek.mp3, using fallback preprocessing
+[2025-06-17 17:48:22,839][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC565945-raspinell 763.mp3, using fallback preprocessing
+[2025-06-17 17:48:28,467][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC957314-Short-toed_Treecreeper-98-2024-09-22-birdnet-09_54_33.mp3, using fallback preprocessing
+[2025-06-17 17:48:35,725][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC566333-raspinell 869.mp3, using fallback preprocessing
+[2025-06-17 17:48:40,818][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC459762-190217-092247trepadeirasul.mp3, using fallback preprocessing
+[2025-06-17 17:48:45,410][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC583913-z31737-b-ö-12GBL-ALL-N.mp3, using fallback preprocessing
+[2025-06-17 17:48:48,670][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC457126-190217-092247xeno.mp3, using fallback preprocessing
+[2025-06-17 17:48:56,281][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_brachydactyla/XC536608-agco1.mp3, using fallback preprocessing
+[2025-06-17 17:49:01,339][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0009.wav, using fallback preprocessing
+[2025-06-17 17:49:01,359][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0374.wav, using fallback preprocessing
+[2025-06-17 17:49:01,393][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0412.wav, using fallback preprocessing
+[2025-06-17 17:49:01,412][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0406.wav, using fallback preprocessing
+[2025-06-17 17:49:01,493][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0176.wav, using fallback preprocessing
+[2025-06-17 17:49:01,512][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0162.wav, using fallback preprocessing
+[2025-06-17 17:49:01,532][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0223.wav, using fallback preprocessing
+[2025-06-17 17:49:01,553][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0002.wav, using fallback preprocessing
+[2025-06-17 17:49:01,591][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0182.wav, using fallback preprocessing
+[2025-06-17 17:49:01,645][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0169.wav, using fallback preprocessing
+[2025-06-17 17:49:01,650][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/esc50_0169.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:01,666][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0141.wav, using fallback preprocessing
+[2025-06-17 17:49:01,686][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0200.wav, using fallback preprocessing
+[2025-06-17 17:49:01,753][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0215.wav, using fallback preprocessing
+[2025-06-17 17:49:01,802][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0168.wav, using fallback preprocessing
+[2025-06-17 17:49:01,821][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0229.wav, using fallback preprocessing
+[2025-06-17 17:49:01,841][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0197.wav, using fallback preprocessing
+[2025-06-17 17:49:01,902][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0003.wav, using fallback preprocessing
+[2025-06-17 17:49:01,985][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0188.wav, using fallback preprocessing
+[2025-06-17 17:49:02,021][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0361.wav, using fallback preprocessing
+[2025-06-17 17:49:02,058][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0034.wav, using fallback preprocessing
+[2025-06-17 17:49:02,078][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0375.wav, using fallback preprocessing
+[2025-06-17 17:49:02,097][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0413.wav, using fallback preprocessing
+[2025-06-17 17:49:02,148][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0388.wav, using fallback preprocessing
+[2025-06-17 17:49:02,218][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0405.wav, using fallback preprocessing
+[2025-06-17 17:49:02,253][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0377.wav, using fallback preprocessing
+[2025-06-17 17:49:02,289][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0208.wav, using fallback preprocessing
+[2025-06-17 17:49:02,370][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0175.wav, using fallback preprocessing
+[2025-06-17 17:49:02,392][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0029.wav, using fallback preprocessing
+[2025-06-17 17:49:02,414][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0015.wav, using fallback preprocessing
+[2025-06-17 17:49:02,487][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0217.wav, using fallback preprocessing
+[2025-06-17 17:49:02,509][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0156.wav, using fallback preprocessing
+[2025-06-17 17:49:02,564][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0202.wav, using fallback preprocessing
+[2025-06-17 17:49:02,621][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0216.wav, using fallback preprocessing
+[2025-06-17 17:49:02,718][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0028.wav, using fallback preprocessing
+[2025-06-17 17:49:02,774][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0221.wav, using fallback preprocessing
+[2025-06-17 17:49:02,812][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0148.wav, using fallback preprocessing
+[2025-06-17 17:49:02,868][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0037.wav, using fallback preprocessing
+[2025-06-17 17:49:02,892][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0376.wav, using fallback preprocessing
+[2025-06-17 17:49:02,913][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0362.wav, using fallback preprocessing
+[2025-06-17 17:49:02,966][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0438.wav, using fallback preprocessing
+[2025-06-17 17:49:02,987][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0389.wav, using fallback preprocessing
+[2025-06-17 17:49:03,008][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0399.wav, using fallback preprocessing
+[2025-06-17 17:49:03,029][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0400.wav, using fallback preprocessing
+[2025-06-17 17:49:03,066][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0366.wav, using fallback preprocessing
+[2025-06-17 17:49:03,086][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0372.wav, using fallback preprocessing
+[2025-06-17 17:49:03,106][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0033.wav, using fallback preprocessing
+[2025-06-17 17:49:03,143][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0428.wav, using fallback preprocessing
+[2025-06-17 17:49:03,198][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0231.wav, using fallback preprocessing
+[2025-06-17 17:49:03,203][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/esc50_0231.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:03,237][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0158.wav, using fallback preprocessing
+[2025-06-17 17:49:03,276][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0010.wav, using fallback preprocessing
+[2025-06-17 17:49:03,333][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0190.wav, using fallback preprocessing
+[2025-06-17 17:49:03,354][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0184.wav, using fallback preprocessing
+[2025-06-17 17:49:03,376][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0212.wav, using fallback preprocessing
+[2025-06-17 17:49:03,398][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0153.wav, using fallback preprocessing
+[2025-06-17 17:49:03,436][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0206.wav, using fallback preprocessing
+[2025-06-17 17:49:03,457][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0207.wav, using fallback preprocessing
+[2025-06-17 17:49:03,479][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0146.wav, using fallback preprocessing
+[2025-06-17 17:49:03,500][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0152.wav, using fallback preprocessing
+[2025-06-17 17:49:03,521][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0213.wav, using fallback preprocessing
+[2025-06-17 17:49:03,541][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0185.wav, using fallback preprocessing
+[2025-06-17 17:49:03,597][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0005.wav, using fallback preprocessing
+[2025-06-17 17:49:03,704][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0224.wav, using fallback preprocessing
+[2025-06-17 17:49:03,709][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/esc50_0224.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:03,725][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0165.wav, using fallback preprocessing
+[2025-06-17 17:49:03,746][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0429.wav, using fallback preprocessing
+[2025-06-17 17:49:03,766][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0032.wav, using fallback preprocessing
+[2025-06-17 17:49:03,806][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0415.wav, using fallback preprocessing
+[2025-06-17 17:49:03,828][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0401.wav, using fallback preprocessing
+[2025-06-17 17:49:03,903][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0417.wav, using fallback preprocessing
+[2025-06-17 17:49:03,923][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0371.wav, using fallback preprocessing
+[2025-06-17 17:49:03,977][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0024.wav, using fallback preprocessing
+[2025-06-17 17:49:04,048][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0359.wav, using fallback preprocessing
+[2025-06-17 17:49:04,102][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0173.wav, using fallback preprocessing
+[2025-06-17 17:49:04,123][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0167.wav, using fallback preprocessing
+[2025-06-17 17:49:04,144][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0226.wav, using fallback preprocessing
+[2025-06-17 17:49:04,148][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/esc50_0226.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:04,165][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0007.wav, using fallback preprocessing
+[2025-06-17 17:49:04,185][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0013.wav, using fallback preprocessing
+[2025-06-17 17:49:04,255][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0205.wav, using fallback preprocessing
+[2025-06-17 17:49:04,293][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0150.wav, using fallback preprocessing
+[2025-06-17 17:49:04,346][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0238.wav, using fallback preprocessing
+[2025-06-17 17:49:04,367][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0179.wav, using fallback preprocessing
+[2025-06-17 17:49:04,388][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0151.wav, using fallback preprocessing
+[2025-06-17 17:49:04,410][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0210.wav, using fallback preprocessing
+[2025-06-17 17:49:04,481][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0186.wav, using fallback preprocessing
+[2025-06-17 17:49:04,502][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0012.wav, using fallback preprocessing
+[2025-06-17 17:49:04,522][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0006.wav, using fallback preprocessing
+[2025-06-17 17:49:04,543][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0227.wav, using fallback preprocessing
+[2025-06-17 17:49:04,582][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0172.wav, using fallback preprocessing
+[2025-06-17 17:49:04,604][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0233.wav, using fallback preprocessing
+[2025-06-17 17:49:04,642][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0358.wav, using fallback preprocessing
+[2025-06-17 17:49:04,663][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0019.wav, using fallback preprocessing
+[2025-06-17 17:49:04,683][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0364.wav, using fallback preprocessing
+[2025-06-17 17:49:04,704][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0025.wav, using fallback preprocessing
+[2025-06-17 17:49:04,726][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0402.wav, using fallback preprocessing
+[2025-06-17 17:49:04,747][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0416.wav, using fallback preprocessing
+[2025-06-17 17:49:04,768][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0031.wav, using fallback preprocessing
+[2025-06-17 17:49:04,788][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0370.wav, using fallback preprocessing
+[2025-06-17 17:49:04,834][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0081.wav, using fallback preprocessing
+[2025-06-17 17:49:04,854][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0459.wav, using fallback preprocessing
+[2025-06-17 17:49:04,875][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0471.wav, using fallback preprocessing
+[2025-06-17 17:49:04,912][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0317.wav, using fallback preprocessing
+[2025-06-17 17:49:04,934][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0303.wav, using fallback preprocessing
+[2025-06-17 17:49:05,000][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0465.wav, using fallback preprocessing
+[2025-06-17 17:49:05,020][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0297.wav, using fallback preprocessing
+[2025-06-17 17:49:05,072][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0268.wav, using fallback preprocessing
+[2025-06-17 17:49:05,076][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/esc50_0268.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:05,092][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0115.wav, using fallback preprocessing
+[2025-06-17 17:49:05,149][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0101.wav, using fallback preprocessing
+[2025-06-17 17:49:05,169][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0049.wav, using fallback preprocessing
+[2025-06-17 17:49:05,208][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0320.wav, using fallback preprocessing
+[2025-06-17 17:49:05,228][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0061.wav, using fallback preprocessing
+[2025-06-17 17:49:05,249][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0075.wav, using fallback preprocessing
+[2025-06-17 17:49:05,284][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0288.wav, using fallback preprocessing
+[2025-06-17 17:49:05,313][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0263.wav, using fallback preprocessing
+[2025-06-17 17:49:05,401][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0277.wav, using fallback preprocessing
+[2025-06-17 17:49:05,422][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0276.wav, using fallback preprocessing
+[2025-06-17 17:49:05,444][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0137.wav, using fallback preprocessing
+[2025-06-17 17:49:05,465][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0123.wav, using fallback preprocessing
+[2025-06-17 17:49:05,492][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0262.wav, using fallback preprocessing
+[2025-06-17 17:49:05,513][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0289.wav, using fallback preprocessing
+[2025-06-17 17:49:05,535][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0335.wav, using fallback preprocessing
+[2025-06-17 17:49:05,557][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0074.wav, using fallback preprocessing
+[2025-06-17 17:49:05,626][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0048.wav, using fallback preprocessing
+[2025-06-17 17:49:05,649][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0100.wav, using fallback preprocessing
+[2025-06-17 17:49:05,672][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0241.wav, using fallback preprocessing
+[2025-06-17 17:49:05,693][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0255.wav, using fallback preprocessing
+[2025-06-17 17:49:05,715][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0114.wav, using fallback preprocessing
+[2025-06-17 17:49:05,736][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0269.wav, using fallback preprocessing
+[2025-06-17 17:49:05,757][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0128.wav, using fallback preprocessing
+[2025-06-17 17:49:05,815][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0043.wav, using fallback preprocessing
+[2025-06-17 17:49:05,838][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0302.wav, using fallback preprocessing
+[2025-06-17 17:49:05,879][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0470.wav, using fallback preprocessing
+[2025-06-17 17:49:05,936][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0458.wav, using fallback preprocessing
+[2025-06-17 17:49:05,958][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0080.wav, using fallback preprocessing
+[2025-06-17 17:49:05,997][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0499.wav, using fallback preprocessing
+[2025-06-17 17:49:06,019][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0082.wav, using fallback preprocessing
+[2025-06-17 17:49:06,099][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0069.wav, using fallback preprocessing
+[2025-06-17 17:49:06,120][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0328.wav, using fallback preprocessing
+[2025-06-17 17:49:06,142][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0466.wav, using fallback preprocessing
+[2025-06-17 17:49:06,164][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0300.wav, using fallback preprocessing
+[2025-06-17 17:49:06,186][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0041.wav, using fallback preprocessing
+[2025-06-17 17:49:06,207][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0055.wav, using fallback preprocessing
+[2025-06-17 17:49:06,229][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0314.wav, using fallback preprocessing
+[2025-06-17 17:49:06,251][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0472.wav, using fallback preprocessing
+[2025-06-17 17:49:06,290][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0294.wav, using fallback preprocessing
+[2025-06-17 17:49:06,357][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0243.wav, using fallback preprocessing
+[2025-06-17 17:49:06,404][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0102.wav, using fallback preprocessing
+[2025-06-17 17:49:06,425][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0116.wav, using fallback preprocessing
+[2025-06-17 17:49:06,461][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0089.wav, using fallback preprocessing
+[2025-06-17 17:49:06,512][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0062.wav, using fallback preprocessing
+[2025-06-17 17:49:06,550][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0248.wav, using fallback preprocessing
+[2025-06-17 17:49:06,570][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0135.wav, using fallback preprocessing
+[2025-06-17 17:49:06,590][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0274.wav, using fallback preprocessing
+[2025-06-17 17:49:06,611][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0260.wav, using fallback preprocessing
+[2025-06-17 17:49:06,649][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0120.wav, using fallback preprocessing
+[2025-06-17 17:49:06,670][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0261.wav, using fallback preprocessing
+[2025-06-17 17:49:06,692][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0275.wav, using fallback preprocessing
+[2025-06-17 17:49:06,729][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0249.wav, using fallback preprocessing
+[2025-06-17 17:49:06,768][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0063.wav, using fallback preprocessing
+[2025-06-17 17:49:06,789][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0322.wav, using fallback preprocessing
+[2025-06-17 17:49:06,810][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0077.wav, using fallback preprocessing
+[2025-06-17 17:49:06,880][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0103.wav, using fallback preprocessing
+[2025-06-17 17:49:06,953][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0315.wav, using fallback preprocessing
+[2025-06-17 17:49:06,974][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0054.wav, using fallback preprocessing
+[2025-06-17 17:49:07,013][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0467.wav, using fallback preprocessing
+[2025-06-17 17:49:07,035][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0040.wav, using fallback preprocessing
+[2025-06-17 17:49:07,057][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0301.wav, using fallback preprocessing
+[2025-06-17 17:49:07,078][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0329.wav, using fallback preprocessing
+[2025-06-17 17:49:07,099][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0068.wav, using fallback preprocessing
+[2025-06-17 17:49:07,119][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0097.wav, using fallback preprocessing
+[2025-06-17 17:49:07,157][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0498.wav, using fallback preprocessing
+[2025-06-17 17:49:07,213][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0488.wav, using fallback preprocessing
+[2025-06-17 17:49:07,267][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0463.wav, using fallback preprocessing
+[2025-06-17 17:49:07,288][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0477.wav, using fallback preprocessing
+[2025-06-17 17:49:07,309][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0050.wav, using fallback preprocessing
+[2025-06-17 17:49:07,330][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0311.wav, using fallback preprocessing
+[2025-06-17 17:49:07,350][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0339.wav, using fallback preprocessing
+[2025-06-17 17:49:07,404][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0291.wav, using fallback preprocessing
+[2025-06-17 17:49:07,440][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0107.wav, using fallback preprocessing
+[2025-06-17 17:49:07,461][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0113.wav, using fallback preprocessing
+[2025-06-17 17:49:07,513][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0073.wav, using fallback preprocessing
+[2025-06-17 17:49:07,539][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0332.wav, using fallback preprocessing
+[2025-06-17 17:49:07,576][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0067.wav, using fallback preprocessing
+[2025-06-17 17:49:07,629][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0265.wav, using fallback preprocessing
+[2025-06-17 17:49:07,633][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/empty_0265.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:07,649][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0124.wav, using fallback preprocessing
+[2025-06-17 17:49:07,719][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0258.wav, using fallback preprocessing
+[2025-06-17 17:49:07,723][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/empty_0258.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:07,753][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0264.wav, using fallback preprocessing
+[2025-06-17 17:49:07,804][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0066.wav, using fallback preprocessing
+[2025-06-17 17:49:07,839][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0333.wav, using fallback preprocessing
+[2025-06-17 17:49:07,858][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0072.wav, using fallback preprocessing
+[2025-06-17 17:49:07,877][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0099.wav, using fallback preprocessing
+[2025-06-17 17:49:07,914][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0112.wav, using fallback preprocessing
+[2025-06-17 17:49:07,934][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0106.wav, using fallback preprocessing
+[2025-06-17 17:49:07,999][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0079.wav, using fallback preprocessing
+[2025-06-17 17:49:08,034][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0476.wav, using fallback preprocessing
+[2025-06-17 17:49:08,161][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0086.wav, using fallback preprocessing
+[2025-06-17 17:49:08,226][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0312.wav, using fallback preprocessing
+[2025-06-17 17:49:08,246][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0474.wav, using fallback preprocessing
+[2025-06-17 17:49:08,266][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0460.wav, using fallback preprocessing
+[2025-06-17 17:49:08,293][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0306.wav, using fallback preprocessing
+[2025-06-17 17:49:08,313][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0047.wav, using fallback preprocessing
+[2025-06-17 17:49:08,365][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0286.wav, using fallback preprocessing
+[2025-06-17 17:49:08,394][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0110.wav, using fallback preprocessing
+[2025-06-17 17:49:08,447][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0104.wav, using fallback preprocessing
+[2025-06-17 17:49:08,469][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0279.wav, using fallback preprocessing
+[2025-06-17 17:49:08,588][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0064.wav, using fallback preprocessing
+[2025-06-17 17:49:08,609][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0070.wav, using fallback preprocessing
+[2025-06-17 17:49:08,695][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0058.wav, using fallback preprocessing
+[2025-06-17 17:49:08,779][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0272.wav, using fallback preprocessing
+[2025-06-17 17:49:08,800][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0273.wav, using fallback preprocessing
+[2025-06-17 17:49:08,855][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0267.wav, using fallback preprocessing
+[2025-06-17 17:49:08,876][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0298.wav, using fallback preprocessing
+[2025-06-17 17:49:08,898][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0059.wav, using fallback preprocessing
+[2025-06-17 17:49:08,961][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0071.wav, using fallback preprocessing
+[2025-06-17 17:49:09,016][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0139.wav, using fallback preprocessing
+[2025-06-17 17:49:09,037][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0278.wav, using fallback preprocessing
+[2025-06-17 17:49:09,058][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0105.wav, using fallback preprocessing
+[2025-06-17 17:49:09,111][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0111.wav, using fallback preprocessing
+[2025-06-17 17:49:09,148][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0293.wav, using fallback preprocessing
+[2025-06-17 17:49:09,185][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0461.wav, using fallback preprocessing
+[2025-06-17 17:49:09,206][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0046.wav, using fallback preprocessing
+[2025-06-17 17:49:09,228][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0307.wav, using fallback preprocessing
+[2025-06-17 17:49:09,249][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0313.wav, using fallback preprocessing
+[2025-06-17 17:49:09,285][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0475.wav, using fallback preprocessing
+[2025-06-17 17:49:09,306][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0085.wav, using fallback preprocessing
+[2025-06-17 17:49:09,341][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0088.wav, using fallback preprocessing
+[2025-06-17 17:49:09,361][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0493.wav, using fallback preprocessing
+[2025-06-17 17:49:09,417][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0450.wav, using fallback preprocessing
+[2025-06-17 17:49:09,452][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0336.wav, using fallback preprocessing
+[2025-06-17 17:49:09,503][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0444.wav, using fallback preprocessing
+[2025-06-17 17:49:09,523][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0108.wav, using fallback preprocessing
+[2025-06-17 17:49:09,543][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0249.wav, using fallback preprocessing
+[2025-06-17 17:49:09,562][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0134.wav, using fallback preprocessing
+[2025-06-17 17:49:09,597][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0261.wav, using fallback preprocessing
+[2025-06-17 17:49:09,617][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0120.wav, using fallback preprocessing
+[2025-06-17 17:49:09,638][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0083.wav, using fallback preprocessing
+[2025-06-17 17:49:09,658][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0097.wav, using fallback preprocessing
+[2025-06-17 17:49:09,663][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/empty_0097.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:09,678][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0068.wav, using fallback preprocessing
+[2025-06-17 17:49:09,714][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0301.wav, using fallback preprocessing
+[2025-06-17 17:49:09,752][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0054.wav, using fallback preprocessing
+[2025-06-17 17:49:09,787][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0281.wav, using fallback preprocessing
+[2025-06-17 17:49:09,807][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0295.wav, using fallback preprocessing
+[2025-06-17 17:49:09,828][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0242.wav, using fallback preprocessing
+[2025-06-17 17:49:09,849][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0103.wav, using fallback preprocessing
+[2025-06-17 17:49:09,870][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0117.wav, using fallback preprocessing
+[2025-06-17 17:49:09,892][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0256.wav, using fallback preprocessing
+[2025-06-17 17:49:09,913][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0257.wav, using fallback preprocessing
+[2025-06-17 17:49:10,002][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0243.wav, using fallback preprocessing
+[2025-06-17 17:49:10,040][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0280.wav, using fallback preprocessing
+[2025-06-17 17:49:10,079][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0055.wav, using fallback preprocessing
+[2025-06-17 17:49:10,100][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0041.wav, using fallback preprocessing
+[2025-06-17 17:49:10,136][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0328.wav, using fallback preprocessing
+[2025-06-17 17:49:10,157][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0069.wav, using fallback preprocessing
+[2025-06-17 17:49:10,179][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0096.wav, using fallback preprocessing
+[2025-06-17 17:49:10,200][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0082.wav, using fallback preprocessing
+[2025-06-17 17:49:10,220][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0121.wav, using fallback preprocessing
+[2025-06-17 17:49:10,240][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0260.wav, using fallback preprocessing
+[2025-06-17 17:49:10,276][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0135.wav, using fallback preprocessing
+[2025-06-17 17:49:10,295][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0248.wav, using fallback preprocessing
+[2025-06-17 17:49:10,316][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0109.wav, using fallback preprocessing
+[2025-06-17 17:49:10,353][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0323.wav, using fallback preprocessing
+[2025-06-17 17:49:10,374][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0445.wav, using fallback preprocessing
+[2025-06-17 17:49:10,395][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0451.wav, using fallback preprocessing
+[2025-06-17 17:49:10,415][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0337.wav, using fallback preprocessing
+[2025-06-17 17:49:10,452][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0479.wav, using fallback preprocessing
+[2025-06-17 17:49:10,474][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0486.wav, using fallback preprocessing
+[2025-06-17 17:49:10,495][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0492.wav, using fallback preprocessing
+[2025-06-17 17:49:10,517][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0089.wav, using fallback preprocessing
+[2025-06-17 17:49:10,538][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0484.wav, using fallback preprocessing
+[2025-06-17 17:49:10,558][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0490.wav, using fallback preprocessing
+[2025-06-17 17:49:10,580][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0048.wav, using fallback preprocessing
+[2025-06-17 17:49:10,600][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0309.wav, using fallback preprocessing
+[2025-06-17 17:49:10,620][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0447.wav, using fallback preprocessing
+[2025-06-17 17:49:10,639][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0321.wav, using fallback preprocessing
+[2025-06-17 17:49:10,660][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0060.wav, using fallback preprocessing
+[2025-06-17 17:49:10,697][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0335.wav, using fallback preprocessing
+[2025-06-17 17:49:10,717][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0453.wav, using fallback preprocessing
+[2025-06-17 17:49:10,771][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0123.wav, using fallback preprocessing
+[2025-06-17 17:49:10,791][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0137.wav, using fallback preprocessing
+[2025-06-17 17:49:10,827][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0094.wav, using fallback preprocessing
+[2025-06-17 17:49:10,847][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0080.wav, using fallback preprocessing
+[2025-06-17 17:49:10,866][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0057.wav, using fallback preprocessing
+[2025-06-17 17:49:10,884][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0316.wav, using fallback preprocessing
+[2025-06-17 17:49:10,904][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0302.wav, using fallback preprocessing
+[2025-06-17 17:49:10,923][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0043.wav, using fallback preprocessing
+[2025-06-17 17:49:10,942][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0296.wav, using fallback preprocessing
+[2025-06-17 17:49:10,962][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0282.wav, using fallback preprocessing
+[2025-06-17 17:49:10,981][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0128.wav, using fallback preprocessing
+[2025-06-17 17:49:11,000][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0269.wav, using fallback preprocessing
+[2025-06-17 17:49:11,020][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0114.wav, using fallback preprocessing
+[2025-06-17 17:49:11,039][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0255.wav, using fallback preprocessing
+[2025-06-17 17:49:11,060][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0241.wav, using fallback preprocessing
+[2025-06-17 17:49:11,094][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0101.wav, using fallback preprocessing
+[2025-06-17 17:49:11,113][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0240.wav, using fallback preprocessing
+[2025-06-17 17:49:11,162][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0268.wav, using fallback preprocessing
+[2025-06-17 17:49:11,202][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0283.wav, using fallback preprocessing
+[2025-06-17 17:49:11,222][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0297.wav, using fallback preprocessing
+[2025-06-17 17:49:11,244][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0042.wav, using fallback preprocessing
+[2025-06-17 17:49:11,287][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0317.wav, using fallback preprocessing
+[2025-06-17 17:49:11,330][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0081.wav, using fallback preprocessing
+[2025-06-17 17:49:11,355][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0095.wav, using fallback preprocessing
+[2025-06-17 17:49:11,417][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0122.wav, using fallback preprocessing
+[2025-06-17 17:49:11,442][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0263.wav, using fallback preprocessing
+[2025-06-17 17:49:11,486][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0334.wav, using fallback preprocessing
+[2025-06-17 17:49:11,533][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0452.wav, using fallback preprocessing
+[2025-06-17 17:49:11,558][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0446.wav, using fallback preprocessing
+[2025-06-17 17:49:11,622][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0308.wav, using fallback preprocessing
+[2025-06-17 17:49:11,668][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0491.wav, using fallback preprocessing
+[2025-06-17 17:49:11,694][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0485.wav, using fallback preprocessing
+[2025-06-17 17:49:11,719][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0481.wav, using fallback preprocessing
+[2025-06-17 17:49:11,744][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0495.wav, using fallback preprocessing
+[2025-06-17 17:49:11,769][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0324.wav, using fallback preprocessing
+[2025-06-17 17:49:11,815][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0442.wav, using fallback preprocessing
+[2025-06-17 17:49:11,841][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0456.wav, using fallback preprocessing
+[2025-06-17 17:49:11,868][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0071.wav, using fallback preprocessing
+[2025-06-17 17:49:11,894][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0330.wav, using fallback preprocessing
+[2025-06-17 17:49:11,919][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0318.wav, using fallback preprocessing
+[2025-06-17 17:49:12,004][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0126.wav, using fallback preprocessing
+[2025-06-17 17:49:12,048][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0273.wav, using fallback preprocessing
+[2025-06-17 17:49:12,093][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0085.wav, using fallback preprocessing
+[2025-06-17 17:49:12,119][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0052.wav, using fallback preprocessing
+[2025-06-17 17:49:12,144][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0313.wav, using fallback preprocessing
+[2025-06-17 17:49:12,190][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0046.wav, using fallback preprocessing
+[2025-06-17 17:49:12,216][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0293.wav, using fallback preprocessing
+[2025-06-17 17:49:12,241][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0287.wav, using fallback preprocessing
+[2025-06-17 17:49:12,291][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0250.wav, using fallback preprocessing
+[2025-06-17 17:49:12,316][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0244.wav, using fallback preprocessing
+[2025-06-17 17:49:12,382][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0139.wav, using fallback preprocessing
+[2025-06-17 17:49:12,438][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0279.wav, using fallback preprocessing
+[2025-06-17 17:49:12,502][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0251.wav, using fallback preprocessing
+[2025-06-17 17:49:12,528][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0110.wav, using fallback preprocessing
+[2025-06-17 17:49:12,554][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0286.wav, using fallback preprocessing
+[2025-06-17 17:49:12,579][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0292.wav, using fallback preprocessing
+[2025-06-17 17:49:12,604][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0047.wav, using fallback preprocessing
+[2025-06-17 17:49:12,649][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0312.wav, using fallback preprocessing
+[2025-06-17 17:49:12,694][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0084.wav, using fallback preprocessing
+[2025-06-17 17:49:12,718][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0090.wav, using fallback preprocessing
+[2025-06-17 17:49:12,744][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0272.wav, using fallback preprocessing
+[2025-06-17 17:49:12,789][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0127.wav, using fallback preprocessing
+[2025-06-17 17:49:12,815][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0266.wav, using fallback preprocessing
+[2025-06-17 17:49:12,842][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0299.wav, using fallback preprocessing
+[2025-06-17 17:49:12,869][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0058.wav, using fallback preprocessing
+[2025-06-17 17:49:12,901][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0319.wav, using fallback preprocessing
+[2025-06-17 17:49:12,942][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0457.wav, using fallback preprocessing
+[2025-06-17 17:49:12,980][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0331.wav, using fallback preprocessing
+[2025-06-17 17:49:13,018][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0070.wav, using fallback preprocessing
+[2025-06-17 17:49:13,056][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0064.wav, using fallback preprocessing
+[2025-06-17 17:49:13,096][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0325.wav, using fallback preprocessing
+[2025-06-17 17:49:13,124][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0443.wav, using fallback preprocessing
+[2025-06-17 17:49:13,170][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0480.wav, using fallback preprocessing
+[2025-06-17 17:49:13,196][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0496.wav, using fallback preprocessing
+[2025-06-17 17:49:13,242][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0099.wav, using fallback preprocessing
+[2025-06-17 17:49:13,269][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0072.wav, using fallback preprocessing
+[2025-06-17 17:49:13,295][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0333.wav, using fallback preprocessing
+[2025-06-17 17:49:13,321][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0455.wav, using fallback preprocessing
+[2025-06-17 17:49:13,348][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0441.wav, using fallback preprocessing
+[2025-06-17 17:49:13,374][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0327.wav, using fallback preprocessing
+[2025-06-17 17:49:13,401][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0066.wav, using fallback preprocessing
+[2025-06-17 17:49:13,428][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0469.wav, using fallback preprocessing
+[2025-06-17 17:49:13,455][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0131.wav, using fallback preprocessing
+[2025-06-17 17:49:13,481][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0270.wav, using fallback preprocessing
+[2025-06-17 17:49:13,508][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0264.wav, using fallback preprocessing
+[2025-06-17 17:49:13,514][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../augmented_dataset/no_birds/esc50_0264.wav: At least one stride in the given numpy array is negative, and tensors with negative strides are not currently supported. (You can probably work around this by making a copy of your array  with array.copy().) 
+[2025-06-17 17:49:13,535][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0125.wav, using fallback preprocessing
+[2025-06-17 17:49:13,582][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0119.wav, using fallback preprocessing
+[2025-06-17 17:49:13,630][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0092.wav, using fallback preprocessing
+[2025-06-17 17:49:13,677][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0045.wav, using fallback preprocessing
+[2025-06-17 17:49:13,808][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0247.wav, using fallback preprocessing
+[2025-06-17 17:49:13,834][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0106.wav, using fallback preprocessing
+[2025-06-17 17:49:13,882][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0253.wav, using fallback preprocessing
+[2025-06-17 17:49:13,909][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0252.wav, using fallback preprocessing
+[2025-06-17 17:49:13,978][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0246.wav, using fallback preprocessing
+[2025-06-17 17:49:14,004][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0291.wav, using fallback preprocessing
+[2025-06-17 17:49:14,037][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0285.wav, using fallback preprocessing
+[2025-06-17 17:49:14,105][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0050.wav, using fallback preprocessing
+[2025-06-17 17:49:14,174][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0093.wav, using fallback preprocessing
+[2025-06-17 17:49:14,200][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0087.wav, using fallback preprocessing
+[2025-06-17 17:49:14,226][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0118.wav, using fallback preprocessing
+[2025-06-17 17:49:14,274][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0124.wav, using fallback preprocessing
+[2025-06-17 17:49:14,304][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0265.wav, using fallback preprocessing
+[2025-06-17 17:49:14,352][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0130.wav, using fallback preprocessing
+[2025-06-17 17:49:14,378][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0468.wav, using fallback preprocessing
+[2025-06-17 17:49:14,405][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0440.wav, using fallback preprocessing
+[2025-06-17 17:49:14,452][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0326.wav, using fallback preprocessing
+[2025-06-17 17:49:14,479][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0332.wav, using fallback preprocessing
+[2025-06-17 17:49:14,524][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0454.wav, using fallback preprocessing
+[2025-06-17 17:49:14,550][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0098.wav, using fallback preprocessing
+[2025-06-17 17:49:14,575][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0483.wav, using fallback preprocessing
+[2025-06-17 17:49:14,620][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0396.wav, using fallback preprocessing
+[2025-06-17 17:49:14,645][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0382.wav, using fallback preprocessing
+[2025-06-17 17:49:14,671][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0369.wav, using fallback preprocessing
+[2025-06-17 17:49:14,697][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0028.wav, using fallback preprocessing
+[2025-06-17 17:49:14,762][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0433.wav, using fallback preprocessing
+[2025-06-17 17:49:14,788][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0427.wav, using fallback preprocessing
+[2025-06-17 17:49:14,834][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0341.wav, using fallback preprocessing
+[2025-06-17 17:49:14,859][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0194.wav, using fallback preprocessing
+[2025-06-17 17:49:14,884][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0180.wav, using fallback preprocessing
+[2025-06-17 17:49:14,910][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0216.wav, using fallback preprocessing
+[2025-06-17 17:49:14,936][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0157.wav, using fallback preprocessing
+[2025-06-17 17:49:14,962][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0143.wav, using fallback preprocessing
+[2025-06-17 17:49:14,988][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0202.wav, using fallback preprocessing
+[2025-06-17 17:49:15,014][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0023.wav, using fallback preprocessing
+[2025-06-17 17:49:15,039][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0037.wav, using fallback preprocessing
+[2025-06-17 17:49:15,122][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0221.wav, using fallback preprocessing
+[2025-06-17 17:49:15,206][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0234.wav, using fallback preprocessing
+[2025-06-17 17:49:15,231][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0220.wav, using fallback preprocessing
+[2025-06-17 17:49:15,256][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0161.wav, using fallback preprocessing
+[2025-06-17 17:49:15,281][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0149.wav, using fallback preprocessing
+[2025-06-17 17:49:15,306][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0208.wav, using fallback preprocessing
+[2025-06-17 17:49:15,353][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0022.wav, using fallback preprocessing
+[2025-06-17 17:49:15,378][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0203.wav, using fallback preprocessing
+[2025-06-17 17:49:15,411][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0142.wav, using fallback preprocessing
+[2025-06-17 17:49:15,436][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0156.wav, using fallback preprocessing
+[2025-06-17 17:49:15,461][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0217.wav, using fallback preprocessing
+[2025-06-17 17:49:15,487][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0181.wav, using fallback preprocessing
+[2025-06-17 17:49:15,537][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0426.wav, using fallback preprocessing
+[2025-06-17 17:49:15,563][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0340.wav, using fallback preprocessing
+[2025-06-17 17:49:15,632][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0354.wav, using fallback preprocessing
+[2025-06-17 17:49:15,657][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0432.wav, using fallback preprocessing
+[2025-06-17 17:49:15,682][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0029.wav, using fallback preprocessing
+[2025-06-17 17:49:15,707][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0368.wav, using fallback preprocessing
+[2025-06-17 17:49:15,733][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0383.wav, using fallback preprocessing
+[2025-06-17 17:49:15,779][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0381.wav, using fallback preprocessing
+[2025-06-17 17:49:15,805][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0395.wav, using fallback preprocessing
+[2025-06-17 17:49:15,831][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0418.wav, using fallback preprocessing
+[2025-06-17 17:49:15,877][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0342.wav, using fallback preprocessing
+[2025-06-17 17:49:15,901][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0424.wav, using fallback preprocessing
+[2025-06-17 17:49:15,926][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0430.wav, using fallback preprocessing
+[2025-06-17 17:49:15,992][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0183.wav, using fallback preprocessing
+[2025-06-17 17:49:16,026][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0197.wav, using fallback preprocessing
+[2025-06-17 17:49:16,072][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0168.wav, using fallback preprocessing
+[2025-06-17 17:49:16,098][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0140.wav, using fallback preprocessing
+[2025-06-17 17:49:16,143][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0215.wav, using fallback preprocessing
+[2025-06-17 17:49:16,169][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0154.wav, using fallback preprocessing
+[2025-06-17 17:49:16,260][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0020.wav, using fallback preprocessing
+[2025-06-17 17:49:16,296][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0188.wav, using fallback preprocessing
+[2025-06-17 17:49:16,333][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0236.wav, using fallback preprocessing
+[2025-06-17 17:49:16,380][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0163.wav, using fallback preprocessing
+[2025-06-17 17:49:16,405][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0222.wav, using fallback preprocessing
+[2025-06-17 17:49:16,438][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0223.wav, using fallback preprocessing
+[2025-06-17 17:49:16,492][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0176.wav, using fallback preprocessing
+[2025-06-17 17:49:16,519][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0237.wav, using fallback preprocessing
+[2025-06-17 17:49:16,545][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0189.wav, using fallback preprocessing
+[2025-06-17 17:49:16,570][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0021.wav, using fallback preprocessing
+[2025-06-17 17:49:16,596][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0035.wav, using fallback preprocessing
+[2025-06-17 17:49:16,623][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0009.wav, using fallback preprocessing
+[2025-06-17 17:49:16,648][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0155.wav, using fallback preprocessing
+[2025-06-17 17:49:16,674][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0214.wav, using fallback preprocessing
+[2025-06-17 17:49:16,700][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0200.wav, using fallback preprocessing
+[2025-06-17 17:49:16,726][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0141.wav, using fallback preprocessing
+[2025-06-17 17:49:16,751][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0169.wav, using fallback preprocessing
+[2025-06-17 17:49:16,818][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0182.wav, using fallback preprocessing
+[2025-06-17 17:49:16,845][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0431.wav, using fallback preprocessing
+[2025-06-17 17:49:16,892][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0357.wav, using fallback preprocessing
+[2025-06-17 17:49:16,918][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0343.wav, using fallback preprocessing
+[2025-06-17 17:49:16,979][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0425.wav, using fallback preprocessing
+[2025-06-17 17:49:17,070][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0380.wav, using fallback preprocessing
+[2025-06-17 17:49:17,106][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0384.wav, using fallback preprocessing
+[2025-06-17 17:49:17,171][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0421.wav, using fallback preprocessing
+[2025-06-17 17:49:17,235][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0347.wav, using fallback preprocessing
+[2025-06-17 17:49:17,268][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0353.wav, using fallback preprocessing
+[2025-06-17 17:49:17,311][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0435.wav, using fallback preprocessing
+[2025-06-17 17:49:17,362][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0192.wav, using fallback preprocessing
+[2025-06-17 17:49:17,397][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0204.wav, using fallback preprocessing
+[2025-06-17 17:49:17,417][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0210.wav, using fallback preprocessing
+[2025-06-17 17:49:17,453][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0179.wav, using fallback preprocessing
+[2025-06-17 17:49:17,489][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0031.wav, using fallback preprocessing
+[2025-06-17 17:49:17,516][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0025.wav, using fallback preprocessing
+[2025-06-17 17:49:17,536][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0019.wav, using fallback preprocessing
+[2025-06-17 17:49:17,574][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0233.wav, using fallback preprocessing
+[2025-06-17 17:49:17,628][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0227.wav, using fallback preprocessing
+[2025-06-17 17:49:17,650][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0226.wav, using fallback preprocessing
+[2025-06-17 17:49:17,670][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0167.wav, using fallback preprocessing
+[2025-06-17 17:49:17,755][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0024.wav, using fallback preprocessing
+[2025-06-17 17:49:17,792][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0239.wav, using fallback preprocessing
+[2025-06-17 17:49:17,828][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0150.wav, using fallback preprocessing
+[2025-06-17 17:49:17,882][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0144.wav, using fallback preprocessing
+[2025-06-17 17:49:17,903][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0193.wav, using fallback preprocessing
+[2025-06-17 17:49:17,923][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0187.wav, using fallback preprocessing
+[2025-06-17 17:49:17,962][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0013.wav, using fallback preprocessing
+[2025-06-17 17:49:17,983][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0352.wav, using fallback preprocessing
+[2025-06-17 17:49:18,003][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0434.wav, using fallback preprocessing
+[2025-06-17 17:49:18,040][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0346.wav, using fallback preprocessing
+[2025-06-17 17:49:18,116][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0391.wav, using fallback preprocessing
+[2025-06-17 17:49:18,137][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0385.wav, using fallback preprocessing
+[2025-06-17 17:49:18,158][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0393.wav, using fallback preprocessing
+[2025-06-17 17:49:18,196][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0436.wav, using fallback preprocessing
+[2025-06-17 17:49:18,217][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0350.wav, using fallback preprocessing
+[2025-06-17 17:49:18,238][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0011.wav, using fallback preprocessing
+[2025-06-17 17:49:18,349][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0344.wav, using fallback preprocessing
+[2025-06-17 17:49:18,375][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0422.wav, using fallback preprocessing
+[2025-06-17 17:49:18,400][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0039.wav, using fallback preprocessing
+[2025-06-17 17:49:18,424][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0378.wav, using fallback preprocessing
+[2025-06-17 17:49:18,467][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0185.wav, using fallback preprocessing
+[2025-06-17 17:49:18,529][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0146.wav, using fallback preprocessing
+[2025-06-17 17:49:18,553][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0207.wav, using fallback preprocessing
+[2025-06-17 17:49:18,599][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0032.wav, using fallback preprocessing
+[2025-06-17 17:49:18,624][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0165.wav, using fallback preprocessing
+[2025-06-17 17:49:18,648][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0224.wav, using fallback preprocessing
+[2025-06-17 17:49:18,734][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0218.wav, using fallback preprocessing
+[2025-06-17 17:49:18,759][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0219.wav, using fallback preprocessing
+[2025-06-17 17:49:18,823][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0231.wav, using fallback preprocessing
+[2025-06-17 17:49:18,849][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0225.wav, using fallback preprocessing
+[2025-06-17 17:49:18,895][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0033.wav, using fallback preprocessing
+[2025-06-17 17:49:18,920][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0027.wav, using fallback preprocessing
+[2025-06-17 17:49:18,966][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0147.wav, using fallback preprocessing
+[2025-06-17 17:49:18,993][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0153.wav, using fallback preprocessing
+[2025-06-17 17:49:19,104][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0038.wav, using fallback preprocessing
+[2025-06-17 17:49:19,191][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0437.wav, using fallback preprocessing
+[2025-06-17 17:49:19,217][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/esc50_0010.wav, using fallback preprocessing
+[2025-06-17 17:49:19,263][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0386.wav, using fallback preprocessing
+[2025-06-17 17:49:19,289][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../augmented_dataset/no_birds/empty_0392.wav, using fallback preprocessing
+[2025-06-17 17:49:19,508][__main__][INFO] - Student predictions saved to: /workspace/benchmark/results/predictions/student_predictions.csv
+[2025-06-17 17:49:19,511][__main__][INFO] - ✅ Student prediction completed
+[2025-06-17 17:49:19,511][__main__][INFO] -   Total predictions: 10822
+[2025-06-17 17:49:19,512][__main__][INFO] -   Average confidence: 0.636
+[2025-06-17 17:49:19,512][__main__][INFO] -   Top prediction: Periparus_ater (3056 files)
+[2025-06-17 17:49:19,514][__main__][INFO] - 
+========================================
+[2025-06-17 17:49:19,515][__main__][INFO] - 🦅 STEP 3: BirdNET Aligned Predictions
+[2025-06-17 17:49:19,515][__main__][INFO] - ========================================
+[2025-06-17 17:49:19,515][__main__][INFO] - Starting BirdNET predictions with ALIGNED preprocessing
+[2025-06-17 17:49:19,515][__main__][INFO] - 🎯 Using identical preprocessing pipeline as student model:
+[2025-06-17 17:49:19,515][__main__][INFO] -    - Segment duration: 3.0s
+[2025-06-17 17:49:19,515][__main__][INFO] -    - Sample rate: 32000 Hz
+[2025-06-17 17:49:19,515][__main__][INFO] -    - Bandpass filter: 150.0-16000.0 Hz
+[2025-06-17 17:49:19,515][__main__][INFO] -    - Extract calls: True
+[2025-06-17 17:49:19,518][__main__][ERROR] - BirdNET prediction failed: __init__() got an unexpected keyword argument 'model_path'

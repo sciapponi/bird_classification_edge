@@ -1,0 +1,69 @@
+[2025-06-16 14:20:44,834][__main__][INFO] - ============================================================
+[2025-06-16 14:20:44,834][__main__][INFO] - 🐦 BIRD CLASSIFICATION BENCHMARK
+[2025-06-16 14:20:44,834][__main__][INFO] - ============================================================
+[2025-06-16 14:20:44,834][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-16_14-20-43
+[2025-06-16 14:20:44,834][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-16_14-20-43
+[2025-06-16 14:20:44,834][__main__][INFO] - 
+========================================
+[2025-06-16 14:20:44,834][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-16 14:20:44,834][__main__][INFO] - ========================================
+[2025-06-16 14:20:44,835][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-16 14:20:44,835][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-16 14:20:44,858][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-16 14:20:44,858][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-16 14:20:44,882][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-16 14:20:44,882][__main__][INFO] - Processing species: Apus_apus
+[2025-06-16 14:20:44,896][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-16 14:20:44,896][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-16 14:20:44,910][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-16 14:20:44,910][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-16 14:20:44,959][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-16 14:20:44,959][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-16 14:20:44,966][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-16 14:20:44,966][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-16 14:20:44,984][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-16 14:20:44,984][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-16 14:20:45,008][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-16 14:20:45,008][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-16 14:20:45,021][__main__][INFO] - Found 836 no_birds files
+[2025-06-16 14:20:45,034][__main__][INFO] - 🔍 LIMITED TO 200 files for testing
+[2025-06-16 14:20:45,034][__main__][INFO] - Total audio files discovered: 195
+[2025-06-16 14:20:45,034][__main__][INFO] - Class distribution:
+[2025-06-16 14:20:45,034][__main__][INFO] -   Periparus_ater: 53 files
+[2025-06-16 14:20:45,034][__main__][INFO] -   Certhia_brachydactyla: 25 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   Certhia_familiaris: 24 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   Poecile_montanus: 23 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   Lophophanes_cristatus: 19 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   Bubo_bubo: 15 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   no_birds: 15 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   Apus_apus: 14 files
+[2025-06-16 14:20:45,035][__main__][INFO] -   Emberiza_cia: 7 files
+[2025-06-16 14:20:45,037][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-16 14:20:45,037][__main__][INFO] - 
+========================================
+[2025-06-16 14:20:45,037][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-16 14:20:45,037][__main__][INFO] - ========================================
+[2025-06-16 14:20:45,037][__main__][INFO] - Starting student model predictions
+[2025-06-16 14:20:45,402][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-16 14:20:45,958][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-16 14:20:45,958][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-16 14:20:45,958][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-16 14:20:45,958][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-16 14:20:45,974][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/benchmark/../config/bird_classification.yaml
+[2025-06-16 14:20:46,118][benchmark.predict_student][INFO] - Loaded model from: /workspace/benchmark/../best_distillation_model.pt
+[2025-06-16 14:20:46,120][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-16 14:20:46,120][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-16 14:20:46,120][benchmark.predict_student][INFO] - Confidence threshold: 0.1
+[2025-06-16 14:20:57,458][__main__][INFO] - Student predictions saved to: /workspace/benchmark/results/predictions/student_predictions.csv
+[2025-06-16 14:20:57,459][__main__][INFO] - ✅ Student prediction completed
+[2025-06-16 14:20:57,459][__main__][INFO] -   Total predictions: 195
+[2025-06-16 14:20:57,459][__main__][INFO] -   Average confidence: 0.637
+[2025-06-16 14:20:57,459][__main__][INFO] -   Top prediction: Periparus_ater (44 files)
+[2025-06-16 14:20:57,460][__main__][INFO] - 
+========================================
+[2025-06-16 14:20:57,460][__main__][INFO] - 🦉 STEP 3: BirdNET Predictions
+[2025-06-16 14:20:57,460][__main__][INFO] - ========================================
+[2025-06-16 14:20:57,460][__main__][INFO] - Starting BirdNET predictions
+[2025-06-16 14:20:57,494][benchmark.predict_birdnet][INFO] - BirdNET initialized with 8 target species
+[2025-06-16 14:20:57,494][benchmark.predict_birdnet][INFO] - Target species: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus']
+[2025-06-16 14:20:57,494][benchmark.predict_birdnet][INFO] - Confidence threshold: 0.1

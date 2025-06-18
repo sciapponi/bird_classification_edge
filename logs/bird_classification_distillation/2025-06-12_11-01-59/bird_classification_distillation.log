@@ -1,0 +1,109 @@
+[2025-06-12 11:01:59,414][__main__][INFO] - Starting knowledge distillation training
+[2025-06-12 11:01:59,419][__main__][INFO] - Configuration:
+experiment_name: bird_classification_distillation
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+soft_labels_path: test_soft_labels
+training:
+  epochs: 30
+  batch_size: 16
+  patience: 15
+  min_delta: 0.001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Bubo_bubo
+  - Certhia_familiaris
+  - Apus_apus
+  - Certhia_brachydactyla
+  - Emberiza_cia
+  - Lophophanes_cristatus
+  - Periparus_ater
+  - Poecile_montanus
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-12 11:01:59,440][__main__][INFO] - Initialized trainer on device: cpu
+[2025-06-12 11:01:59,441][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-12 11:01:59,613][__main__][INFO] - Train samples: 7832
+[2025-06-12 11:01:59,613][__main__][INFO] - Val samples: 2331
+[2025-06-12 11:01:59,613][__main__][INFO] - Test samples: 2331
+[2025-06-12 11:01:59,613][__main__][INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+[2025-06-12 11:01:59,613][__main__][INFO] - Setting up student model...
+[2025-06-12 11:01:59,630][__main__][INFO] - Student model parameters: 53,516
+[2025-06-12 11:01:59,631][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-12 11:02:00,794][__main__][INFO] - Optimizer: AdamW
+[2025-06-12 11:02:00,794][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-12 11:02:00,794][__main__][INFO] - Setting up distillation loss...
+[2025-06-12 11:02:00,795][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-12 11:02:00,795][__main__][INFO] - Alpha: 0.3, Temperature: 4.0
+[2025-06-12 11:02:00,795][__main__][INFO] - Starting distillation training...
+[2025-06-12 11:02:11,673][__main__][INFO] - Epoch 0, Batch 0/979, Loss: 1.5058 (Hard: 2.1330, Soft: 0.0426)
+[2025-06-12 11:03:33,177][__main__][INFO] - Epoch 0, Batch 50/979, Loss: 1.5011 (Hard: 2.1147, Soft: 0.0693)
+[2025-06-12 11:05:09,824][__main__][INFO] - Epoch 0, Batch 100/979, Loss: 1.4494 (Hard: 1.9850, Soft: 0.1996)
+[2025-06-12 11:06:44,308][__main__][INFO] - Epoch 0, Batch 150/979, Loss: 1.5264 (Hard: 2.1170, Soft: 0.1483)
+[2025-06-12 11:08:28,146][__main__][INFO] - Epoch 0, Batch 200/979, Loss: 1.2307 (Hard: 1.6112, Soft: 0.3430)
+[2025-06-12 11:10:10,098][__main__][INFO] - Epoch 0, Batch 250/979, Loss: 1.2581 (Hard: 1.7060, Soft: 0.2129)
+[2025-06-12 11:12:02,175][__main__][INFO] - Epoch 0, Batch 300/979, Loss: 0.9384 (Hard: 1.2148, Soft: 0.2933)
+[2025-06-12 11:13:44,757][__main__][INFO] - Epoch 0, Batch 350/979, Loss: 1.0901 (Hard: 1.4325, Soft: 0.2913)
+[2025-06-12 11:15:24,930][__main__][INFO] - Epoch 0, Batch 400/979, Loss: 1.5502 (Hard: 2.1048, Soft: 0.2563)
+[2025-06-12 11:17:04,687][__main__][INFO] - Epoch 0, Batch 450/979, Loss: 0.8276 (Hard: 0.9907, Soft: 0.4470)
+[2025-06-12 11:18:42,190][__main__][INFO] - Epoch 0, Batch 500/979, Loss: 1.3353 (Hard: 1.7839, Soft: 0.2885)
+[2025-06-12 11:20:21,308][__main__][INFO] - Epoch 0, Batch 550/979, Loss: 1.3709 (Hard: 1.8377, Soft: 0.2816)
+[2025-06-12 11:21:54,945][__main__][INFO] - Epoch 0, Batch 600/979, Loss: 0.9137 (Hard: 1.1291, Soft: 0.4110)
+[2025-06-12 11:23:23,882][__main__][INFO] - Epoch 0, Batch 650/979, Loss: 0.8084 (Hard: 1.0035, Soft: 0.3532)
+[2025-06-12 11:25:02,360][__main__][INFO] - Epoch 0, Batch 700/979, Loss: 0.9668 (Hard: 1.2523, Soft: 0.3008)
+[2025-06-12 11:26:54,960][__main__][INFO] - Epoch 0, Batch 750/979, Loss: 1.2644 (Hard: 1.6401, Soft: 0.3878)
+[2025-06-12 11:28:42,468][__main__][INFO] - Epoch 0, Batch 800/979, Loss: 1.1097 (Hard: 1.4647, Soft: 0.2813)
+[2025-06-12 11:30:03,008][__main__][INFO] - Epoch 0, Batch 850/979, Loss: 1.1367 (Hard: 1.4909, Soft: 0.3100)
+[2025-06-12 11:31:43,669][__main__][INFO] - Epoch 0, Batch 900/979, Loss: 1.0093 (Hard: 1.2729, Soft: 0.3943)
+[2025-06-12 11:33:14,855][__main__][INFO] - Epoch 0, Batch 950/979, Loss: 0.9759 (Hard: 1.2407, Soft: 0.3581)

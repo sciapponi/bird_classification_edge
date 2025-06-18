@@ -1,0 +1,90 @@
+[2025-06-17 17:02:54,519][__main__][INFO] - ============================================================
+[2025-06-17 17:02:54,519][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-17 17:02:54,519][__main__][INFO] - ============================================================
+[2025-06-17 17:02:54,519][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-17 17:02:54,519][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-17 17:02:54,519][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-17 17:02:54,519][__main__][INFO] -    • Both models see identical audio data
+[2025-06-17 17:02:54,520][__main__][INFO] - ============================================================
+[2025-06-17 17:02:54,520][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_17-02-52
+[2025-06-17 17:02:54,520][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_17-02-52
+[2025-06-17 17:02:54,520][__main__][INFO] - 
+========================================
+[2025-06-17 17:02:54,520][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-17 17:02:54,520][__main__][INFO] - ========================================
+[2025-06-17 17:02:54,520][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-17 17:02:54,520][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-17 17:02:54,554][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-17 17:02:54,554][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-17 17:02:54,588][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-17 17:02:54,588][__main__][INFO] - Processing species: Apus_apus
+[2025-06-17 17:02:54,608][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-17 17:02:54,609][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-17 17:02:54,630][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-17 17:02:54,630][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-17 17:02:54,701][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-17 17:02:54,702][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-17 17:02:54,712][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-17 17:02:54,712][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-17 17:02:54,738][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-17 17:02:54,738][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-17 17:02:54,773][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-17 17:02:54,774][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-17 17:02:54,792][__main__][INFO] - Found 836 no_birds files
+[2025-06-17 17:02:54,803][__main__][INFO] - Total audio files discovered: 10822
+[2025-06-17 17:02:54,805][__main__][INFO] - Class distribution:
+[2025-06-17 17:02:54,805][__main__][INFO] -   Periparus_ater: 2902 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Certhia_brachydactyla: 1396 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Lophophanes_cristatus: 1045 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   no_birds: 836 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-17 17:02:54,805][__main__][INFO] -   Emberiza_cia: 403 files
+[2025-06-17 17:02:54,850][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-17 17:02:54,850][__main__][INFO] - 
+========================================
+[2025-06-17 17:02:54,850][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-17 17:02:54,850][__main__][INFO] - ========================================
+[2025-06-17 17:02:54,850][__main__][INFO] - Starting student model predictions
+[2025-06-17 17:02:55,562][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-17 17:02:55,847][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-17 17:02:55,847][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-17 17:02:55,847][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-17 17:02:55,847][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-17 17:02:55,864][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/benchmark/../config/bird_classification.yaml
+[2025-06-17 17:02:56,003][benchmark.predict_student][INFO] - Loaded model from: /workspace/benchmark/../best_distillation_model.pt
+[2025-06-17 17:02:56,004][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-17 17:02:56,004][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-17 17:02:56,004][benchmark.predict_student][INFO] - Confidence threshold: 0.1
+[2025-06-17 17:03:04,336][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC892577-240330_0132_25db_nr.wav, using fallback preprocessing
+[2025-06-17 17:03:04,339][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC892577-240330_0132_25db_nr.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:04,826][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC794939-wt-6803d12a.1.wav, using fallback preprocessing
+[2025-06-17 17:03:04,833][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC794939-wt-6803d12a.1.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:04,964][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC879067-PARMON120127.wav, using fallback preprocessing
+[2025-06-17 17:03:04,971][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC879067-PARMON120127.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,021][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC830388-Poecile-montanus-Willow-Tit-call-2005-07-09-0721-Kurmenes-pagasts-56.4896,-24.7956-(seen)-Telinga-5W.wav, using fallback preprocessing
+[2025-06-17 17:03:05,027][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC830388-Poecile-montanus-Willow-Tit-call-2005-07-09-0721-Kurmenes-pagasts-56.4896,-24.7956-(seen)-Telinga-5W.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,139][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC770114-Glanskop-zang-en-roep---Zeist---2021-01-08---1147-copy.wav, using fallback preprocessing
+[2025-06-17 17:03:05,146][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC770114-Glanskop-zang-en-roep---Zeist---2021-01-08---1147-copy.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,215][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC830597-Willow-Tit-1-Sept-23-Hällö-0535.wav, using fallback preprocessing
+[2025-06-17 17:03:05,219][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC830597-Willow-Tit-1-Sept-23-Hällö-0535.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,374][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC891335-WEIDENMEISEN,-Konterges.--20.04.21--Kiesgr.-Th.--19_05--VOC_210420-2136-.wav, using fallback preprocessing
+[2025-06-17 17:03:05,380][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC891335-WEIDENMEISEN,-Konterges.--20.04.21--Kiesgr.-Th.--19_05--VOC_210420-2136-.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,421][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC796772-Mésange_boreale_song230424_0858.wav, using fallback preprocessing
+[2025-06-17 17:03:05,426][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC796772-Mésange_boreale_song230424_0858.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,598][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC794938-wt-6803d12.wav, using fallback preprocessing
+[2025-06-17 17:03:05,604][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC794938-wt-6803d12.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,652][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC841120-2023-11-09-07_56.wav, using fallback preprocessing
+[2025-06-17 17:03:05,654][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC841120-2023-11-09-07_56.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,696][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC830392-Poecile-montanus-Willow-Tit-song-2006-05-11-0536-Valles-pagasts-56.497105,-24.781219-(seen)-Telinga-5W.wav, using fallback preprocessing
+[2025-06-17 17:03:05,702][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC830392-Poecile-montanus-Willow-Tit-song-2006-05-11-0536-Valles-pagasts-56.497105,-24.781219-(seen)-Telinga-5W.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,831][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC773145-WEIDENMEISE,-Bibersumpf--9_47--VOC_220823-3202.wav, using fallback preprocessing
+[2025-06-17 17:03:05,837][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC773145-WEIDENMEISE,-Bibersumpf--9_47--VOC_220823-3202.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:05,877][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC833639-231001-111604-talltita-edit.wav, using fallback preprocessing
+[2025-06-17 17:03:05,880][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC833639-231001-111604-talltita-edit.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:06,361][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC881192-WEIDENMEISE,-Gesang--6_48--Flachtenberger-Moor---VOC_240303-4926.wav, using fallback preprocessing
+[2025-06-17 17:03:06,367][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC881192-WEIDENMEISE,-Gesang--6_48--Flachtenberger-Moor---VOC_240303-4926.wav: Digital filter critical frequencies must be 0 < Wn < 1
+[2025-06-17 17:03:06,490][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC918903-Weidenmeise,-ssp.-montanus,-Gesang,-Engstelnalp-BE,-240618-016.wav, using fallback preprocessing
+[2025-06-17 17:03:06,500][benchmark.predict_student][ERROR] - Failed to preprocess audio /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC918903-Weidenmeise,-ssp.-montanus,-Gesang,-Engstelnalp-BE,-240618-016.wav: Digital filter critical frequencies must be 0 < Wn < 1

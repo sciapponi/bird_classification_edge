@@ -1,0 +1,136 @@
+[2025-06-12 13:22:45,508][__main__][INFO] - Starting knowledge distillation training
+[2025-06-12 13:22:45,514][__main__][INFO] - Configuration:
+experiment_name: bird_classification_distillation
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+soft_labels_path: test_soft_labels
+training:
+  epochs: 1
+  batch_size: 16
+  patience: 15
+  min_delta: 0.001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Bubo_bubo
+  - Certhia_familiaris
+  - Apus_apus
+  - Certhia_brachydactyla
+  - Emberiza_cia
+  - Lophophanes_cristatus
+  - Periparus_ater
+  - Poecile_montanus
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-12 13:22:45,520][__main__][INFO] - Initialized trainer on device: cpu
+[2025-06-12 13:22:45,520][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-12 13:22:45,705][__main__][INFO] - Train samples: 7832
+[2025-06-12 13:22:45,705][__main__][INFO] - Val samples: 2331
+[2025-06-12 13:22:45,705][__main__][INFO] - Test samples: 2331
+[2025-06-12 13:22:45,706][__main__][INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+[2025-06-12 13:22:45,706][__main__][INFO] - Setting up student model...
+[2025-06-12 13:22:45,725][__main__][INFO] - Student model parameters: 53,516
+[2025-06-12 13:22:45,725][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-12 13:22:46,895][__main__][INFO] - Optimizer: AdamW
+[2025-06-12 13:22:46,895][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-12 13:22:46,895][__main__][INFO] - Setting up distillation loss...
+[2025-06-12 13:22:46,895][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-12 13:22:46,895][__main__][INFO] - Alpha: 0.3, Temperature: 4.0
+[2025-06-12 13:22:46,895][__main__][INFO] - Starting distillation training...
+[2025-06-12 13:22:59,064][__main__][INFO] - Epoch 0, Batch 0/979, Loss: 1.6317 (Hard: 2.2998, Soft: 0.0727)
+[2025-06-12 13:24:44,398][__main__][INFO] - Epoch 0, Batch 50/979, Loss: 1.4321 (Hard: 1.9952, Soft: 0.1181)
+[2025-06-12 13:26:09,401][__main__][INFO] - Epoch 0, Batch 100/979, Loss: 1.3432 (Hard: 1.8290, Soft: 0.2096)
+[2025-06-12 13:27:40,561][__main__][INFO] - Epoch 0, Batch 150/979, Loss: 1.3833 (Hard: 1.8973, Soft: 0.1838)
+[2025-06-12 13:29:19,699][__main__][INFO] - Epoch 0, Batch 200/979, Loss: 1.2800 (Hard: 1.7272, Soft: 0.2367)
+[2025-06-12 13:30:52,976][__main__][INFO] - Epoch 0, Batch 250/979, Loss: 1.3052 (Hard: 1.7513, Soft: 0.2641)
+[2025-06-12 13:32:30,182][__main__][INFO] - Epoch 0, Batch 300/979, Loss: 1.1173 (Hard: 1.4749, Soft: 0.2830)
+[2025-06-12 13:34:09,161][__main__][INFO] - Epoch 0, Batch 350/979, Loss: 1.0871 (Hard: 1.4353, Soft: 0.2747)
+[2025-06-12 13:35:34,998][__main__][INFO] - Epoch 0, Batch 400/979, Loss: 1.3626 (Hard: 1.8273, Soft: 0.2783)
+[2025-06-12 13:37:04,590][__main__][INFO] - Epoch 0, Batch 450/979, Loss: 1.1849 (Hard: 1.5333, Soft: 0.3722)
+[2025-06-12 13:38:31,785][__main__][INFO] - Epoch 0, Batch 500/979, Loss: 1.2891 (Hard: 1.6280, Soft: 0.4983)
+[2025-06-12 13:39:59,975][__main__][INFO] - Epoch 0, Batch 550/979, Loss: 1.3828 (Hard: 1.8447, Soft: 0.3048)
+[2025-06-12 13:41:41,931][__main__][INFO] - Epoch 0, Batch 600/979, Loss: 1.3332 (Hard: 1.7446, Soft: 0.3733)
+[2025-06-12 13:43:16,052][__main__][INFO] - Epoch 0, Batch 650/979, Loss: 0.9838 (Hard: 1.2303, Soft: 0.4084)
+[2025-06-12 13:44:47,720][__main__][INFO] - Epoch 0, Batch 700/979, Loss: 0.7230 (Hard: 0.8505, Soft: 0.4254)
+[2025-06-12 13:46:01,085][__main__][INFO] - Epoch 0, Batch 750/979, Loss: 0.8696 (Hard: 1.0931, Soft: 0.3480)
+[2025-06-12 13:47:33,141][__main__][INFO] - Epoch 0, Batch 800/979, Loss: 1.2263 (Hard: 1.6308, Soft: 0.2825)
+[2025-06-12 13:49:02,011][__main__][INFO] - Epoch 0, Batch 850/979, Loss: 1.3818 (Hard: 1.8319, Soft: 0.3316)
+[2025-06-12 13:50:41,448][__main__][INFO] - Epoch 0, Batch 900/979, Loss: 1.1095 (Hard: 1.3981, Soft: 0.4361)
+[2025-06-12 13:52:08,761][__main__][INFO] - Epoch 0, Batch 950/979, Loss: 1.0992 (Hard: 1.4495, Soft: 0.2817)
+[2025-06-12 13:58:27,769][__main__][INFO] - Epoch 0: Train Loss: 1.1873, Train Acc: 48.46%, Val Loss: 0.8949, Val Acc: 69.84%
+[2025-06-12 13:58:27,769][__main__][INFO] -   Hard Loss: 1.5631, Soft Loss: 0.3104, Alpha: 0.300
+[2025-06-12 13:58:27,817][__main__][INFO] - New best model saved! Val Acc: 69.84%
+[2025-06-12 13:58:27,817][__main__][INFO] - Training completed!
+[2025-06-12 13:58:27,818][__main__][INFO] - Best validation accuracy: 69.84%
+[2025-06-12 13:58:27,818][__main__][INFO] - Testing best model...
+[2025-06-12 14:03:33,733][__main__][INFO] - Test Accuracy: 68.77%
+[2025-06-12 14:03:33,751][__main__][INFO] - Classification Report:
+                       precision    recall  f1-score   support
+
+     Poecile montanus       0.48      0.74      0.58       129
+   Certhia familiaris       0.50      0.79      0.61       198
+            Apus apus       0.64      0.75      0.69       121
+            Bubo bubo       0.81      0.41      0.55       209
+       Periparus ater       0.00      0.00      0.00        60
+         Emberiza cia       0.37      0.38      0.38       156
+Lophophanes cristatus       0.75      0.57      0.65       435
+Certhia brachydactyla       0.37      0.62      0.46       187
+             non-bird       0.98      0.90      0.94       836
+
+             accuracy                           0.69      2331
+            macro avg       0.54      0.57      0.54      2331
+         weighted avg       0.72      0.69      0.69      2331
+
+[2025-06-12 14:03:36,396][__main__][INFO] - Training plots saved to distillation_training_history.png
+[2025-06-12 14:03:36,396][__main__][INFO] - Distillation training completed successfully!
+[2025-06-12 14:03:36,396][__main__][INFO] - Final test accuracy: 68.77%

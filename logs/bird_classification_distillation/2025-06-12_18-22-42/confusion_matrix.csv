@@ -1,0 +1,10 @@
+,Poecile montanus,Certhia familiaris,Apus apus,Bubo bubo,Periparus ater,Emberiza cia,Lophophanes cristatus,Certhia brachydactyla,non-bird
+Poecile montanus,110,2,2,1,0,4,4,4,2
+Certhia familiaris,1,170,0,7,1,2,11,5,1
+Apus apus,2,2,111,3,0,1,2,0,0
+Bubo bubo,2,19,3,173,0,3,5,4,0
+Periparus ater,0,2,0,0,50,1,7,0,0
+Emberiza cia,2,6,0,1,0,133,9,4,1
+Lophophanes cristatus,0,15,0,18,5,8,365,24,0
+Certhia brachydactyla,3,3,0,2,1,11,24,143,0
+non-bird,12,2,1,0,0,2,12,2,805

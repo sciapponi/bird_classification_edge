@@ -1,0 +1,51 @@
+[2025-06-17 19:09:11,286][__main__][INFO] - ============================================================
+[2025-06-17 19:09:11,286][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-17 19:09:11,286][__main__][INFO] - ============================================================
+[2025-06-17 19:09:11,286][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-17 19:09:11,286][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-17 19:09:11,286][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-17 19:09:11,286][__main__][INFO] -    • Both models see identical audio data
+[2025-06-17 19:09:11,286][__main__][INFO] - ============================================================
+[2025-06-17 19:09:11,286][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_19-09-09
+[2025-06-17 19:09:11,286][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_19-09-09
+[2025-06-17 19:09:11,286][__main__][INFO] - 
+========================================
+[2025-06-17 19:09:11,286][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-17 19:09:11,286][__main__][INFO] - ========================================
+[2025-06-17 19:09:11,286][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-17 19:09:11,287][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-17 19:09:11,320][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-17 19:09:11,320][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-17 19:09:11,355][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-17 19:09:11,355][__main__][INFO] - Processing species: Apus_apus
+[2025-06-17 19:09:11,375][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-17 19:09:11,375][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-17 19:09:11,396][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-17 19:09:11,396][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-17 19:09:11,467][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-17 19:09:11,467][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-17 19:09:11,477][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-17 19:09:11,478][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-17 19:09:11,504][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-17 19:09:11,504][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-17 19:09:11,539][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-17 19:09:11,539][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-17 19:09:11,558][__main__][INFO] - Found 836 no_birds files
+[2025-06-17 19:09:11,569][__main__][INFO] - Total audio files discovered: 10822
+[2025-06-17 19:09:11,571][__main__][INFO] - Class distribution:
+[2025-06-17 19:09:11,571][__main__][INFO] -   Periparus_ater: 2902 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Certhia_brachydactyla: 1396 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Lophophanes_cristatus: 1045 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   no_birds: 836 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-17 19:09:11,571][__main__][INFO] -   Emberiza_cia: 403 files
+[2025-06-17 19:09:11,630][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-17 19:09:11,630][__main__][INFO] - 
+========================================
+[2025-06-17 19:09:11,630][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-17 19:09:11,630][__main__][INFO] - ========================================
+[2025-06-17 19:09:11,630][__main__][INFO] - Starting student model predictions
+[2025-06-17 19:09:11,749][__main__][ERROR] - Student model prediction failed: invalid syntax (predict_birdnet.py, line 1)

@@ -1,0 +1,161 @@
+[2025-06-12 10:18:14,469][__main__][INFO] - Starting knowledge distillation training
+[2025-06-12 10:18:14,474][__main__][INFO] - Configuration:
+experiment_name: bird_classification_distillation
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+soft_labels_path: test_soft_labels
+training:
+  epochs: 30
+  batch_size: 16
+  patience: 15
+  min_delta: 0.001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Poecile montanus
+  - Certhia familiaris
+  - Apus apus
+  - Bubo bubo
+  - Periparus ater
+  - Emberiza cia
+  - Lophophanes cristatus
+  - Certhia brachydactyla
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-12 10:18:14,497][__main__][INFO] - Initialized trainer on device: cpu
+[2025-06-12 10:18:14,497][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-12 10:18:14,604][__main__][INFO] - Train samples: 836
+[2025-06-12 10:18:14,604][__main__][INFO] - Val samples: 836
+[2025-06-12 10:18:14,604][__main__][INFO] - Test samples: 836
+[2025-06-12 10:18:14,604][__main__][INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+[2025-06-12 10:18:14,605][__main__][INFO] - Setting up student model...
+[2025-06-12 10:18:14,623][__main__][INFO] - Student model parameters: 53,516
+[2025-06-12 10:18:14,623][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-12 10:18:15,803][__main__][INFO] - Optimizer: AdamW
+[2025-06-12 10:18:15,803][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-12 10:18:15,803][__main__][INFO] - Setting up distillation loss...
+[2025-06-12 10:18:15,803][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-12 10:18:15,803][__main__][INFO] - Alpha: 0.3, Temperature: 4.0
+[2025-06-12 10:18:15,803][__main__][INFO] - Starting distillation training...
+[2025-06-12 10:18:16,120][__main__][INFO] - Epoch 0, Batch 0/105, Loss: 1.4830 (Hard: 2.1153, Soft: 0.0076)
+[2025-06-12 10:18:25,103][__main__][INFO] - Epoch 0, Batch 50/105, Loss: 0.3832 (Hard: 0.2653, Soft: 0.6583)
+[2025-06-12 10:18:34,573][__main__][INFO] - Epoch 0, Batch 100/105, Loss: 0.3787 (Hard: 0.2216, Soft: 0.7454)
+[2025-06-12 10:18:41,046][__main__][INFO] - Epoch 0: Train Loss: 0.4891, Train Acc: 99.16%, Val Loss: 0.3836, Val Acc: 100.00%
+[2025-06-12 10:18:41,046][__main__][INFO] -   Hard Loss: 0.4186, Soft Loss: 0.6537, Alpha: 0.300
+[2025-06-12 10:18:41,084][__main__][INFO] - New best model saved! Val Acc: 100.00%
+[2025-06-12 10:18:41,252][__main__][INFO] - Epoch 1, Batch 0/105, Loss: 0.3786 (Hard: 0.2200, Soft: 0.7485)
+[2025-06-12 10:18:49,564][__main__][INFO] - Epoch 1, Batch 50/105, Loss: 0.3785 (Hard: 0.2286, Soft: 0.7283)
+[2025-06-12 10:18:58,055][__main__][INFO] - Epoch 1, Batch 100/105, Loss: 0.3785 (Hard: 0.2341, Soft: 0.7155)
+[2025-06-12 10:19:04,128][__main__][INFO] - Epoch 1: Train Loss: 0.3785, Train Acc: 100.00%, Val Loss: 0.3813, Val Acc: 100.00%
+[2025-06-12 10:19:04,129][__main__][INFO] -   Hard Loss: 0.2253, Soft Loss: 0.7360, Alpha: 0.300
+[2025-06-12 10:19:04,298][__main__][INFO] - Epoch 2, Batch 0/105, Loss: 0.3785 (Hard: 0.2298, Soft: 0.7254)
+[2025-06-12 10:19:12,730][__main__][INFO] - Epoch 2, Batch 50/105, Loss: 0.3783 (Hard: 0.2261, Soft: 0.7334)
+[2025-06-12 10:19:21,040][__main__][INFO] - Epoch 2, Batch 100/105, Loss: 0.3784 (Hard: 0.2327, Soft: 0.7184)
+[2025-06-12 10:19:27,072][__main__][INFO] - Epoch 2: Train Loss: 0.3784, Train Acc: 100.00%, Val Loss: 0.3807, Val Acc: 100.00%
+[2025-06-12 10:19:27,072][__main__][INFO] -   Hard Loss: 0.2252, Soft Loss: 0.7357, Alpha: 0.300
+[2025-06-12 10:19:27,247][__main__][INFO] - Epoch 3, Batch 0/105, Loss: 0.3783 (Hard: 0.2272, Soft: 0.7307)
+[2025-06-12 10:19:35,513][__main__][INFO] - Epoch 3, Batch 50/105, Loss: 0.3785 (Hard: 0.2265, Soft: 0.7332)
+[2025-06-12 10:19:44,028][__main__][INFO] - Epoch 3, Batch 100/105, Loss: 0.3784 (Hard: 0.2298, Soft: 0.7250)
+[2025-06-12 10:19:50,041][__main__][INFO] - Epoch 3: Train Loss: 0.3783, Train Acc: 100.00%, Val Loss: 0.3794, Val Acc: 100.00%
+[2025-06-12 10:19:50,041][__main__][INFO] -   Hard Loss: 0.2253, Soft Loss: 0.7354, Alpha: 0.300
+[2025-06-12 10:19:50,244][__main__][INFO] - Epoch 4, Batch 0/105, Loss: 0.3783 (Hard: 0.2193, Soft: 0.7494)
+[2025-06-12 10:19:58,655][__main__][INFO] - Epoch 4, Batch 50/105, Loss: 0.3783 (Hard: 0.2252, Soft: 0.7353)
+[2025-06-12 10:20:07,097][__main__][INFO] - Epoch 4, Batch 100/105, Loss: 0.3784 (Hard: 0.2273, Soft: 0.7311)
+[2025-06-12 10:20:13,050][__main__][INFO] - Epoch 4: Train Loss: 0.3783, Train Acc: 100.00%, Val Loss: 0.3810, Val Acc: 100.00%
+[2025-06-12 10:20:13,050][__main__][INFO] -   Hard Loss: 0.2252, Soft Loss: 0.7354, Alpha: 0.300
+[2025-06-12 10:20:13,213][__main__][INFO] - Epoch 5, Batch 0/105, Loss: 0.3782 (Hard: 0.2278, Soft: 0.7293)
+[2025-06-12 10:20:21,493][__main__][INFO] - Epoch 5, Batch 50/105, Loss: 0.3782 (Hard: 0.2247, Soft: 0.7365)
+[2025-06-12 10:20:29,731][__main__][INFO] - Epoch 5, Batch 100/105, Loss: 0.3783 (Hard: 0.2250, Soft: 0.7361)
+[2025-06-12 10:20:35,695][__main__][INFO] - Epoch 5: Train Loss: 0.3783, Train Acc: 100.00%, Val Loss: 0.3807, Val Acc: 100.00%
+[2025-06-12 10:20:35,695][__main__][INFO] -   Hard Loss: 0.2252, Soft Loss: 0.7354, Alpha: 0.300
+[2025-06-12 10:20:35,859][__main__][INFO] - Epoch 6, Batch 0/105, Loss: 0.3782 (Hard: 0.2289, Soft: 0.7267)
+[2025-06-12 10:20:44,161][__main__][INFO] - Epoch 6, Batch 50/105, Loss: 0.3782 (Hard: 0.2240, Soft: 0.7380)
+[2025-06-12 10:20:52,745][__main__][INFO] - Epoch 6, Batch 100/105, Loss: 0.3782 (Hard: 0.2215, Soft: 0.7439)
+[2025-06-12 10:20:58,554][__main__][INFO] - Epoch 6: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3810, Val Acc: 100.00%
+[2025-06-12 10:20:58,554][__main__][INFO] -   Hard Loss: 0.2252, Soft Loss: 0.7352, Alpha: 0.300
+[2025-06-12 10:20:58,728][__main__][INFO] - Epoch 7, Batch 0/105, Loss: 0.3783 (Hard: 0.2293, Soft: 0.7259)
+[2025-06-12 10:21:07,269][__main__][INFO] - Epoch 7, Batch 50/105, Loss: 0.3782 (Hard: 0.2236, Soft: 0.7390)
+[2025-06-12 10:21:15,700][__main__][INFO] - Epoch 7, Batch 100/105, Loss: 0.3782 (Hard: 0.2209, Soft: 0.7453)
+[2025-06-12 10:21:21,724][__main__][INFO] - Epoch 7: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3800, Val Acc: 100.00%
+[2025-06-12 10:21:21,724][__main__][INFO] -   Hard Loss: 0.2253, Soft Loss: 0.7350, Alpha: 0.300
+[2025-06-12 10:21:21,892][__main__][INFO] - Epoch 8, Batch 0/105, Loss: 0.3782 (Hard: 0.2266, Soft: 0.7321)
+[2025-06-12 10:21:30,264][__main__][INFO] - Epoch 8, Batch 50/105, Loss: 0.3782 (Hard: 0.2251, Soft: 0.7353)
+[2025-06-12 10:21:38,670][__main__][INFO] - Epoch 8, Batch 100/105, Loss: 0.3782 (Hard: 0.2226, Soft: 0.7414)
+[2025-06-12 10:21:44,667][__main__][INFO] - Epoch 8: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3802, Val Acc: 100.00%
+[2025-06-12 10:21:44,668][__main__][INFO] -   Hard Loss: 0.2251, Soft Loss: 0.7354, Alpha: 0.300
+[2025-06-12 10:21:44,878][__main__][INFO] - Epoch 9, Batch 0/105, Loss: 0.3782 (Hard: 0.2250, Soft: 0.7356)
+[2025-06-12 10:21:53,465][__main__][INFO] - Epoch 9, Batch 50/105, Loss: 0.3783 (Hard: 0.2286, Soft: 0.7275)
+[2025-06-12 10:22:01,977][__main__][INFO] - Epoch 9, Batch 100/105, Loss: 0.3782 (Hard: 0.2273, Soft: 0.7302)
+[2025-06-12 10:22:07,966][__main__][INFO] - Epoch 9: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3797, Val Acc: 100.00%
+[2025-06-12 10:22:07,966][__main__][INFO] -   Hard Loss: 0.2253, Soft Loss: 0.7350, Alpha: 0.300
+[2025-06-12 10:22:08,132][__main__][INFO] - Epoch 10, Batch 0/105, Loss: 0.3782 (Hard: 0.2232, Soft: 0.7398)
+[2025-06-12 10:22:16,708][__main__][INFO] - Epoch 10, Batch 50/105, Loss: 0.3782 (Hard: 0.2206, Soft: 0.7461)
+[2025-06-12 10:22:25,002][__main__][INFO] - Epoch 10, Batch 100/105, Loss: 0.3782 (Hard: 0.2246, Soft: 0.7365)
+[2025-06-12 10:22:30,568][__main__][INFO] - Epoch 10: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3796, Val Acc: 100.00%
+[2025-06-12 10:22:30,568][__main__][INFO] -   Hard Loss: 0.2252, Soft Loss: 0.7352, Alpha: 0.300
+[2025-06-12 10:22:30,744][__main__][INFO] - Epoch 11, Batch 0/105, Loss: 0.3782 (Hard: 0.2289, Soft: 0.7265)
+[2025-06-12 10:22:39,224][__main__][INFO] - Epoch 11, Batch 50/105, Loss: 0.3782 (Hard: 0.2249, Soft: 0.7358)
+[2025-06-12 10:22:47,580][__main__][INFO] - Epoch 11, Batch 100/105, Loss: 0.3783 (Hard: 0.2272, Soft: 0.7307)
+[2025-06-12 10:22:53,508][__main__][INFO] - Epoch 11: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3788, Val Acc: 100.00%
+[2025-06-12 10:22:53,508][__main__][INFO] -   Hard Loss: 0.2253, Soft Loss: 0.7350, Alpha: 0.300
+[2025-06-12 10:22:53,670][__main__][INFO] - Epoch 12, Batch 0/105, Loss: 0.3782 (Hard: 0.2283, Soft: 0.7279)
+[2025-06-12 10:23:02,121][__main__][INFO] - Epoch 12, Batch 50/105, Loss: 0.3782 (Hard: 0.2229, Soft: 0.7406)
+[2025-06-12 10:23:10,585][__main__][INFO] - Epoch 12, Batch 100/105, Loss: 0.3782 (Hard: 0.2218, Soft: 0.7431)
+[2025-06-12 10:23:16,669][__main__][INFO] - Epoch 12: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3799, Val Acc: 100.00%
+[2025-06-12 10:23:16,669][__main__][INFO] -   Hard Loss: 0.2251, Soft Loss: 0.7353, Alpha: 0.300
+[2025-06-12 10:23:16,836][__main__][INFO] - Epoch 13, Batch 0/105, Loss: 0.3782 (Hard: 0.2301, Soft: 0.7239)
+[2025-06-12 10:23:25,300][__main__][INFO] - Epoch 13, Batch 50/105, Loss: 0.3782 (Hard: 0.2234, Soft: 0.7392)
+[2025-06-12 10:23:33,744][__main__][INFO] - Epoch 13, Batch 100/105, Loss: 0.3782 (Hard: 0.2243, Soft: 0.7371)
+[2025-06-12 10:23:39,820][__main__][INFO] - Epoch 13: Train Loss: 0.3782, Train Acc: 100.00%, Val Loss: 0.3797, Val Acc: 100.00%
+[2025-06-12 10:23:39,820][__main__][INFO] -   Hard Loss: 0.2252, Soft Loss: 0.7350, Alpha: 0.300
+[2025-06-12 10:23:39,986][__main__][INFO] - Epoch 14, Batch 0/105, Loss: 0.3782 (Hard: 0.2279, Soft: 0.7289)

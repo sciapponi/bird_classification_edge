@@ -1,0 +1,10 @@
+{
+    "experiment_name": "bird_classification_distillation_extract_calls_100_epochs",
+    "best_val_acc": 0.8901758901758902,
+    "test_acc": 0.9021879021879022,
+    "test_f1_weighted": 0.9020723017513869,
+    "test_precision_weighted": 0.9041082947402007,
+    "test_recall_weighted": 0.9021879021879022,
+    "total_params": 53516,
+    "trainable_params": 53516
+}

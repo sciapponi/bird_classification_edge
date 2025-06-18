@@ -1,0 +1,2 @@
+- dataset.soft_labels_path=test_soft_labels
+- training.epochs=2

@@ -1,0 +1,90 @@
+[2025-06-16 14:05:09,636][__main__][INFO] - ============================================================
+[2025-06-16 14:05:09,636][__main__][INFO] - 🐦 BIRD CLASSIFICATION BENCHMARK
+[2025-06-16 14:05:09,636][__main__][INFO] - ============================================================
+[2025-06-16 14:05:09,637][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-16_14-05-08
+[2025-06-16 14:05:09,637][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-16_14-05-08
+[2025-06-16 14:05:09,637][__main__][INFO] - 
+========================================
+[2025-06-16 14:05:09,637][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-16 14:05:09,637][__main__][INFO] - ========================================
+[2025-06-16 14:05:09,637][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-16 14:05:09,637][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-16 14:05:09,660][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-16 14:05:09,660][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-16 14:05:09,684][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-16 14:05:09,684][__main__][INFO] - Processing species: Apus_apus
+[2025-06-16 14:05:09,697][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-16 14:05:09,697][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-16 14:05:09,712][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-16 14:05:09,712][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-16 14:05:09,762][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-16 14:05:09,762][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-16 14:05:09,770][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-16 14:05:09,770][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-16 14:05:09,789][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-16 14:05:09,789][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-16 14:05:09,813][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-16 14:05:09,813][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-16 14:05:09,826][__main__][INFO] - Found 836 no_birds files
+[2025-06-16 14:05:09,839][__main__][INFO] - 🔍 LIMITED TO 3 files for testing
+[2025-06-16 14:05:09,840][__main__][INFO] - Total audio files discovered: 3
+[2025-06-16 14:05:09,840][__main__][INFO] - Class distribution:
+[2025-06-16 14:05:09,840][__main__][INFO] -   Apus_apus: 1 files
+[2025-06-16 14:05:09,840][__main__][INFO] -   Bubo_bubo: 1 files
+[2025-06-16 14:05:09,840][__main__][INFO] -   Certhia_brachydactyla: 1 files
+[2025-06-16 14:05:09,842][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-16 14:05:09,842][__main__][INFO] - 
+========================================
+[2025-06-16 14:05:09,842][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-16 14:05:09,842][__main__][INFO] - ========================================
+[2025-06-16 14:05:09,842][__main__][INFO] - Starting student model predictions
+[2025-06-16 14:05:10,197][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-16 14:05:10,737][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-16 14:05:10,737][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-16 14:05:10,737][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-16 14:05:10,737][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-16 14:05:10,753][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/benchmark/../config/bird_classification.yaml
+[2025-06-16 14:05:10,894][benchmark.predict_student][INFO] - Loaded model from: /workspace/benchmark/../best_distillation_model.pt
+[2025-06-16 14:05:10,895][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-16 14:05:10,895][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-16 14:05:10,895][benchmark.predict_student][INFO] - Confidence threshold: 0.1
+[2025-06-16 14:05:19,521][__main__][INFO] - Student predictions saved to: /workspace/benchmark/results/predictions/student_predictions.csv
+[2025-06-16 14:05:19,521][__main__][INFO] - ✅ Student prediction completed
+[2025-06-16 14:05:19,521][__main__][INFO] -   Total predictions: 3
+[2025-06-16 14:05:19,522][__main__][INFO] -   Average confidence: 0.602
+[2025-06-16 14:05:19,522][__main__][INFO] -   Top prediction: Apus_apus (1 files)
+[2025-06-16 14:05:19,522][__main__][INFO] - 
+========================================
+[2025-06-16 14:05:19,522][__main__][INFO] - 🦉 STEP 3: BirdNET Predictions
+[2025-06-16 14:05:19,522][__main__][INFO] - ========================================
+[2025-06-16 14:05:19,522][__main__][INFO] - Starting BirdNET predictions
+[2025-06-16 14:05:19,558][benchmark.predict_birdnet][INFO] - BirdNET initialized with 8 target species
+[2025-06-16 14:05:19,558][benchmark.predict_birdnet][INFO] - Target species: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus']
+[2025-06-16 14:05:19,558][benchmark.predict_birdnet][INFO] - Confidence threshold: 0.1
+[2025-06-16 14:05:31,342][__main__][INFO] - BirdNET predictions saved to: /workspace/benchmark/results/predictions/birdnet_predictions.csv
+[2025-06-16 14:05:31,342][__main__][INFO] - ✅ BirdNET prediction completed
+[2025-06-16 14:05:31,342][__main__][INFO] -   Total predictions: 3
+[2025-06-16 14:05:31,343][__main__][INFO] -   Average confidence: 0.912
+[2025-06-16 14:05:31,343][__main__][INFO] -   Top prediction: Apus_apus (1 files)
+[2025-06-16 14:05:31,343][benchmark.predict_birdnet][INFO] - Cleaned up temporary species list file
+[2025-06-16 14:05:31,345][__main__][INFO] - 
+========================================
+[2025-06-16 14:05:31,345][__main__][INFO] - 📊 STEP 4: Metrics and Comparison
+[2025-06-16 14:05:31,345][__main__][INFO] - ========================================
+[2025-06-16 14:05:31,345][__main__][INFO] - Starting model comparison
+[2025-06-16 14:05:31,348][__main__][INFO] - Comparing 3 predictions
+[2025-06-16 14:05:31,349][benchmark.compare_predictions][INFO] - Comparing model predictions
+[2025-06-16 14:05:31,382][benchmark.compare_predictions][INFO] - JSON report saved to: /workspace/benchmark/results/comparison/comparison_report.json
+[2025-06-16 14:05:31,382][benchmark.compare_predictions][INFO] - Text summary saved to: /workspace/benchmark/results/comparison/comparison_summary.txt
+[2025-06-16 14:05:31,383][benchmark.compare_predictions][INFO] - Detailed cases saved to: /workspace/benchmark/results/comparison/detailed_cases.csv
+[2025-06-16 14:05:31,384][benchmark.compare_predictions][INFO] - Metrics comparison table saved to: /workspace/benchmark/results/comparison/metrics_comparison_table.csv
+[2025-06-16 14:05:31,385][benchmark.compare_predictions][INFO] - Per-class metrics table saved to: /workspace/benchmark/results/comparison/per_class_metrics_table.csv
+[2025-06-16 14:05:32,382][benchmark.compare_predictions][INFO] - Confusion matrices saved to: /workspace/benchmark/results/comparison/confusion_matrices.png
+[2025-06-16 14:05:33,132][benchmark.compare_predictions][INFO] - Agreement analysis saved to: /workspace/benchmark/results/comparison/agreement_analysis.png
+[2025-06-16 14:05:33,661][benchmark.compare_predictions][INFO] - Per-class comparison saved to: /workspace/benchmark/results/comparison/per_class_accuracy.png
+[2025-06-16 14:05:35,425][benchmark.compare_predictions][INFO] - Comprehensive metrics comparison saved to: /workspace/benchmark/results/comparison/comprehensive_metrics_comparison.png
+[2025-06-16 14:05:35,425][__main__][INFO] - Comparison results saved to: /workspace/benchmark/results/comparison
+[2025-06-16 14:05:35,425][__main__][INFO] - 
+============================================================
+[2025-06-16 14:05:35,425][__main__][INFO] - 🎉 BENCHMARK COMPLETED SUCCESSFULLY!
+[2025-06-16 14:05:35,425][__main__][INFO] - ============================================================

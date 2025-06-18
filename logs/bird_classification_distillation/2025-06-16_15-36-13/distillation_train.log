@@ -1,0 +1,368 @@
+2025-06-16 15:36:13,142 - [INFO] - Hydra output directory: /app/logs/bird_classification_distillation/2025-06-16_15-36-13
+2025-06-16 15:36:13,147 - [INFO] - Full config:
+experiment_name: bird_classification_distillation
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+training:
+  epochs: 100
+  batch_size: 64
+  patience: 20
+  min_delta: 0.001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  soft_labels_path: test_soft_labels
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Bubo_bubo
+  - Certhia_familiaris
+  - Apus_apus
+  - Certhia_brachydactyla
+  - Emberiza_cia
+  - Lophophanes_cristatus
+  - Periparus_ater
+  - Poecile_montanus
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+2025-06-16 15:36:13,148 - [INFO] - Using soft labels from: /app/test_soft_labels
+2025-06-16 15:36:13,148 - [INFO] - Initialized trainer on device: cuda
+2025-06-16 15:36:13,148 - [INFO] - Outputs will be saved to: /app/logs/bird_classification_distillation/2025-06-16_15-36-13
+2025-06-16 15:36:13,148 - [INFO] - Setting up data loaders with soft labels...
+2025-06-16 15:36:13,343 - [INFO] - Train samples: 7832
+2025-06-16 15:36:13,344 - [INFO] - Val samples: 2331
+2025-06-16 15:36:13,344 - [INFO] - Test samples: 2331
+2025-06-16 15:36:13,344 - [INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+2025-06-16 15:36:13,344 - [INFO] - Number of classes: 9
+2025-06-16 15:36:13,344 - [INFO] - Class names: ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird']
+2025-06-16 15:36:13,344 - [INFO] - Setting up student model...
+2025-06-16 15:36:13,491 - [INFO] - Student model parameters: 53,516
+2025-06-16 15:36:13,491 - [INFO] - Setting up optimizer and scheduler...
+2025-06-16 15:36:14,439 - [INFO] - Optimizer: AdamW
+2025-06-16 15:36:14,439 - [INFO] - Scheduler: ReduceLROnPlateau
+2025-06-16 15:36:14,439 - [INFO] - Setting up distillation loss...
+2025-06-16 15:36:14,439 - [INFO] - Using Standard DistillationLoss
+2025-06-16 15:36:14,439 - [INFO] - Alpha: 0.3, Temperature: 4.0
+2025-06-16 15:36:14,440 - [INFO] - Starting training loop...
+2025-06-16 15:40:22,384 - [INFO] - Epoch 1 [Train] Avg Loss: 1.1921, Avg Acc: 48.1486
+2025-06-16 15:41:23,160 - [INFO] - Epoch 1 [Val] Avg Loss: 0.8965, Avg Acc: 68.8546
+2025-06-16 15:41:23,160 - [INFO] - New best validation loss: 0.8965, Acc: 68.8546
+2025-06-16 15:41:23,161 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 15:45:18,569 - [INFO] - Epoch 2 [Train] Avg Loss: 1.0022, Avg Acc: 61.7211
+2025-06-16 15:46:18,729 - [INFO] - Epoch 2 [Val] Avg Loss: 0.8081, Avg Acc: 75.1609
+2025-06-16 15:46:18,729 - [INFO] - New best validation loss: 0.8081, Acc: 75.1609
+2025-06-16 15:46:18,730 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 15:50:18,616 - [INFO] - Epoch 3 [Train] Avg Loss: 0.9286, Avg Acc: 67.4030
+2025-06-16 15:51:19,048 - [INFO] - Epoch 3 [Val] Avg Loss: 0.9623, Avg Acc: 63.5779
+2025-06-16 15:55:19,331 - [INFO] - Epoch 4 [Train] Avg Loss: 0.8866, Avg Acc: 70.0332
+2025-06-16 15:56:20,582 - [INFO] - Epoch 4 [Val] Avg Loss: 0.7350, Avg Acc: 79.5796
+2025-06-16 15:56:20,582 - [INFO] - New best validation loss: 0.7350, Acc: 79.5796
+2025-06-16 15:56:20,584 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:00:22,414 - [INFO] - Epoch 5 [Train] Avg Loss: 0.8485, Avg Acc: 73.0592
+2025-06-16 16:01:23,606 - [INFO] - Epoch 5 [Val] Avg Loss: 0.7253, Avg Acc: 79.6654
+2025-06-16 16:01:23,606 - [INFO] - New best validation loss: 0.7253, Acc: 79.6654
+2025-06-16 16:01:23,607 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:05:26,595 - [INFO] - Epoch 6 [Train] Avg Loss: 0.8286, Avg Acc: 73.8253
+2025-06-16 16:06:26,707 - [INFO] - Epoch 6 [Val] Avg Loss: 0.6842, Avg Acc: 82.9687
+2025-06-16 16:06:26,707 - [INFO] - New best validation loss: 0.6842, Acc: 82.9687
+2025-06-16 16:06:26,707 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:10:30,803 - [INFO] - Epoch 7 [Train] Avg Loss: 0.8053, Avg Acc: 75.0638
+2025-06-16 16:11:31,840 - [INFO] - Epoch 7 [Val] Avg Loss: 0.7342, Avg Acc: 79.6654
+2025-06-16 16:15:37,449 - [INFO] - Epoch 8 [Train] Avg Loss: 0.7942, Avg Acc: 75.5235
+2025-06-16 16:16:37,997 - [INFO] - Epoch 8 [Val] Avg Loss: 0.8337, Avg Acc: 73.5736
+2025-06-16 16:20:40,611 - [INFO] - Epoch 9 [Train] Avg Loss: 0.7736, Avg Acc: 77.1834
+2025-06-16 16:21:41,073 - [INFO] - Epoch 9 [Val] Avg Loss: 0.7627, Avg Acc: 78.5929
+2025-06-16 16:25:44,966 - [INFO] - Epoch 10 [Train] Avg Loss: 0.7643, Avg Acc: 77.4898
+2025-06-16 16:26:45,564 - [INFO] - Epoch 10 [Val] Avg Loss: 0.7095, Avg Acc: 80.2231
+2025-06-16 16:30:47,180 - [INFO] - Epoch 11 [Train] Avg Loss: 0.7550, Avg Acc: 77.8473
+2025-06-16 16:31:48,264 - [INFO] - Epoch 11 [Val] Avg Loss: 0.6859, Avg Acc: 82.7542
+2025-06-16 16:35:49,545 - [INFO] - Epoch 12 [Train] Avg Loss: 0.7442, Avg Acc: 78.6645
+2025-06-16 16:36:49,885 - [INFO] - Epoch 12 [Val] Avg Loss: 0.6753, Avg Acc: 82.7971
+2025-06-16 16:36:49,885 - [INFO] - New best validation loss: 0.6753, Acc: 82.7971
+2025-06-16 16:36:49,886 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:40:42,624 - [INFO] - Epoch 13 [Train] Avg Loss: 0.7355, Avg Acc: 79.0730
+2025-06-16 16:41:43,213 - [INFO] - Epoch 13 [Val] Avg Loss: 0.6459, Avg Acc: 84.7705
+2025-06-16 16:41:43,214 - [INFO] - New best validation loss: 0.6459, Acc: 84.7705
+2025-06-16 16:41:43,215 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:45:48,354 - [INFO] - Epoch 14 [Train] Avg Loss: 0.7315, Avg Acc: 79.0986
+2025-06-16 16:46:49,801 - [INFO] - Epoch 14 [Val] Avg Loss: 0.6458, Avg Acc: 85.2853
+2025-06-16 16:46:49,801 - [INFO] - New best validation loss: 0.6458, Acc: 85.2853
+2025-06-16 16:46:49,802 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:51:01,321 - [INFO] - Epoch 15 [Train] Avg Loss: 0.7236, Avg Acc: 79.5582
+2025-06-16 16:52:03,030 - [INFO] - Epoch 15 [Val] Avg Loss: 0.6253, Avg Acc: 86.8297
+2025-06-16 16:52:03,030 - [INFO] - New best validation loss: 0.6253, Acc: 86.8297
+2025-06-16 16:52:03,031 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 16:56:04,538 - [INFO] - Epoch 16 [Train] Avg Loss: 0.7194, Avg Acc: 79.9285
+2025-06-16 16:57:07,040 - [INFO] - Epoch 16 [Val] Avg Loss: 0.6330, Avg Acc: 86.1862
+2025-06-16 17:01:07,146 - [INFO] - Epoch 17 [Train] Avg Loss: 0.7102, Avg Acc: 80.3498
+2025-06-16 17:02:07,787 - [INFO] - Epoch 17 [Val] Avg Loss: 0.6378, Avg Acc: 85.8430
+2025-06-16 17:06:20,314 - [INFO] - Epoch 18 [Train] Avg Loss: 0.7084, Avg Acc: 80.8095
+2025-06-16 17:07:20,476 - [INFO] - Epoch 18 [Val] Avg Loss: 0.6468, Avg Acc: 84.3415
+2025-06-16 17:11:10,140 - [INFO] - Epoch 19 [Train] Avg Loss: 0.7000, Avg Acc: 80.8989
+2025-06-16 17:12:10,193 - [INFO] - Epoch 19 [Val] Avg Loss: 0.6835, Avg Acc: 81.8962
+2025-06-16 17:16:16,650 - [INFO] - Epoch 20 [Train] Avg Loss: 0.6950, Avg Acc: 81.3458
+2025-06-16 17:17:18,423 - [INFO] - Epoch 20 [Val] Avg Loss: 0.6226, Avg Acc: 86.2720
+2025-06-16 17:17:18,423 - [INFO] - New best validation loss: 0.6226, Acc: 86.2720
+2025-06-16 17:17:18,423 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 17:21:26,833 - [INFO] - Epoch 21 [Train] Avg Loss: 0.6925, Avg Acc: 81.5245
+2025-06-16 17:22:26,998 - [INFO] - Epoch 21 [Val] Avg Loss: 0.6099, Avg Acc: 87.1729
+2025-06-16 17:22:26,998 - [INFO] - New best validation loss: 0.6099, Acc: 87.1729
+2025-06-16 17:22:26,998 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 17:26:27,170 - [INFO] - Epoch 22 [Train] Avg Loss: 0.6842, Avg Acc: 82.3672
+2025-06-16 17:27:27,872 - [INFO] - Epoch 22 [Val] Avg Loss: 0.6362, Avg Acc: 86.1433
+2025-06-16 17:31:29,002 - [INFO] - Epoch 23 [Train] Avg Loss: 0.6797, Avg Acc: 82.0608
+2025-06-16 17:32:30,362 - [INFO] - Epoch 23 [Val] Avg Loss: 0.6383, Avg Acc: 84.8992
+2025-06-16 17:36:29,180 - [INFO] - Epoch 24 [Train] Avg Loss: 0.6831, Avg Acc: 81.9459
+2025-06-16 17:37:29,987 - [INFO] - Epoch 24 [Val] Avg Loss: 0.6025, Avg Acc: 86.6581
+2025-06-16 17:37:29,988 - [INFO] - New best validation loss: 0.6025, Acc: 86.6581
+2025-06-16 17:37:29,989 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 17:41:37,810 - [INFO] - Epoch 25 [Train] Avg Loss: 0.6806, Avg Acc: 82.0097
+2025-06-16 17:42:38,877 - [INFO] - Epoch 25 [Val] Avg Loss: 0.6002, Avg Acc: 87.1300
+2025-06-16 17:42:38,877 - [INFO] - New best validation loss: 0.6002, Acc: 87.1300
+2025-06-16 17:42:38,877 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 17:46:36,663 - [INFO] - Epoch 26 [Train] Avg Loss: 0.6668, Avg Acc: 82.8141
+2025-06-16 17:47:37,815 - [INFO] - Epoch 26 [Val] Avg Loss: 0.6175, Avg Acc: 86.0575
+2025-06-16 17:51:44,409 - [INFO] - Epoch 27 [Train] Avg Loss: 0.6648, Avg Acc: 82.9162
+2025-06-16 17:52:45,721 - [INFO] - Epoch 27 [Val] Avg Loss: 0.6067, Avg Acc: 86.6152
+2025-06-16 17:56:47,827 - [INFO] - Epoch 28 [Train] Avg Loss: 0.6662, Avg Acc: 83.0439
+2025-06-16 17:57:49,266 - [INFO] - Epoch 28 [Val] Avg Loss: 0.6188, Avg Acc: 86.4436
+2025-06-16 18:01:54,380 - [INFO] - Epoch 29 [Train] Avg Loss: 0.6593, Avg Acc: 83.2993
+2025-06-16 18:02:57,686 - [INFO] - Epoch 29 [Val] Avg Loss: 0.6116, Avg Acc: 86.4007
+2025-06-16 18:06:59,110 - [INFO] - Epoch 30 [Train] Avg Loss: 0.6552, Avg Acc: 83.6057
+2025-06-16 18:08:00,180 - [INFO] - Epoch 30 [Val] Avg Loss: 0.6110, Avg Acc: 86.7439
+2025-06-16 18:12:09,812 - [INFO] - Epoch 31 [Train] Avg Loss: 0.6571, Avg Acc: 83.5036
+2025-06-16 18:13:10,527 - [INFO] - Epoch 31 [Val] Avg Loss: 0.6174, Avg Acc: 86.4436
+2025-06-16 18:17:02,197 - [INFO] - Epoch 32 [Train] Avg Loss: 0.6475, Avg Acc: 83.8100
+2025-06-16 18:18:02,968 - [INFO] - Epoch 32 [Val] Avg Loss: 0.5966, Avg Acc: 87.2587
+2025-06-16 18:18:02,969 - [INFO] - New best validation loss: 0.5966, Acc: 87.2587
+2025-06-16 18:18:02,969 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 18:22:00,701 - [INFO] - Epoch 33 [Train] Avg Loss: 0.6357, Avg Acc: 84.7932
+2025-06-16 18:23:01,817 - [INFO] - Epoch 33 [Val] Avg Loss: 0.5777, Avg Acc: 88.0738
+2025-06-16 18:23:01,817 - [INFO] - New best validation loss: 0.5777, Acc: 88.0738
+2025-06-16 18:23:01,818 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 18:27:00,111 - [INFO] - Epoch 34 [Train] Avg Loss: 0.6380, Avg Acc: 84.6399
+2025-06-16 18:28:01,376 - [INFO] - Epoch 34 [Val] Avg Loss: 0.5834, Avg Acc: 87.8164
+2025-06-16 18:32:02,695 - [INFO] - Epoch 35 [Train] Avg Loss: 0.6320, Avg Acc: 85.0102
+2025-06-16 18:33:04,037 - [INFO] - Epoch 35 [Val] Avg Loss: 0.6347, Avg Acc: 84.7705
+2025-06-16 18:37:08,134 - [INFO] - Epoch 36 [Train] Avg Loss: 0.6366, Avg Acc: 84.8570
+2025-06-16 18:38:08,553 - [INFO] - Epoch 36 [Val] Avg Loss: 0.5878, Avg Acc: 87.7306
+2025-06-16 18:42:16,521 - [INFO] - Epoch 37 [Train] Avg Loss: 0.6306, Avg Acc: 84.8442
+2025-06-16 18:43:17,121 - [INFO] - Epoch 37 [Val] Avg Loss: 0.6424, Avg Acc: 84.7705
+2025-06-16 18:47:21,370 - [INFO] - Epoch 38 [Train] Avg Loss: 0.6322, Avg Acc: 84.6144
+2025-06-16 18:48:22,133 - [INFO] - Epoch 38 [Val] Avg Loss: 0.6038, Avg Acc: 87.1300
+2025-06-16 18:52:27,200 - [INFO] - Epoch 39 [Train] Avg Loss: 0.6317, Avg Acc: 84.8059
+2025-06-16 18:53:27,934 - [INFO] - Epoch 39 [Val] Avg Loss: 0.5775, Avg Acc: 87.9451
+2025-06-16 18:53:27,935 - [INFO] - New best validation loss: 0.5775, Acc: 87.9451
+2025-06-16 18:53:27,935 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 18:57:28,281 - [INFO] - Epoch 40 [Train] Avg Loss: 0.6264, Avg Acc: 85.2145
+2025-06-16 18:58:28,835 - [INFO] - Epoch 40 [Val] Avg Loss: 0.6030, Avg Acc: 86.7439
+2025-06-16 19:02:30,290 - [INFO] - Epoch 41 [Train] Avg Loss: 0.6240, Avg Acc: 85.4699
+2025-06-16 19:03:31,910 - [INFO] - Epoch 41 [Val] Avg Loss: 0.5910, Avg Acc: 87.1729
+2025-06-16 19:07:33,536 - [INFO] - Epoch 42 [Train] Avg Loss: 0.6310, Avg Acc: 84.8315
+2025-06-16 19:08:34,069 - [INFO] - Epoch 42 [Val] Avg Loss: 0.6257, Avg Acc: 84.3844
+2025-06-16 19:12:31,218 - [INFO] - Epoch 43 [Train] Avg Loss: 0.6192, Avg Acc: 85.4954
+2025-06-16 19:13:31,981 - [INFO] - Epoch 43 [Val] Avg Loss: 0.6262, Avg Acc: 84.7276
+2025-06-16 19:17:37,015 - [INFO] - Epoch 44 [Train] Avg Loss: 0.6204, Avg Acc: 85.4060
+2025-06-16 19:18:38,697 - [INFO] - Epoch 44 [Val] Avg Loss: 0.6877, Avg Acc: 80.9953
+2025-06-16 19:22:30,667 - [INFO] - Epoch 45 [Train] Avg Loss: 0.6193, Avg Acc: 85.2400
+2025-06-16 19:23:32,258 - [INFO] - Epoch 45 [Val] Avg Loss: 0.5760, Avg Acc: 88.0738
+2025-06-16 19:23:32,258 - [INFO] - New best validation loss: 0.5760, Acc: 88.0738
+2025-06-16 19:23:32,258 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 19:27:33,726 - [INFO] - Epoch 46 [Train] Avg Loss: 0.6170, Avg Acc: 85.7763
+2025-06-16 19:28:34,615 - [INFO] - Epoch 46 [Val] Avg Loss: 0.5825, Avg Acc: 88.1596
+2025-06-16 19:32:41,016 - [INFO] - Epoch 47 [Train] Avg Loss: 0.6205, Avg Acc: 85.5082
+2025-06-16 19:33:41,217 - [INFO] - Epoch 47 [Val] Avg Loss: 0.5795, Avg Acc: 88.2454
+2025-06-16 19:37:47,079 - [INFO] - Epoch 48 [Train] Avg Loss: 0.6163, Avg Acc: 85.7508
+2025-06-16 19:38:48,081 - [INFO] - Epoch 48 [Val] Avg Loss: 0.5798, Avg Acc: 88.1167
+2025-06-16 19:42:54,884 - [INFO] - Epoch 49 [Train] Avg Loss: 0.6130, Avg Acc: 86.4275
+2025-06-16 19:43:54,848 - [INFO] - Epoch 49 [Val] Avg Loss: 0.5801, Avg Acc: 87.8593
+2025-06-16 19:48:07,271 - [INFO] - Epoch 50 [Train] Avg Loss: 0.6159, Avg Acc: 85.8529
+2025-06-16 19:49:07,864 - [INFO] - Epoch 50 [Val] Avg Loss: 0.5939, Avg Acc: 87.4732
+2025-06-16 19:53:22,077 - [INFO] - Epoch 51 [Train] Avg Loss: 0.6141, Avg Acc: 85.8401
+2025-06-16 19:54:22,514 - [INFO] - Epoch 51 [Val] Avg Loss: 0.5787, Avg Acc: 88.2883
+2025-06-16 19:58:26,118 - [INFO] - Epoch 52 [Train] Avg Loss: 0.6048, Avg Acc: 86.3636
+2025-06-16 19:59:27,182 - [INFO] - Epoch 52 [Val] Avg Loss: 0.5916, Avg Acc: 87.6877
+2025-06-16 20:03:31,085 - [INFO] - Epoch 53 [Train] Avg Loss: 0.6012, Avg Acc: 86.4402
+2025-06-16 20:04:32,724 - [INFO] - Epoch 53 [Val] Avg Loss: 0.5917, Avg Acc: 87.5161
+2025-06-16 20:08:39,838 - [INFO] - Epoch 54 [Train] Avg Loss: 0.6086, Avg Acc: 86.0444
+2025-06-16 20:09:41,722 - [INFO] - Epoch 54 [Val] Avg Loss: 0.5967, Avg Acc: 87.8593
+2025-06-16 20:13:48,226 - [INFO] - Epoch 55 [Train] Avg Loss: 0.6000, Avg Acc: 86.7850
+2025-06-16 20:14:49,432 - [INFO] - Epoch 55 [Val] Avg Loss: 0.5633, Avg Acc: 89.7898
+2025-06-16 20:14:49,432 - [INFO] - New best validation loss: 0.5633, Acc: 89.7898
+2025-06-16 20:14:49,433 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 20:18:54,969 - [INFO] - Epoch 56 [Train] Avg Loss: 0.5985, Avg Acc: 86.8616
+2025-06-16 20:19:55,598 - [INFO] - Epoch 56 [Val] Avg Loss: 0.5708, Avg Acc: 88.7602
+2025-06-16 20:24:00,519 - [INFO] - Epoch 57 [Train] Avg Loss: 0.5998, Avg Acc: 86.9637
+2025-06-16 20:25:01,961 - [INFO] - Epoch 57 [Val] Avg Loss: 0.5712, Avg Acc: 88.4170
+2025-06-16 20:29:01,999 - [INFO] - Epoch 58 [Train] Avg Loss: 0.5968, Avg Acc: 87.0020
+2025-06-16 20:30:03,110 - [INFO] - Epoch 58 [Val] Avg Loss: 0.5638, Avg Acc: 88.9318
+2025-06-16 20:34:18,967 - [INFO] - Epoch 59 [Train] Avg Loss: 0.5986, Avg Acc: 86.6828
+2025-06-16 20:35:19,729 - [INFO] - Epoch 59 [Val] Avg Loss: 0.5709, Avg Acc: 89.1034
+2025-06-16 20:39:28,288 - [INFO] - Epoch 60 [Train] Avg Loss: 0.5944, Avg Acc: 87.2957
+2025-06-16 20:40:29,967 - [INFO] - Epoch 60 [Val] Avg Loss: 0.5752, Avg Acc: 88.1167
+2025-06-16 20:44:38,049 - [INFO] - Epoch 61 [Train] Avg Loss: 0.6019, Avg Acc: 86.4147
+2025-06-16 20:45:38,389 - [INFO] - Epoch 61 [Val] Avg Loss: 0.5635, Avg Acc: 89.6182
+2025-06-16 20:49:46,427 - [INFO] - Epoch 62 [Train] Avg Loss: 0.5939, Avg Acc: 87.5128
+2025-06-16 20:50:46,991 - [INFO] - Epoch 62 [Val] Avg Loss: 0.5656, Avg Acc: 88.9318
+2025-06-16 20:54:55,918 - [INFO] - Epoch 63 [Train] Avg Loss: 0.5941, Avg Acc: 86.6956
+2025-06-16 20:55:56,238 - [INFO] - Epoch 63 [Val] Avg Loss: 0.5663, Avg Acc: 88.8460
+2025-06-16 21:00:19,485 - [INFO] - Epoch 64 [Train] Avg Loss: 0.5885, Avg Acc: 87.3979
+2025-06-16 21:01:20,168 - [INFO] - Epoch 64 [Val] Avg Loss: 0.5791, Avg Acc: 87.7735
+2025-06-16 21:05:43,783 - [INFO] - Epoch 65 [Train] Avg Loss: 0.5977, Avg Acc: 87.0148
+2025-06-16 21:06:47,413 - [INFO] - Epoch 65 [Val] Avg Loss: 0.5629, Avg Acc: 88.9747
+2025-06-16 21:06:47,413 - [INFO] - New best validation loss: 0.5629, Acc: 88.9747
+2025-06-16 21:06:47,413 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 21:11:03,846 - [INFO] - Epoch 66 [Train] Avg Loss: 0.5921, Avg Acc: 86.8105
+2025-06-16 21:12:07,075 - [INFO] - Epoch 66 [Val] Avg Loss: 0.5799, Avg Acc: 87.7306
+2025-06-16 21:16:22,268 - [INFO] - Epoch 67 [Train] Avg Loss: 0.5923, Avg Acc: 87.2957
+2025-06-16 21:17:25,335 - [INFO] - Epoch 67 [Val] Avg Loss: 0.5688, Avg Acc: 89.2750
+2025-06-16 21:21:49,189 - [INFO] - Epoch 68 [Train] Avg Loss: 0.5848, Avg Acc: 87.8192
+2025-06-16 21:22:52,736 - [INFO] - Epoch 68 [Val] Avg Loss: 0.5709, Avg Acc: 89.0605
+2025-06-16 21:27:12,673 - [INFO] - Epoch 69 [Train] Avg Loss: 0.5922, Avg Acc: 87.1297
+2025-06-16 21:28:16,535 - [INFO] - Epoch 69 [Val] Avg Loss: 0.5680, Avg Acc: 88.6744
+2025-06-16 21:32:33,805 - [INFO] - Epoch 70 [Train] Avg Loss: 0.5876, Avg Acc: 87.3979
+2025-06-16 21:33:35,010 - [INFO] - Epoch 70 [Val] Avg Loss: 0.6182, Avg Acc: 85.5856
+2025-06-16 21:37:42,227 - [INFO] - Epoch 71 [Train] Avg Loss: 0.5924, Avg Acc: 87.0403
+2025-06-16 21:38:44,209 - [INFO] - Epoch 71 [Val] Avg Loss: 0.6146, Avg Acc: 85.8430
+2025-06-16 21:42:50,456 - [INFO] - Epoch 72 [Train] Avg Loss: 0.5852, Avg Acc: 87.2829
+2025-06-16 21:43:51,872 - [INFO] - Epoch 72 [Val] Avg Loss: 0.5582, Avg Acc: 89.4037
+2025-06-16 21:43:51,873 - [INFO] - New best validation loss: 0.5582, Acc: 89.4037
+2025-06-16 21:43:51,873 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 21:48:07,850 - [INFO] - Epoch 73 [Train] Avg Loss: 0.5895, Avg Acc: 87.1170
+2025-06-16 21:49:08,855 - [INFO] - Epoch 73 [Val] Avg Loss: 0.5706, Avg Acc: 89.1463
+2025-06-16 21:53:13,519 - [INFO] - Epoch 74 [Train] Avg Loss: 0.5868, Avg Acc: 87.5383
+2025-06-16 21:54:13,803 - [INFO] - Epoch 74 [Val] Avg Loss: 0.5695, Avg Acc: 88.8460
+2025-06-16 21:58:25,838 - [INFO] - Epoch 75 [Train] Avg Loss: 0.5891, Avg Acc: 87.4745
+2025-06-16 21:59:29,300 - [INFO] - Epoch 75 [Val] Avg Loss: 0.5777, Avg Acc: 88.3312
+2025-06-16 22:03:50,804 - [INFO] - Epoch 76 [Train] Avg Loss: 0.5883, Avg Acc: 87.1680
+2025-06-16 22:04:50,767 - [INFO] - Epoch 76 [Val] Avg Loss: 0.5627, Avg Acc: 88.6315
+2025-06-16 22:08:50,314 - [INFO] - Epoch 77 [Train] Avg Loss: 0.5856, Avg Acc: 87.5128
+2025-06-16 22:09:50,729 - [INFO] - Epoch 77 [Val] Avg Loss: 0.5749, Avg Acc: 88.6744
+2025-06-16 22:13:53,816 - [INFO] - Epoch 78 [Train] Avg Loss: 0.5938, Avg Acc: 87.0276
+2025-06-16 22:14:53,984 - [INFO] - Epoch 78 [Val] Avg Loss: 0.5665, Avg Acc: 89.3179
+2025-06-16 22:19:02,255 - [INFO] - Epoch 79 [Train] Avg Loss: 0.5873, Avg Acc: 87.7043
+2025-06-16 22:20:03,404 - [INFO] - Epoch 79 [Val] Avg Loss: 0.5673, Avg Acc: 89.0176
+2025-06-16 22:24:15,978 - [INFO] - Epoch 80 [Train] Avg Loss: 0.5831, Avg Acc: 87.9086
+2025-06-16 22:25:16,213 - [INFO] - Epoch 80 [Val] Avg Loss: 0.5806, Avg Acc: 87.7735
+2025-06-16 22:29:27,330 - [INFO] - Epoch 81 [Train] Avg Loss: 0.5893, Avg Acc: 87.4362
+2025-06-16 22:30:27,751 - [INFO] - Epoch 81 [Val] Avg Loss: 0.6869, Avg Acc: 81.0811
+2025-06-16 22:34:42,589 - [INFO] - Epoch 82 [Train] Avg Loss: 0.5871, Avg Acc: 87.5128
+2025-06-16 22:35:44,839 - [INFO] - Epoch 82 [Val] Avg Loss: 0.5595, Avg Acc: 89.1463
+2025-06-16 22:39:48,689 - [INFO] - Epoch 83 [Train] Avg Loss: 0.5848, Avg Acc: 87.4489
+2025-06-16 22:40:49,047 - [INFO] - Epoch 83 [Val] Avg Loss: 0.5653, Avg Acc: 88.8460
+2025-06-16 22:44:46,724 - [INFO] - Epoch 84 [Train] Avg Loss: 0.5831, Avg Acc: 87.8064
+2025-06-16 22:45:47,247 - [INFO] - Epoch 84 [Val] Avg Loss: 0.5951, Avg Acc: 87.3016
+2025-06-16 22:49:44,115 - [INFO] - Epoch 85 [Train] Avg Loss: 0.5815, Avg Acc: 87.8575
+2025-06-16 22:50:44,742 - [INFO] - Epoch 85 [Val] Avg Loss: 0.5557, Avg Acc: 89.7040
+2025-06-16 22:50:44,742 - [INFO] - New best validation loss: 0.5557, Acc: 89.7040
+2025-06-16 22:50:44,743 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 22:54:46,781 - [INFO] - Epoch 86 [Train] Avg Loss: 0.5820, Avg Acc: 87.7937
+2025-06-16 22:55:49,725 - [INFO] - Epoch 86 [Val] Avg Loss: 0.5685, Avg Acc: 89.0605
+2025-06-16 22:59:52,135 - [INFO] - Epoch 87 [Train] Avg Loss: 0.5807, Avg Acc: 87.9341
+2025-06-16 23:00:52,539 - [INFO] - Epoch 87 [Val] Avg Loss: 0.5818, Avg Acc: 87.7306
+2025-06-16 23:04:59,813 - [INFO] - Epoch 88 [Train] Avg Loss: 0.5848, Avg Acc: 87.6021
+2025-06-16 23:05:59,926 - [INFO] - Epoch 88 [Val] Avg Loss: 0.5658, Avg Acc: 89.4037
+2025-06-16 23:09:53,271 - [INFO] - Epoch 89 [Train] Avg Loss: 0.5813, Avg Acc: 88.0490
+2025-06-16 23:10:58,480 - [INFO] - Epoch 89 [Val] Avg Loss: 0.5772, Avg Acc: 88.2454
+2025-06-16 23:14:58,426 - [INFO] - Epoch 90 [Train] Avg Loss: 0.5840, Avg Acc: 87.5638
+2025-06-16 23:16:00,533 - [INFO] - Epoch 90 [Val] Avg Loss: 0.5741, Avg Acc: 88.5457
+2025-06-16 23:20:02,491 - [INFO] - Epoch 91 [Train] Avg Loss: 0.5836, Avg Acc: 87.8958
+2025-06-16 23:21:03,671 - [INFO] - Epoch 91 [Val] Avg Loss: 0.5521, Avg Acc: 89.7898
+2025-06-16 23:21:03,671 - [INFO] - New best validation loss: 0.5521, Acc: 89.7898
+2025-06-16 23:21:03,672 - [INFO] - Saving best model to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth...
+2025-06-16 23:25:09,327 - [INFO] - Epoch 92 [Train] Avg Loss: 0.5902, Avg Acc: 87.5383
+2025-06-16 23:26:12,134 - [INFO] - Epoch 92 [Val] Avg Loss: 0.5711, Avg Acc: 88.9747
+2025-06-16 23:30:22,620 - [INFO] - Epoch 93 [Train] Avg Loss: 0.5821, Avg Acc: 87.7809
+2025-06-16 23:31:23,228 - [INFO] - Epoch 93 [Val] Avg Loss: 0.5673, Avg Acc: 88.6744
+2025-06-16 23:35:29,734 - [INFO] - Epoch 94 [Train] Avg Loss: 0.5846, Avg Acc: 87.5255
+2025-06-16 23:36:30,875 - [INFO] - Epoch 94 [Val] Avg Loss: 0.5577, Avg Acc: 89.7040
+2025-06-16 23:40:47,428 - [INFO] - Epoch 95 [Train] Avg Loss: 0.5871, Avg Acc: 87.8064
+2025-06-16 23:41:48,362 - [INFO] - Epoch 95 [Val] Avg Loss: 0.5760, Avg Acc: 88.5457
+2025-06-16 23:45:51,430 - [INFO] - Epoch 96 [Train] Avg Loss: 0.5833, Avg Acc: 87.6149
+2025-06-16 23:46:52,351 - [INFO] - Epoch 96 [Val] Avg Loss: 0.5677, Avg Acc: 88.8889
+2025-06-16 23:50:52,858 - [INFO] - Epoch 97 [Train] Avg Loss: 0.5843, Avg Acc: 87.5383
+2025-06-16 23:51:53,790 - [INFO] - Epoch 97 [Val] Avg Loss: 0.5756, Avg Acc: 87.9451
+2025-06-16 23:55:55,379 - [INFO] - Epoch 98 [Train] Avg Loss: 0.5836, Avg Acc: 87.7171
+2025-06-16 23:56:56,487 - [INFO] - Epoch 98 [Val] Avg Loss: 0.5798, Avg Acc: 87.6877
+2025-06-17 00:01:00,362 - [INFO] - Epoch 99 [Train] Avg Loss: 0.5828, Avg Acc: 87.5000
+2025-06-17 00:02:00,664 - [INFO] - Epoch 99 [Val] Avg Loss: 0.5563, Avg Acc: 89.6182
+2025-06-17 00:06:10,404 - [INFO] - Epoch 100 [Train] Avg Loss: 0.5863, Avg Acc: 87.7681
+2025-06-17 00:07:10,664 - [INFO] - Epoch 100 [Val] Avg Loss: 0.5658, Avg Acc: 89.0176
+2025-06-17 00:07:10,665 - [INFO] - Training loop finished.
+2025-06-17 00:07:11,335 - [INFO] - Saved training plots to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/training_history.png
+2025-06-17 00:07:11,335 - [INFO] - Starting testing...
+2025-06-17 00:07:11,336 - [INFO] - Loading best model from /app/logs/bird_classification_distillation/2025-06-16_15-36-13/bird_classification_distillation_best_model.pth for testing...
+2025-06-17 00:08:06,160 - [INFO] - Test Accuracy: 0.8970
+2025-06-17 00:08:06,183 - [INFO] - Test Report:
+                       precision    recall  f1-score   support
+
+     Poecile montanus       0.84      0.85      0.85       129
+   Certhia familiaris       0.83      0.85      0.84       198
+            Apus apus       0.91      0.88      0.90       121
+            Bubo bubo       0.85      0.85      0.85       209
+       Periparus ater       0.92      0.77      0.84        60
+         Emberiza cia       0.87      0.76      0.81       156
+Lophophanes cristatus       0.84      0.89      0.87       435
+Certhia brachydactyla       0.81      0.79      0.80       187
+             non-bird       0.99      0.99      0.99       836
+
+             accuracy                           0.90      2331
+            macro avg       0.87      0.85      0.86      2331
+         weighted avg       0.90      0.90      0.90      2331
+
+2025-06-17 00:08:06,184 - [INFO] - Generating confusion matrix...
+2025-06-17 00:08:06,193 - [INFO] - Confusion matrix CSV saved to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/confusion_matrix.csv
+2025-06-17 00:08:06,653 - [INFO] - Confusion matrix PNG saved to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/confusion_matrix.png
+2025-06-17 00:08:06,656 - [INFO] - Results saved to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/results.json
+2025-06-17 00:08:06,657 - [INFO] - Model summary saved to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/model_summary.txt
+2025-06-17 00:08:06,659 - [INFO] - Results saved to /app/logs/bird_classification_distillation/2025-06-16_15-36-13/results.json
+2025-06-17 00:08:06,659 - [INFO] - --- Distillation Training Completed ---
+2025-06-17 00:08:06,660 - [INFO] - Final test accuracy: 0.8970
+2025-06-17 00:08:06,660 - [INFO] - Results and plots saved to: /app/logs/bird_classification_distillation/2025-06-16_15-36-13

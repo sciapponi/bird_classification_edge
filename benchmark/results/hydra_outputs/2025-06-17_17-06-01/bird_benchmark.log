@@ -1,0 +1,69 @@
+[2025-06-17 17:06:03,123][__main__][INFO] - ============================================================
+[2025-06-17 17:06:03,123][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-17 17:06:03,124][__main__][INFO] - ============================================================
+[2025-06-17 17:06:03,124][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-17 17:06:03,124][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-17 17:06:03,124][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-17 17:06:03,124][__main__][INFO] -    • Both models see identical audio data
+[2025-06-17 17:06:03,124][__main__][INFO] - ============================================================
+[2025-06-17 17:06:03,124][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_17-06-01
+[2025-06-17 17:06:03,124][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-17_17-06-01
+[2025-06-17 17:06:03,124][__main__][INFO] - 
+========================================
+[2025-06-17 17:06:03,124][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-17 17:06:03,124][__main__][INFO] - ========================================
+[2025-06-17 17:06:03,124][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-17 17:06:03,124][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-17 17:06:03,158][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-17 17:06:03,159][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-17 17:06:03,193][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-17 17:06:03,193][__main__][INFO] - Processing species: Apus_apus
+[2025-06-17 17:06:03,213][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-17 17:06:03,213][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-17 17:06:03,235][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-17 17:06:03,235][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-17 17:06:03,307][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-17 17:06:03,307][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-17 17:06:03,317][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-17 17:06:03,318][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-17 17:06:03,344][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-17 17:06:03,344][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-17 17:06:03,380][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-17 17:06:03,380][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-17 17:06:03,399][__main__][INFO] - Found 836 no_birds files
+[2025-06-17 17:06:03,410][__main__][INFO] - Total audio files discovered: 10822
+[2025-06-17 17:06:03,411][__main__][INFO] - Class distribution:
+[2025-06-17 17:06:03,411][__main__][INFO] -   Periparus_ater: 2902 files
+[2025-06-17 17:06:03,411][__main__][INFO] -   Certhia_brachydactyla: 1396 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   Lophophanes_cristatus: 1045 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   no_birds: 836 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-17 17:06:03,412][__main__][INFO] -   Emberiza_cia: 403 files
+[2025-06-17 17:06:03,470][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-17 17:06:03,470][__main__][INFO] - 
+========================================
+[2025-06-17 17:06:03,470][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-17 17:06:03,470][__main__][INFO] - ========================================
+[2025-06-17 17:06:03,470][__main__][INFO] - Starting student model predictions
+[2025-06-17 17:06:04,392][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-17 17:06:04,746][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-17 17:06:04,747][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-17 17:06:04,747][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-17 17:06:04,747][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-17 17:06:04,763][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/benchmark/../config/bird_classification.yaml
+[2025-06-17 17:06:04,915][benchmark.predict_student][INFO] - Loaded model from: /workspace/benchmark/../best_distillation_model.pt
+[2025-06-17 17:06:04,916][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-17 17:06:04,916][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-17 17:06:04,916][benchmark.predict_student][INFO] - Confidence threshold: 0.1
+[2025-06-17 17:06:24,813][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC759943-Fyrremejse,-Kasted-mose,-17-8-2022.wav, using fallback preprocessing
+[2025-06-17 17:06:28,578][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC864150-PARMON130824.wav, using fallback preprocessing
+[2025-06-17 17:06:32,911][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/1761.mp3, using fallback preprocessing
+[2025-06-17 17:06:43,439][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406068-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1220pm.mp3, using fallback preprocessing
+[2025-06-17 17:06:47,634][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540988-WillowTitCall Bagmere 1327pm 11022019.mp3, using fallback preprocessing
+[2025-06-17 17:06:51,324][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406069-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1400pm.mp3, using fallback preprocessing
+[2025-06-17 17:06:52,267][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409237-Willow Tit Calls Bagmere Nature Reserve 18 March 2018 at 0826am.mp3, using fallback preprocessing
+[2025-06-17 17:06:58,460][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC709923-220306_0218 Weidenmeise Beerbusch.mp3, using fallback preprocessing
+[2025-06-17 17:07:01,957][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC529772-Willow Tit call very good 2020 02 11 Combe Wood_1822_short.mp3, using fallback preprocessing

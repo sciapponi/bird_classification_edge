@@ -1,0 +1,47 @@
+[2025-06-16 14:20:06,099][__main__][INFO] - ============================================================
+[2025-06-16 14:20:06,099][__main__][INFO] - 🐦 BIRD CLASSIFICATION BENCHMARK
+[2025-06-16 14:20:06,099][__main__][INFO] - ============================================================
+[2025-06-16 14:20:06,099][__main__][INFO] - Working directory: /workspace/benchmark/results/hydra_outputs/2025-06-16_14-20-04
+[2025-06-16 14:20:06,099][__main__][INFO] - Hydra output directory: /workspace/benchmark/results/hydra_outputs/2025-06-16_14-20-04
+[2025-06-16 14:20:06,099][__main__][INFO] - 
+========================================
+[2025-06-16 14:20:06,099][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-16 14:20:06,099][__main__][INFO] - ========================================
+[2025-06-16 14:20:06,099][__main__][INFO] - Scanning bird dataset: /workspace/benchmark/../bird_sound_dataset
+[2025-06-16 14:20:06,099][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-16 14:20:06,122][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-16 14:20:06,122][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-16 14:20:06,145][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-16 14:20:06,146][__main__][INFO] - Processing species: Apus_apus
+[2025-06-16 14:20:06,159][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-16 14:20:06,159][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-16 14:20:06,174][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-16 14:20:06,174][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-16 14:20:06,222][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-16 14:20:06,222][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-16 14:20:06,230][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-16 14:20:06,230][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-16 14:20:06,248][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-16 14:20:06,248][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-16 14:20:06,272][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-16 14:20:06,272][__main__][INFO] - Scanning no_birds dataset: /workspace/benchmark/../augmented_dataset/no_birds
+[2025-06-16 14:20:06,284][__main__][INFO] - Found 836 no_birds files
+[2025-06-16 14:20:06,298][__main__][INFO] - 🔍 LIMITED TO 200 files for testing
+[2025-06-16 14:20:06,298][__main__][INFO] - Total audio files discovered: 195
+[2025-06-16 14:20:06,298][__main__][INFO] - Class distribution:
+[2025-06-16 14:20:06,298][__main__][INFO] -   Periparus_ater: 53 files
+[2025-06-16 14:20:06,298][__main__][INFO] -   Certhia_brachydactyla: 25 files
+[2025-06-16 14:20:06,298][__main__][INFO] -   Certhia_familiaris: 24 files
+[2025-06-16 14:20:06,298][__main__][INFO] -   Poecile_montanus: 23 files
+[2025-06-16 14:20:06,298][__main__][INFO] -   Lophophanes_cristatus: 19 files
+[2025-06-16 14:20:06,299][__main__][INFO] -   Bubo_bubo: 15 files
+[2025-06-16 14:20:06,299][__main__][INFO] -   no_birds: 15 files
+[2025-06-16 14:20:06,299][__main__][INFO] -   Apus_apus: 14 files
+[2025-06-16 14:20:06,299][__main__][INFO] -   Emberiza_cia: 7 files
+[2025-06-16 14:20:06,301][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/results/predictions/ground_truth.csv
+[2025-06-16 14:20:06,301][__main__][INFO] - 
+========================================
+[2025-06-16 14:20:06,301][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-16 14:20:06,301][__main__][INFO] - ========================================
+[2025-06-16 14:20:06,301][__main__][INFO] - Starting student model predictions
+[2025-06-16 14:20:06,386][__main__][ERROR] - Student model prediction failed: expected an indented block (predict_birdnet.py, line 73)

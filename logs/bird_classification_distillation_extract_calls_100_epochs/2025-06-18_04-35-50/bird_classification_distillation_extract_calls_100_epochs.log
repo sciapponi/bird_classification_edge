@@ -1,0 +1,136 @@
+[2025-06-18 04:35:51,009][__main__][INFO] - Hydra output directory: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50
+[2025-06-18 04:35:51,014][__main__][INFO] - Full config:
+experiment_name: bird_classification_distillation_extract_calls_100_epochs
+distillation:
+  alpha: 0.4
+  temperature: 3.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+training:
+  epochs: 2
+  batch_size: 64
+  patience: 35
+  min_delta: 0.0001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0003
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  soft_labels_path: test_soft_labels
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Bubo_bubo
+  - Certhia_familiaris
+  - Apus_apus
+  - Certhia_brachydactyla
+  - Emberiza_cia
+  - Lophophanes_cristatus
+  - Periparus_ater
+  - Poecile_montanus
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: true
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-18 04:35:51,014][__main__][INFO] - Using soft labels from: /app/test_soft_labels
+[2025-06-18 04:35:51,014][__main__][INFO] - Initialized trainer on device: cuda
+[2025-06-18 04:35:51,014][__main__][INFO] - Outputs will be saved to: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50
+[2025-06-18 04:35:51,014][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-18 04:35:51,192][__main__][INFO] - Train samples: 7832
+[2025-06-18 04:35:51,192][__main__][INFO] - Val samples: 2331
+[2025-06-18 04:35:51,192][__main__][INFO] - Test samples: 2331
+[2025-06-18 04:35:51,192][__main__][INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+[2025-06-18 04:35:51,193][__main__][INFO] - Number of classes: 9
+[2025-06-18 04:35:51,193][__main__][INFO] - Class names: ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird']
+[2025-06-18 04:35:51,193][__main__][INFO] - Setting up student model...
+[2025-06-18 04:35:51,335][__main__][INFO] - Student model parameters: 53,516
+[2025-06-18 04:35:51,335][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-18 04:35:52,364][__main__][INFO] - Optimizer: AdamW
+[2025-06-18 04:35:52,364][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-18 04:35:52,364][__main__][INFO] - Setting up distillation loss...
+[2025-06-18 04:35:52,365][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-18 04:35:52,365][__main__][INFO] - Alpha: 0.4, Temperature: 3.0
+[2025-06-18 04:35:52,365][__main__][INFO] - Starting training loop...
+[2025-06-18 04:39:59,851][__main__][INFO] - Epoch 1 [Train] Avg Loss: 1.1046, Avg Acc: 43.4499
+[2025-06-18 04:41:03,059][__main__][INFO] - Epoch 1 [Val] Avg Loss: 0.8966, Avg Acc: 64.8649
+[2025-06-18 04:41:03,060][__main__][INFO] - Epoch 1 - Filter params: Breakpoint=3994.09Hz, Transition Width=99.87
+[2025-06-18 04:41:03,060][__main__][INFO] - New best validation loss: 0.8966, Acc: 64.8649
+[2025-06-18 04:41:03,060][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+[2025-06-18 04:44:56,155][__main__][INFO] - Epoch 2 [Train] Avg Loss: 0.9609, Avg Acc: 57.7247
+[2025-06-18 04:45:56,542][__main__][INFO] - Epoch 2 [Val] Avg Loss: 0.8370, Avg Acc: 69.1978
+[2025-06-18 04:45:56,544][__main__][INFO] - Epoch 2 - Filter params: Breakpoint=3988.21Hz, Transition Width=99.72
+[2025-06-18 04:45:56,544][__main__][INFO] - New best validation loss: 0.8370, Acc: 69.1978
+[2025-06-18 04:45:56,545][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+[2025-06-18 04:45:56,823][__main__][INFO] - Training loop finished.
+[2025-06-18 04:45:58,793][__main__][INFO] - Saved training plots to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/training_history.png
+[2025-06-18 04:45:58,797][__main__][INFO] - Saved filter parameters evolution to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/filter_parameters_evolution.csv
+[2025-06-18 04:46:02,910][__main__][INFO] - Generated 2 advanced analysis plots
+[2025-06-18 04:46:02,910][__main__][INFO] - Starting testing...
+[2025-06-18 04:46:02,911][__main__][INFO] - Loading best model from /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/bird_classification_distillation_extract_calls_100_epochs_best_model.pth for testing...
+[2025-06-18 04:46:56,805][__main__][INFO] - Test Accuracy: 0.6868
+[2025-06-18 04:46:56,830][__main__][INFO] - Test Report:
+                       precision    recall  f1-score   support
+
+     Poecile montanus       0.47      0.71      0.57       129
+   Certhia familiaris       0.58      0.78      0.66       198
+            Apus apus       0.96      0.64      0.77       121
+            Bubo bubo       0.62      0.55      0.59       209
+       Periparus ater       0.00      0.00      0.00        60
+         Emberiza cia       0.59      0.13      0.21       156
+Lophophanes cristatus       0.57      0.86      0.69       435
+Certhia brachydactyla       0.35      0.40      0.37       187
+             non-bird       0.99      0.83      0.90       836
+
+             accuracy                           0.69      2331
+            macro avg       0.57      0.54      0.53      2331
+         weighted avg       0.71      0.69      0.68      2331
+
+[2025-06-18 04:46:56,830][__main__][INFO] - Generating confusion matrix...
+[2025-06-18 04:46:56,835][__main__][INFO] - Confusion matrix CSV saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/confusion_matrix.csv
+[2025-06-18 04:46:57,376][__main__][INFO] - Confusion matrix PNG saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/confusion_matrix.png
+[2025-06-18 04:46:57,379][__main__][INFO] - Results saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/results.json
+[2025-06-18 04:46:57,381][__main__][INFO] - Model summary saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/model_summary.txt
+[2025-06-18 04:46:57,384][__main__][INFO] - Results saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50/results.json
+[2025-06-18 04:46:57,384][__main__][INFO] - --- Distillation Training Completed ---
+[2025-06-18 04:46:57,384][__main__][INFO] - Final test accuracy: 0.6868
+[2025-06-18 04:46:57,384][__main__][INFO] - Results and plots saved to: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_04-35-50

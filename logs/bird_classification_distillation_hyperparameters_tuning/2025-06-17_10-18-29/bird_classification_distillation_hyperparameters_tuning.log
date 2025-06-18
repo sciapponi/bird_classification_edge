@@ -1,0 +1,140 @@
+[2025-06-17 10:18:30,005][__main__][INFO] - Hydra output directory: /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29
+[2025-06-17 10:18:30,010][__main__][INFO] - Full config:
+experiment_name: bird_classification_distillation_hyperparameters_tuning
+distillation:
+  alpha: 0.4
+  temperature: 3.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+training:
+  epochs: 100
+  batch_size: 64
+  patience: 15
+  min_delta: 0.0005
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0003
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  soft_labels_path: test_soft_labels
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Bubo_bubo
+  - Certhia_familiaris
+  - Apus_apus
+  - Certhia_brachydactyla
+  - Emberiza_cia
+  - Lophophanes_cristatus
+  - Periparus_ater
+  - Poecile_montanus
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-17 10:18:30,010][__main__][INFO] - Using soft labels from: /app/test_soft_labels
+[2025-06-17 10:18:30,011][__main__][INFO] - Initialized trainer on device: cuda
+[2025-06-17 10:18:30,011][__main__][INFO] - Outputs will be saved to: /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29
+[2025-06-17 10:18:30,011][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-17 10:18:30,184][__main__][INFO] - Train samples: 7832
+[2025-06-17 10:18:30,184][__main__][INFO] - Val samples: 2331
+[2025-06-17 10:18:30,184][__main__][INFO] - Test samples: 2331
+[2025-06-17 10:18:30,184][__main__][INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+[2025-06-17 10:18:30,184][__main__][INFO] - Number of classes: 9
+[2025-06-17 10:18:30,185][__main__][INFO] - Class names: ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird']
+[2025-06-17 10:18:30,185][__main__][INFO] - Setting up student model...
+[2025-06-17 10:18:30,338][__main__][INFO] - Student model parameters: 53,516
+[2025-06-17 10:18:30,338][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-17 10:18:31,286][__main__][INFO] - Optimizer: AdamW
+[2025-06-17 10:18:31,286][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-17 10:18:31,286][__main__][INFO] - Setting up distillation loss...
+[2025-06-17 10:18:31,287][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-17 10:18:31,287][__main__][INFO] - Alpha: 0.4, Temperature: 3.0
+[2025-06-17 10:18:31,287][__main__][INFO] - Starting training loop...
+[2025-06-17 10:22:57,009][__main__][INFO] - Epoch 1 [Train] Avg Loss: 1.1089, Avg Acc: 43.5138
+[2025-06-17 10:23:59,166][__main__][INFO] - Epoch 1 [Val] Avg Loss: 0.8556, Avg Acc: 67.1386
+[2025-06-17 10:23:59,167][__main__][INFO] - Epoch 1 - Filter params: Breakpoint=3994.11Hz, Transition Width=99.85
+[2025-06-17 10:23:59,167][__main__][INFO] - New best validation loss: 0.8556, Acc: 67.1386
+[2025-06-17 10:23:59,168][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 10:28:20,991][__main__][INFO] - Epoch 2 [Train] Avg Loss: 0.9638, Avg Acc: 57.1757
+[2025-06-17 10:29:21,484][__main__][INFO] - Epoch 2 [Val] Avg Loss: 0.8353, Avg Acc: 69.2407
+[2025-06-17 10:29:21,484][__main__][INFO] - Epoch 2 - Filter params: Breakpoint=3988.25Hz, Transition Width=99.70
+[2025-06-17 10:29:21,485][__main__][INFO] - New best validation loss: 0.8353, Acc: 69.2407
+[2025-06-17 10:29:21,485][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 10:33:38,727][__main__][INFO] - Epoch 3 [Train] Avg Loss: 0.9079, Avg Acc: 62.6532
+[2025-06-17 10:34:38,939][__main__][INFO] - Epoch 3 [Val] Avg Loss: 0.8201, Avg Acc: 69.9271
+[2025-06-17 10:34:38,940][__main__][INFO] - Epoch 3 - Filter params: Breakpoint=3982.40Hz, Transition Width=99.54
+[2025-06-17 10:34:38,940][__main__][INFO] - New best validation loss: 0.8201, Acc: 69.9271
+[2025-06-17 10:34:38,940][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 10:38:46,060][__main__][INFO] - Epoch 4 [Train] Avg Loss: 0.8649, Avg Acc: 66.5347
+[2025-06-17 10:39:46,814][__main__][INFO] - Epoch 4 [Val] Avg Loss: 0.7638, Avg Acc: 75.4183
+[2025-06-17 10:39:46,814][__main__][INFO] - Epoch 4 - Filter params: Breakpoint=3976.54Hz, Transition Width=99.37
+[2025-06-17 10:39:46,814][__main__][INFO] - New best validation loss: 0.7638, Acc: 75.4183
+[2025-06-17 10:39:46,814][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 10:44:00,438][__main__][INFO] - Epoch 5 [Train] Avg Loss: 0.8358, Avg Acc: 68.7564
+[2025-06-17 10:45:01,127][__main__][INFO] - Epoch 5 [Val] Avg Loss: 0.8958, Avg Acc: 63.3634
+[2025-06-17 10:45:01,128][__main__][INFO] - Epoch 5 - Filter params: Breakpoint=3970.73Hz, Transition Width=99.20
+[2025-06-17 10:49:08,271][__main__][INFO] - Epoch 6 [Train] Avg Loss: 0.8161, Avg Acc: 70.6588
+[2025-06-17 10:50:09,803][__main__][INFO] - Epoch 6 [Val] Avg Loss: 0.7394, Avg Acc: 78.1639
+[2025-06-17 10:50:09,804][__main__][INFO] - Epoch 6 - Filter params: Breakpoint=3964.99Hz, Transition Width=99.04
+[2025-06-17 10:50:09,804][__main__][INFO] - New best validation loss: 0.7394, Acc: 78.1639
+[2025-06-17 10:50:09,804][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 10:54:28,130][__main__][INFO] - Epoch 7 [Train] Avg Loss: 0.8031, Avg Acc: 71.5909
+[2025-06-17 10:55:29,133][__main__][INFO] - Epoch 7 [Val] Avg Loss: 0.7481, Avg Acc: 78.3355
+[2025-06-17 10:55:29,133][__main__][INFO] - Epoch 7 - Filter params: Breakpoint=3959.25Hz, Transition Width=98.86
+[2025-06-17 10:59:56,553][__main__][INFO] - Epoch 8 [Train] Avg Loss: 0.7848, Avg Acc: 73.5061
+[2025-06-17 11:00:56,885][__main__][INFO] - Epoch 8 [Val] Avg Loss: 0.6837, Avg Acc: 81.6817
+[2025-06-17 11:00:56,886][__main__][INFO] - Epoch 8 - Filter params: Breakpoint=3953.51Hz, Transition Width=98.70
+[2025-06-17 11:00:56,886][__main__][INFO] - New best validation loss: 0.6837, Acc: 81.6817
+[2025-06-17 11:00:56,886][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 11:05:04,623][__main__][INFO] - Epoch 9 [Train] Avg Loss: 0.7763, Avg Acc: 74.3616
+[2025-06-17 11:06:03,784][__main__][INFO] - Epoch 9 [Val] Avg Loss: 0.6734, Avg Acc: 82.5826
+[2025-06-17 11:06:03,785][__main__][INFO] - Epoch 9 - Filter params: Breakpoint=3947.77Hz, Transition Width=98.53
+[2025-06-17 11:06:03,785][__main__][INFO] - New best validation loss: 0.6734, Acc: 82.5826
+[2025-06-17 11:06:03,785][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_hyperparameters_tuning/2025-06-17_10-18-29/bird_classification_distillation_hyperparameters_tuning_best_model.pth...
+[2025-06-17 11:10:00,825][__main__][INFO] - Epoch 10 [Train] Avg Loss: 0.7634, Avg Acc: 74.8979
+[2025-06-17 11:11:01,100][__main__][INFO] - Epoch 10 [Val] Avg Loss: 0.6956, Avg Acc: 80.7379
+[2025-06-17 11:11:01,101][__main__][INFO] - Epoch 10 - Filter params: Breakpoint=3942.04Hz, Transition Width=98.36
+[2025-06-17 11:15:06,337][__main__][INFO] - Epoch 11 [Train] Avg Loss: 0.7530, Avg Acc: 75.7406
+[2025-06-17 11:16:06,306][__main__][INFO] - Epoch 11 [Val] Avg Loss: 0.6805, Avg Acc: 82.2823
+[2025-06-17 11:16:06,306][__main__][INFO] - Epoch 11 - Filter params: Breakpoint=3936.30Hz, Transition Width=98.19

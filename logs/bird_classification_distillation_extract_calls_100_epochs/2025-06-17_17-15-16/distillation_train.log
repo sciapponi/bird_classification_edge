@@ -1,0 +1,478 @@
+2025-06-17 17:15:17,170 - [INFO] - Hydra output directory: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16
+2025-06-17 17:15:17,182 - [INFO] - Full config:
+experiment_name: bird_classification_distillation_extract_calls_100_epochs
+distillation:
+  alpha: 0.4
+  temperature: 3.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+training:
+  epochs: 100
+  batch_size: 64
+  patience: 35
+  min_delta: 0.0001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0003
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  soft_labels_path: test_soft_labels
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Bubo_bubo
+  - Certhia_familiaris
+  - Apus_apus
+  - Certhia_brachydactyla
+  - Emberiza_cia
+  - Lophophanes_cristatus
+  - Periparus_ater
+  - Poecile_montanus
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: true
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+2025-06-17 17:15:17,182 - [INFO] - Using soft labels from: /app/test_soft_labels
+2025-06-17 17:15:17,183 - [INFO] - Initialized trainer on device: cuda
+2025-06-17 17:15:17,183 - [INFO] - Outputs will be saved to: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16
+2025-06-17 17:15:17,183 - [INFO] - Setting up data loaders with soft labels...
+2025-06-17 17:15:17,438 - [INFO] - Train samples: 7832
+2025-06-17 17:15:17,438 - [INFO] - Val samples: 2331
+2025-06-17 17:15:17,438 - [INFO] - Test samples: 2331
+2025-06-17 17:15:17,438 - [INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+2025-06-17 17:15:17,438 - [INFO] - Number of classes: 9
+2025-06-17 17:15:17,439 - [INFO] - Class names: ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird']
+2025-06-17 17:15:17,439 - [INFO] - Setting up student model...
+2025-06-17 17:15:17,638 - [INFO] - Student model parameters: 53,516
+2025-06-17 17:15:17,638 - [INFO] - Setting up optimizer and scheduler...
+2025-06-17 17:15:18,779 - [INFO] - Optimizer: AdamW
+2025-06-17 17:15:18,779 - [INFO] - Scheduler: ReduceLROnPlateau
+2025-06-17 17:15:18,780 - [INFO] - Setting up distillation loss...
+2025-06-17 17:15:18,780 - [INFO] - Using Standard DistillationLoss
+2025-06-17 17:15:18,780 - [INFO] - Alpha: 0.4, Temperature: 3.0
+2025-06-17 17:15:18,780 - [INFO] - Starting training loop...
+2025-06-17 17:19:30,292 - [INFO] - Epoch 1 [Train] Avg Loss: 1.1027, Avg Acc: 43.4627
+2025-06-17 17:20:32,756 - [INFO] - Epoch 1 [Val] Avg Loss: 0.8665, Avg Acc: 65.7658
+2025-06-17 17:20:32,757 - [INFO] - Epoch 1 - Filter params: Breakpoint=3994.10Hz, Transition Width=99.85
+2025-06-17 17:20:32,757 - [INFO] - New best validation loss: 0.8665, Acc: 65.7658
+2025-06-17 17:20:32,758 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 17:24:37,855 - [INFO] - Epoch 2 [Train] Avg Loss: 0.9477, Avg Acc: 58.7462
+2025-06-17 17:25:38,410 - [INFO] - Epoch 2 [Val] Avg Loss: 0.8297, Avg Acc: 69.3694
+2025-06-17 17:25:38,411 - [INFO] - Epoch 2 - Filter params: Breakpoint=3988.24Hz, Transition Width=99.70
+2025-06-17 17:25:38,411 - [INFO] - New best validation loss: 0.8297, Acc: 69.3694
+2025-06-17 17:25:38,411 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 17:29:37,405 - [INFO] - Epoch 3 [Train] Avg Loss: 0.8965, Avg Acc: 63.3810
+2025-06-17 17:30:38,239 - [INFO] - Epoch 3 [Val] Avg Loss: 0.7620, Avg Acc: 74.7748
+2025-06-17 17:30:38,240 - [INFO] - Epoch 3 - Filter params: Breakpoint=3982.38Hz, Transition Width=99.53
+2025-06-17 17:30:38,240 - [INFO] - New best validation loss: 0.7620, Acc: 74.7748
+2025-06-17 17:30:38,240 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 17:34:32,632 - [INFO] - Epoch 4 [Train] Avg Loss: 0.8584, Avg Acc: 67.2242
+2025-06-17 17:35:32,506 - [INFO] - Epoch 4 [Val] Avg Loss: 0.7379, Avg Acc: 77.7778
+2025-06-17 17:35:32,507 - [INFO] - Epoch 4 - Filter params: Breakpoint=3976.52Hz, Transition Width=99.35
+2025-06-17 17:35:32,507 - [INFO] - New best validation loss: 0.7379, Acc: 77.7778
+2025-06-17 17:35:32,507 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 17:39:31,008 - [INFO] - Epoch 5 [Train] Avg Loss: 0.8367, Avg Acc: 69.5608
+2025-06-17 17:40:32,189 - [INFO] - Epoch 5 [Val] Avg Loss: 0.7185, Avg Acc: 79.4509
+2025-06-17 17:40:32,190 - [INFO] - Epoch 5 - Filter params: Breakpoint=3970.71Hz, Transition Width=99.20
+2025-06-17 17:40:32,190 - [INFO] - New best validation loss: 0.7185, Acc: 79.4509
+2025-06-17 17:40:32,190 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 17:44:42,114 - [INFO] - Epoch 6 [Train] Avg Loss: 0.8069, Avg Acc: 71.7569
+2025-06-17 17:45:42,125 - [INFO] - Epoch 6 [Val] Avg Loss: 0.6811, Avg Acc: 81.8104
+2025-06-17 17:45:42,127 - [INFO] - Epoch 6 - Filter params: Breakpoint=3964.98Hz, Transition Width=99.04
+2025-06-17 17:45:42,127 - [INFO] - New best validation loss: 0.6811, Acc: 81.8104
+2025-06-17 17:45:42,128 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 17:49:42,621 - [INFO] - Epoch 7 [Train] Avg Loss: 0.7930, Avg Acc: 72.6507
+2025-06-17 17:50:42,578 - [INFO] - Epoch 7 [Val] Avg Loss: 0.7351, Avg Acc: 78.0781
+2025-06-17 17:50:42,579 - [INFO] - Epoch 7 - Filter params: Breakpoint=3959.24Hz, Transition Width=98.88
+2025-06-17 17:54:40,983 - [INFO] - Epoch 8 [Train] Avg Loss: 0.7811, Avg Acc: 73.5700
+2025-06-17 17:55:40,491 - [INFO] - Epoch 8 [Val] Avg Loss: 0.6907, Avg Acc: 80.3947
+2025-06-17 17:55:40,492 - [INFO] - Epoch 8 - Filter params: Breakpoint=3953.50Hz, Transition Width=98.71
+2025-06-17 17:59:42,421 - [INFO] - Epoch 9 [Train] Avg Loss: 0.7652, Avg Acc: 74.6936
+2025-06-17 18:00:42,000 - [INFO] - Epoch 9 [Val] Avg Loss: 0.6710, Avg Acc: 82.9258
+2025-06-17 18:00:42,001 - [INFO] - Epoch 9 - Filter params: Breakpoint=3947.77Hz, Transition Width=98.54
+2025-06-17 18:00:42,001 - [INFO] - New best validation loss: 0.6710, Acc: 82.9258
+2025-06-17 18:00:42,001 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 18:04:38,844 - [INFO] - Epoch 10 [Train] Avg Loss: 0.7568, Avg Acc: 75.3064
+2025-06-17 18:05:38,135 - [INFO] - Epoch 10 [Val] Avg Loss: 0.6891, Avg Acc: 81.3814
+2025-06-17 18:05:38,136 - [INFO] - Epoch 10 - Filter params: Breakpoint=3942.04Hz, Transition Width=98.38
+2025-06-17 18:09:33,793 - [INFO] - Epoch 11 [Train] Avg Loss: 0.7467, Avg Acc: 76.4811
+2025-06-17 18:10:32,843 - [INFO] - Epoch 11 [Val] Avg Loss: 0.6902, Avg Acc: 81.5101
+2025-06-17 18:10:32,843 - [INFO] - Epoch 11 - Filter params: Breakpoint=3936.30Hz, Transition Width=98.23
+2025-06-17 18:14:25,057 - [INFO] - Epoch 12 [Train] Avg Loss: 0.7367, Avg Acc: 76.6599
+2025-06-17 18:15:24,652 - [INFO] - Epoch 12 [Val] Avg Loss: 0.6792, Avg Acc: 82.6255
+2025-06-17 18:15:24,652 - [INFO] - Epoch 12 - Filter params: Breakpoint=3930.56Hz, Transition Width=98.07
+2025-06-17 18:19:19,389 - [INFO] - Epoch 13 [Train] Avg Loss: 0.7334, Avg Acc: 77.3876
+2025-06-17 18:20:18,682 - [INFO] - Epoch 13 [Val] Avg Loss: 0.6618, Avg Acc: 83.5693
+2025-06-17 18:20:18,682 - [INFO] - Epoch 13 - Filter params: Breakpoint=3924.82Hz, Transition Width=97.91
+2025-06-17 18:20:18,683 - [INFO] - New best validation loss: 0.6618, Acc: 83.5693
+2025-06-17 18:20:18,683 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 18:24:18,944 - [INFO] - Epoch 14 [Train] Avg Loss: 0.7299, Avg Acc: 77.2855
+2025-06-17 18:25:18,278 - [INFO] - Epoch 14 [Val] Avg Loss: 0.6581, Avg Acc: 83.2261
+2025-06-17 18:25:18,278 - [INFO] - Epoch 14 - Filter params: Breakpoint=3919.09Hz, Transition Width=97.76
+2025-06-17 18:25:18,279 - [INFO] - New best validation loss: 0.6581, Acc: 83.2261
+2025-06-17 18:25:18,279 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 18:29:16,471 - [INFO] - Epoch 15 [Train] Avg Loss: 0.7191, Avg Acc: 78.0005
+2025-06-17 18:30:15,632 - [INFO] - Epoch 15 [Val] Avg Loss: 0.7239, Avg Acc: 77.8636
+2025-06-17 18:30:15,633 - [INFO] - Epoch 15 - Filter params: Breakpoint=3913.34Hz, Transition Width=97.61
+2025-06-17 18:34:19,413 - [INFO] - Epoch 16 [Train] Avg Loss: 0.7212, Avg Acc: 77.5664
+2025-06-17 18:35:18,768 - [INFO] - Epoch 16 [Val] Avg Loss: 0.6412, Avg Acc: 83.9983
+2025-06-17 18:35:18,769 - [INFO] - Epoch 16 - Filter params: Breakpoint=3907.59Hz, Transition Width=97.45
+2025-06-17 18:35:18,769 - [INFO] - New best validation loss: 0.6412, Acc: 83.9983
+2025-06-17 18:35:18,769 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 18:39:20,178 - [INFO] - Epoch 17 [Train] Avg Loss: 0.7108, Avg Acc: 79.0347
+2025-06-17 18:40:18,892 - [INFO] - Epoch 17 [Val] Avg Loss: 0.6579, Avg Acc: 82.1536
+2025-06-17 18:40:18,892 - [INFO] - Epoch 17 - Filter params: Breakpoint=3901.86Hz, Transition Width=97.29
+2025-06-17 18:44:18,024 - [INFO] - Epoch 18 [Train] Avg Loss: 0.7065, Avg Acc: 78.7921
+2025-06-17 18:45:18,068 - [INFO] - Epoch 18 [Val] Avg Loss: 0.6426, Avg Acc: 84.1270
+2025-06-17 18:45:18,069 - [INFO] - Epoch 18 - Filter params: Breakpoint=3896.12Hz, Transition Width=97.12
+2025-06-17 18:49:15,073 - [INFO] - Epoch 19 [Train] Avg Loss: 0.7084, Avg Acc: 78.7028
+2025-06-17 18:50:15,178 - [INFO] - Epoch 19 [Val] Avg Loss: 0.6339, Avg Acc: 85.2424
+2025-06-17 18:50:15,178 - [INFO] - Epoch 19 - Filter params: Breakpoint=3890.40Hz, Transition Width=96.97
+2025-06-17 18:50:15,178 - [INFO] - New best validation loss: 0.6339, Acc: 85.2424
+2025-06-17 18:50:15,179 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 18:54:05,412 - [INFO] - Epoch 20 [Train] Avg Loss: 0.7001, Avg Acc: 79.4816
+2025-06-17 18:55:05,224 - [INFO] - Epoch 20 [Val] Avg Loss: 0.6561, Avg Acc: 84.0841
+2025-06-17 18:55:05,224 - [INFO] - Epoch 20 - Filter params: Breakpoint=3884.77Hz, Transition Width=96.82
+2025-06-17 18:59:01,651 - [INFO] - Epoch 21 [Train] Avg Loss: 0.7005, Avg Acc: 79.2135
+2025-06-17 19:00:00,833 - [INFO] - Epoch 21 [Val] Avg Loss: 0.6899, Avg Acc: 81.3814
+2025-06-17 19:00:00,833 - [INFO] - Epoch 21 - Filter params: Breakpoint=3879.16Hz, Transition Width=96.66
+2025-06-17 19:03:58,884 - [INFO] - Epoch 22 [Train] Avg Loss: 0.6915, Avg Acc: 80.4265
+2025-06-17 19:04:58,342 - [INFO] - Epoch 22 [Val] Avg Loss: 0.6474, Avg Acc: 84.7276
+2025-06-17 19:04:58,343 - [INFO] - Epoch 22 - Filter params: Breakpoint=3873.54Hz, Transition Width=96.50
+2025-06-17 19:08:57,265 - [INFO] - Epoch 23 [Train] Avg Loss: 0.6894, Avg Acc: 79.8391
+2025-06-17 19:09:57,233 - [INFO] - Epoch 23 [Val] Avg Loss: 0.6350, Avg Acc: 85.1566
+2025-06-17 19:09:57,233 - [INFO] - Epoch 23 - Filter params: Breakpoint=3867.93Hz, Transition Width=96.35
+2025-06-17 19:14:04,354 - [INFO] - Epoch 24 [Train] Avg Loss: 0.6867, Avg Acc: 80.2349
+2025-06-17 19:15:04,673 - [INFO] - Epoch 24 [Val] Avg Loss: 0.6268, Avg Acc: 85.7143
+2025-06-17 19:15:04,674 - [INFO] - Epoch 24 - Filter params: Breakpoint=3862.32Hz, Transition Width=96.20
+2025-06-17 19:15:04,674 - [INFO] - New best validation loss: 0.6268, Acc: 85.7143
+2025-06-17 19:15:04,674 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 19:19:07,281 - [INFO] - Epoch 25 [Train] Avg Loss: 0.6801, Avg Acc: 80.8350
+2025-06-17 19:20:09,535 - [INFO] - Epoch 25 [Val] Avg Loss: 0.6236, Avg Acc: 85.7143
+2025-06-17 19:20:09,536 - [INFO] - Epoch 25 - Filter params: Breakpoint=3856.71Hz, Transition Width=96.03
+2025-06-17 19:20:09,537 - [INFO] - New best validation loss: 0.6236, Acc: 85.7143
+2025-06-17 19:20:09,537 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 19:24:24,019 - [INFO] - Epoch 26 [Train] Avg Loss: 0.6821, Avg Acc: 80.4265
+2025-06-17 19:25:24,867 - [INFO] - Epoch 26 [Val] Avg Loss: 0.6641, Avg Acc: 82.6255
+2025-06-17 19:25:24,868 - [INFO] - Epoch 26 - Filter params: Breakpoint=3851.09Hz, Transition Width=95.88
+2025-06-17 19:29:17,615 - [INFO] - Epoch 27 [Train] Avg Loss: 0.6775, Avg Acc: 80.9499
+2025-06-17 19:30:18,170 - [INFO] - Epoch 27 [Val] Avg Loss: 0.6427, Avg Acc: 84.0841
+2025-06-17 19:30:18,171 - [INFO] - Epoch 27 - Filter params: Breakpoint=3845.47Hz, Transition Width=95.73
+2025-06-17 19:34:19,101 - [INFO] - Epoch 28 [Train] Avg Loss: 0.6767, Avg Acc: 80.9499
+2025-06-17 19:35:18,987 - [INFO] - Epoch 28 [Val] Avg Loss: 0.6571, Avg Acc: 82.5826
+2025-06-17 19:35:18,989 - [INFO] - Epoch 28 - Filter params: Breakpoint=3839.85Hz, Transition Width=95.57
+2025-06-17 19:39:27,812 - [INFO] - Epoch 29 [Train] Avg Loss: 0.6712, Avg Acc: 81.4096
+2025-06-17 19:40:27,769 - [INFO] - Epoch 29 [Val] Avg Loss: 0.6193, Avg Acc: 85.7143
+2025-06-17 19:40:27,769 - [INFO] - Epoch 29 - Filter params: Breakpoint=3834.24Hz, Transition Width=95.42
+2025-06-17 19:40:27,770 - [INFO] - New best validation loss: 0.6193, Acc: 85.7143
+2025-06-17 19:40:27,770 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 19:44:26,756 - [INFO] - Epoch 30 [Train] Avg Loss: 0.6699, Avg Acc: 81.7799
+2025-06-17 19:45:27,291 - [INFO] - Epoch 30 [Val] Avg Loss: 0.6217, Avg Acc: 85.8859
+2025-06-17 19:45:27,291 - [INFO] - Epoch 30 - Filter params: Breakpoint=3828.62Hz, Transition Width=95.27
+2025-06-17 19:49:43,754 - [INFO] - Epoch 31 [Train] Avg Loss: 0.6657, Avg Acc: 81.9842
+2025-06-17 19:50:43,636 - [INFO] - Epoch 31 [Val] Avg Loss: 0.6087, Avg Acc: 86.8726
+2025-06-17 19:50:43,636 - [INFO] - Epoch 31 - Filter params: Breakpoint=3823.00Hz, Transition Width=95.13
+2025-06-17 19:50:43,636 - [INFO] - New best validation loss: 0.6087, Acc: 86.8726
+2025-06-17 19:50:43,636 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 19:54:39,620 - [INFO] - Epoch 32 [Train] Avg Loss: 0.6694, Avg Acc: 81.4607
+2025-06-17 19:55:39,190 - [INFO] - Epoch 32 [Val] Avg Loss: 0.6193, Avg Acc: 85.8001
+2025-06-17 19:55:39,191 - [INFO] - Epoch 32 - Filter params: Breakpoint=3817.39Hz, Transition Width=94.98
+2025-06-17 19:59:37,923 - [INFO] - Epoch 33 [Train] Avg Loss: 0.6654, Avg Acc: 81.9203
+2025-06-17 20:00:37,485 - [INFO] - Epoch 33 [Val] Avg Loss: 0.6161, Avg Acc: 85.6714
+2025-06-17 20:00:37,486 - [INFO] - Epoch 33 - Filter params: Breakpoint=3811.77Hz, Transition Width=94.82
+2025-06-17 20:04:43,843 - [INFO] - Epoch 34 [Train] Avg Loss: 0.6599, Avg Acc: 82.4949
+2025-06-17 20:05:43,174 - [INFO] - Epoch 34 [Val] Avg Loss: 0.6211, Avg Acc: 84.7705
+2025-06-17 20:05:43,175 - [INFO] - Epoch 34 - Filter params: Breakpoint=3806.23Hz, Transition Width=94.67
+2025-06-17 20:09:39,214 - [INFO] - Epoch 35 [Train] Avg Loss: 0.6601, Avg Acc: 82.4694
+2025-06-17 20:10:38,641 - [INFO] - Epoch 35 [Val] Avg Loss: 0.6083, Avg Acc: 86.7439
+2025-06-17 20:10:38,642 - [INFO] - Epoch 35 - Filter params: Breakpoint=3800.74Hz, Transition Width=94.52
+2025-06-17 20:10:38,642 - [INFO] - New best validation loss: 0.6083, Acc: 86.7439
+2025-06-17 20:10:38,642 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 20:14:46,861 - [INFO] - Epoch 36 [Train] Avg Loss: 0.6587, Avg Acc: 82.2140
+2025-06-17 20:15:45,960 - [INFO] - Epoch 36 [Val] Avg Loss: 0.6071, Avg Acc: 86.7010
+2025-06-17 20:15:45,961 - [INFO] - Epoch 36 - Filter params: Breakpoint=3795.24Hz, Transition Width=94.36
+2025-06-17 20:15:45,961 - [INFO] - New best validation loss: 0.6071, Acc: 86.7010
+2025-06-17 20:15:45,961 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 20:19:45,585 - [INFO] - Epoch 37 [Train] Avg Loss: 0.6564, Avg Acc: 82.3672
+2025-06-17 20:20:45,323 - [INFO] - Epoch 37 [Val] Avg Loss: 0.6116, Avg Acc: 86.6581
+2025-06-17 20:20:45,323 - [INFO] - Epoch 37 - Filter params: Breakpoint=3789.75Hz, Transition Width=94.20
+2025-06-17 20:24:41,138 - [INFO] - Epoch 38 [Train] Avg Loss: 0.6559, Avg Acc: 82.6481
+2025-06-17 20:25:40,309 - [INFO] - Epoch 38 [Val] Avg Loss: 0.6019, Avg Acc: 86.6152
+2025-06-17 20:25:40,309 - [INFO] - Epoch 38 - Filter params: Breakpoint=3784.27Hz, Transition Width=94.04
+2025-06-17 20:25:40,309 - [INFO] - New best validation loss: 0.6019, Acc: 86.6152
+2025-06-17 20:25:40,310 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 20:29:38,585 - [INFO] - Epoch 39 [Train] Avg Loss: 0.6510, Avg Acc: 83.0056
+2025-06-17 20:30:38,746 - [INFO] - Epoch 39 [Val] Avg Loss: 0.6022, Avg Acc: 87.1729
+2025-06-17 20:30:38,746 - [INFO] - Epoch 39 - Filter params: Breakpoint=3778.78Hz, Transition Width=93.88
+2025-06-17 20:34:40,629 - [INFO] - Epoch 40 [Train] Avg Loss: 0.6519, Avg Acc: 82.8779
+2025-06-17 20:35:40,794 - [INFO] - Epoch 40 [Val] Avg Loss: 0.6152, Avg Acc: 85.9717
+2025-06-17 20:35:40,795 - [INFO] - Epoch 40 - Filter params: Breakpoint=3773.29Hz, Transition Width=93.73
+2025-06-17 20:39:36,220 - [INFO] - Epoch 41 [Train] Avg Loss: 0.6474, Avg Acc: 83.1716
+2025-06-17 20:40:35,611 - [INFO] - Epoch 41 [Val] Avg Loss: 0.6164, Avg Acc: 85.8430
+2025-06-17 20:40:35,612 - [INFO] - Epoch 41 - Filter params: Breakpoint=3767.79Hz, Transition Width=93.57
+2025-06-17 20:44:43,906 - [INFO] - Epoch 42 [Train] Avg Loss: 0.6501, Avg Acc: 82.9035
+2025-06-17 20:45:44,302 - [INFO] - Epoch 42 [Val] Avg Loss: 0.5979, Avg Acc: 87.2587
+2025-06-17 20:45:44,302 - [INFO] - Epoch 42 - Filter params: Breakpoint=3762.29Hz, Transition Width=93.42
+2025-06-17 20:45:44,302 - [INFO] - New best validation loss: 0.5979, Acc: 87.2587
+2025-06-17 20:45:44,302 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 20:49:37,960 - [INFO] - Epoch 43 [Train] Avg Loss: 0.6509, Avg Acc: 82.8141
+2025-06-17 20:50:37,168 - [INFO] - Epoch 43 [Val] Avg Loss: 0.6006, Avg Acc: 87.0442
+2025-06-17 20:50:37,168 - [INFO] - Epoch 43 - Filter params: Breakpoint=3756.79Hz, Transition Width=93.27
+2025-06-17 20:54:35,279 - [INFO] - Epoch 44 [Train] Avg Loss: 0.6432, Avg Acc: 83.3631
+2025-06-17 20:55:35,202 - [INFO] - Epoch 44 [Val] Avg Loss: 0.6076, Avg Acc: 86.4436
+2025-06-17 20:55:35,203 - [INFO] - Epoch 44 - Filter params: Breakpoint=3751.30Hz, Transition Width=93.11
+2025-06-17 20:59:37,035 - [INFO] - Epoch 45 [Train] Avg Loss: 0.6447, Avg Acc: 83.4014
+2025-06-17 21:00:36,546 - [INFO] - Epoch 45 [Val] Avg Loss: 0.5951, Avg Acc: 87.8164
+2025-06-17 21:00:36,547 - [INFO] - Epoch 45 - Filter params: Breakpoint=3745.81Hz, Transition Width=92.95
+2025-06-17 21:00:36,547 - [INFO] - New best validation loss: 0.5951, Acc: 87.8164
+2025-06-17 21:00:36,547 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 21:04:21,848 - [INFO] - Epoch 46 [Train] Avg Loss: 0.6446, Avg Acc: 83.4780
+2025-06-17 21:05:20,662 - [INFO] - Epoch 46 [Val] Avg Loss: 0.5843, Avg Acc: 88.4599
+2025-06-17 21:05:20,663 - [INFO] - Epoch 46 - Filter params: Breakpoint=3740.31Hz, Transition Width=92.79
+2025-06-17 21:05:20,663 - [INFO] - New best validation loss: 0.5843, Acc: 88.4599
+2025-06-17 21:05:20,663 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 21:09:30,298 - [INFO] - Epoch 47 [Train] Avg Loss: 0.6416, Avg Acc: 83.5546
+2025-06-17 21:10:29,193 - [INFO] - Epoch 47 [Val] Avg Loss: 0.6016, Avg Acc: 86.9584
+2025-06-17 21:10:29,194 - [INFO] - Epoch 47 - Filter params: Breakpoint=3734.82Hz, Transition Width=92.62
+2025-06-17 21:14:21,168 - [INFO] - Epoch 48 [Train] Avg Loss: 0.6397, Avg Acc: 83.5419
+2025-06-17 21:15:20,898 - [INFO] - Epoch 48 [Val] Avg Loss: 0.5980, Avg Acc: 87.1300
+2025-06-17 21:15:20,899 - [INFO] - Epoch 48 - Filter params: Breakpoint=3729.33Hz, Transition Width=92.47
+2025-06-17 21:19:23,930 - [INFO] - Epoch 49 [Train] Avg Loss: 0.6378, Avg Acc: 84.1547
+2025-06-17 21:20:23,273 - [INFO] - Epoch 49 [Val] Avg Loss: 0.5911, Avg Acc: 87.2158
+2025-06-17 21:20:23,273 - [INFO] - Epoch 49 - Filter params: Breakpoint=3723.92Hz, Transition Width=92.31
+2025-06-17 21:24:26,200 - [INFO] - Epoch 50 [Train] Avg Loss: 0.6400, Avg Acc: 83.5674
+2025-06-17 21:25:25,699 - [INFO] - Epoch 50 [Val] Avg Loss: 0.5846, Avg Acc: 88.4170
+2025-06-17 21:25:25,699 - [INFO] - Epoch 50 - Filter params: Breakpoint=3718.56Hz, Transition Width=92.15
+2025-06-17 21:29:28,848 - [INFO] - Epoch 51 [Train] Avg Loss: 0.6384, Avg Acc: 83.6568
+2025-06-17 21:30:27,997 - [INFO] - Epoch 51 [Val] Avg Loss: 0.6056, Avg Acc: 86.7010
+2025-06-17 21:30:27,997 - [INFO] - Epoch 51 - Filter params: Breakpoint=3713.18Hz, Transition Width=92.00
+2025-06-17 21:34:26,880 - [INFO] - Epoch 52 [Train] Avg Loss: 0.6359, Avg Acc: 84.4101
+2025-06-17 21:35:27,733 - [INFO] - Epoch 52 [Val] Avg Loss: 0.5908, Avg Acc: 87.9451
+2025-06-17 21:35:27,733 - [INFO] - Epoch 52 - Filter params: Breakpoint=3707.81Hz, Transition Width=91.84
+2025-06-17 21:39:37,636 - [INFO] - Epoch 53 [Train] Avg Loss: 0.6315, Avg Acc: 84.0398
+2025-06-17 21:40:37,664 - [INFO] - Epoch 53 [Val] Avg Loss: 0.5806, Avg Acc: 88.3312
+2025-06-17 21:40:37,665 - [INFO] - Epoch 53 - Filter params: Breakpoint=3705.06Hz, Transition Width=91.77
+2025-06-17 21:40:37,665 - [INFO] - New best validation loss: 0.5806, Acc: 88.3312
+2025-06-17 21:40:37,665 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 21:44:38,590 - [INFO] - Epoch 54 [Train] Avg Loss: 0.6242, Avg Acc: 84.9081
+2025-06-17 21:45:37,852 - [INFO] - Epoch 54 [Val] Avg Loss: 0.5932, Avg Acc: 87.5161
+2025-06-17 21:45:37,852 - [INFO] - Epoch 54 - Filter params: Breakpoint=3702.32Hz, Transition Width=91.69
+2025-06-17 21:49:37,456 - [INFO] - Epoch 55 [Train] Avg Loss: 0.6230, Avg Acc: 84.8825
+2025-06-17 21:50:36,656 - [INFO] - Epoch 55 [Val] Avg Loss: 0.5831, Avg Acc: 88.4599
+2025-06-17 21:50:36,657 - [INFO] - Epoch 55 - Filter params: Breakpoint=3699.57Hz, Transition Width=91.61
+2025-06-17 21:54:27,941 - [INFO] - Epoch 56 [Train] Avg Loss: 0.6170, Avg Acc: 85.6486
+2025-06-17 21:55:27,538 - [INFO] - Epoch 56 [Val] Avg Loss: 0.5807, Avg Acc: 88.2883
+2025-06-17 21:55:27,539 - [INFO] - Epoch 56 - Filter params: Breakpoint=3696.82Hz, Transition Width=91.53
+2025-06-17 21:59:23,455 - [INFO] - Epoch 57 [Train] Avg Loss: 0.6220, Avg Acc: 85.0996
+2025-06-17 22:00:22,652 - [INFO] - Epoch 57 [Val] Avg Loss: 0.5848, Avg Acc: 87.8164
+2025-06-17 22:00:22,653 - [INFO] - Epoch 57 - Filter params: Breakpoint=3694.06Hz, Transition Width=91.45
+2025-06-17 22:04:26,186 - [INFO] - Epoch 58 [Train] Avg Loss: 0.6235, Avg Acc: 84.9336
+2025-06-17 22:05:25,679 - [INFO] - Epoch 58 [Val] Avg Loss: 0.5880, Avg Acc: 88.1596
+2025-06-17 22:05:25,679 - [INFO] - Epoch 58 - Filter params: Breakpoint=3691.32Hz, Transition Width=91.37
+2025-06-17 22:09:22,129 - [INFO] - Epoch 59 [Train] Avg Loss: 0.6208, Avg Acc: 85.0102
+2025-06-17 22:10:20,935 - [INFO] - Epoch 59 [Val] Avg Loss: 0.5945, Avg Acc: 87.0871
+2025-06-17 22:10:20,936 - [INFO] - Epoch 59 - Filter params: Breakpoint=3688.57Hz, Transition Width=91.29
+2025-06-17 22:14:25,124 - [INFO] - Epoch 60 [Train] Avg Loss: 0.6199, Avg Acc: 85.1762
+2025-06-17 22:15:24,277 - [INFO] - Epoch 60 [Val] Avg Loss: 0.5833, Avg Acc: 87.9880
+2025-06-17 22:15:24,278 - [INFO] - Epoch 60 - Filter params: Breakpoint=3687.13Hz, Transition Width=91.25
+2025-06-17 22:19:17,027 - [INFO] - Epoch 61 [Train] Avg Loss: 0.6139, Avg Acc: 85.5592
+2025-06-17 22:20:16,282 - [INFO] - Epoch 61 [Val] Avg Loss: 0.6065, Avg Acc: 86.6581
+2025-06-17 22:20:16,283 - [INFO] - Epoch 61 - Filter params: Breakpoint=3685.70Hz, Transition Width=91.21
+2025-06-17 22:24:16,981 - [INFO] - Epoch 62 [Train] Avg Loss: 0.6154, Avg Acc: 85.4699
+2025-06-17 22:25:16,622 - [INFO] - Epoch 62 [Val] Avg Loss: 0.5813, Avg Acc: 88.1596
+2025-06-17 22:25:16,623 - [INFO] - Epoch 62 - Filter params: Breakpoint=3684.26Hz, Transition Width=91.18
+2025-06-17 22:29:12,053 - [INFO] - Epoch 63 [Train] Avg Loss: 0.6099, Avg Acc: 85.9678
+2025-06-17 22:30:11,067 - [INFO] - Epoch 63 [Val] Avg Loss: 0.5895, Avg Acc: 87.8164
+2025-06-17 22:30:11,068 - [INFO] - Epoch 63 - Filter params: Breakpoint=3682.83Hz, Transition Width=91.14
+2025-06-17 22:34:09,418 - [INFO] - Epoch 64 [Train] Avg Loss: 0.6147, Avg Acc: 85.4954
+2025-06-17 22:35:08,616 - [INFO] - Epoch 64 [Val] Avg Loss: 0.5838, Avg Acc: 87.9880
+2025-06-17 22:35:08,616 - [INFO] - Epoch 64 - Filter params: Breakpoint=3681.39Hz, Transition Width=91.10
+2025-06-17 22:39:05,035 - [INFO] - Epoch 65 [Train] Avg Loss: 0.6106, Avg Acc: 85.9295
+2025-06-17 22:40:04,066 - [INFO] - Epoch 65 [Val] Avg Loss: 0.5852, Avg Acc: 87.5590
+2025-06-17 22:40:04,066 - [INFO] - Epoch 65 - Filter params: Breakpoint=3679.96Hz, Transition Width=91.06
+2025-06-17 22:44:04,656 - [INFO] - Epoch 66 [Train] Avg Loss: 0.6118, Avg Acc: 85.9040
+2025-06-17 22:45:03,689 - [INFO] - Epoch 66 [Val] Avg Loss: 0.5891, Avg Acc: 87.5590
+2025-06-17 22:45:03,689 - [INFO] - Epoch 66 - Filter params: Breakpoint=3679.36Hz, Transition Width=91.04
+2025-06-17 22:49:05,224 - [INFO] - Epoch 67 [Train] Avg Loss: 0.6088, Avg Acc: 86.0955
+2025-06-17 22:50:04,130 - [INFO] - Epoch 67 [Val] Avg Loss: 0.5888, Avg Acc: 87.9022
+2025-06-17 22:50:04,131 - [INFO] - Epoch 67 - Filter params: Breakpoint=3678.76Hz, Transition Width=91.02
+2025-06-17 22:54:08,278 - [INFO] - Epoch 68 [Train] Avg Loss: 0.6109, Avg Acc: 85.7763
+2025-06-17 22:55:07,997 - [INFO] - Epoch 68 [Val] Avg Loss: 0.5999, Avg Acc: 86.9155
+2025-06-17 22:55:07,998 - [INFO] - Epoch 68 - Filter params: Breakpoint=3678.16Hz, Transition Width=91.00
+2025-06-17 22:59:04,196 - [INFO] - Epoch 69 [Train] Avg Loss: 0.6083, Avg Acc: 86.1210
+2025-06-17 23:00:03,437 - [INFO] - Epoch 69 [Val] Avg Loss: 0.5942, Avg Acc: 87.1729
+2025-06-17 23:00:03,437 - [INFO] - Epoch 69 - Filter params: Breakpoint=3677.56Hz, Transition Width=90.99
+2025-06-17 23:03:58,101 - [INFO] - Epoch 70 [Train] Avg Loss: 0.6070, Avg Acc: 86.0444
+2025-06-17 23:04:57,120 - [INFO] - Epoch 70 [Val] Avg Loss: 0.5785, Avg Acc: 88.3312
+2025-06-17 23:04:57,120 - [INFO] - Epoch 70 - Filter params: Breakpoint=3676.96Hz, Transition Width=90.97
+2025-06-17 23:04:57,121 - [INFO] - New best validation loss: 0.5785, Acc: 88.3312
+2025-06-17 23:04:57,121 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 23:08:52,879 - [INFO] - Epoch 71 [Train] Avg Loss: 0.6075, Avg Acc: 86.3509
+2025-06-17 23:09:52,240 - [INFO] - Epoch 71 [Val] Avg Loss: 0.5897, Avg Acc: 87.9880
+2025-06-17 23:09:52,241 - [INFO] - Epoch 71 - Filter params: Breakpoint=3676.37Hz, Transition Width=90.95
+2025-06-17 23:13:53,506 - [INFO] - Epoch 72 [Train] Avg Loss: 0.6050, Avg Acc: 86.4019
+2025-06-17 23:14:53,731 - [INFO] - Epoch 72 [Val] Avg Loss: 0.5767, Avg Acc: 88.6315
+2025-06-17 23:14:53,732 - [INFO] - Epoch 72 - Filter params: Breakpoint=3675.77Hz, Transition Width=90.93
+2025-06-17 23:14:53,732 - [INFO] - New best validation loss: 0.5767, Acc: 88.6315
+2025-06-17 23:14:53,732 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-17 23:18:53,444 - [INFO] - Epoch 73 [Train] Avg Loss: 0.6024, Avg Acc: 87.0403
+2025-06-17 23:19:52,842 - [INFO] - Epoch 73 [Val] Avg Loss: 0.5823, Avg Acc: 88.1596
+2025-06-17 23:19:52,842 - [INFO] - Epoch 73 - Filter params: Breakpoint=3675.17Hz, Transition Width=90.92
+2025-06-17 23:23:48,957 - [INFO] - Epoch 74 [Train] Avg Loss: 0.6105, Avg Acc: 86.1338
+2025-06-17 23:24:47,840 - [INFO] - Epoch 74 [Val] Avg Loss: 0.5892, Avg Acc: 87.4303
+2025-06-17 23:24:47,841 - [INFO] - Epoch 74 - Filter params: Breakpoint=3674.57Hz, Transition Width=90.90
+2025-06-17 23:28:48,155 - [INFO] - Epoch 75 [Train] Avg Loss: 0.6056, Avg Acc: 86.1593
+2025-06-17 23:29:47,924 - [INFO] - Epoch 75 [Val] Avg Loss: 0.5924, Avg Acc: 86.5723
+2025-06-17 23:29:47,925 - [INFO] - Epoch 75 - Filter params: Breakpoint=3673.97Hz, Transition Width=90.88
+2025-06-17 23:33:42,942 - [INFO] - Epoch 76 [Train] Avg Loss: 0.6082, Avg Acc: 85.7508
+2025-06-17 23:34:42,311 - [INFO] - Epoch 76 [Val] Avg Loss: 0.5857, Avg Acc: 88.2454
+2025-06-17 23:34:42,312 - [INFO] - Epoch 76 - Filter params: Breakpoint=3673.38Hz, Transition Width=90.86
+2025-06-17 23:38:38,223 - [INFO] - Epoch 77 [Train] Avg Loss: 0.6077, Avg Acc: 86.0061
+2025-06-17 23:39:37,256 - [INFO] - Epoch 77 [Val] Avg Loss: 0.5931, Avg Acc: 87.3445
+2025-06-17 23:39:37,258 - [INFO] - Epoch 77 - Filter params: Breakpoint=3672.78Hz, Transition Width=90.85
+2025-06-17 23:43:40,352 - [INFO] - Epoch 78 [Train] Avg Loss: 0.6070, Avg Acc: 86.3636
+2025-06-17 23:44:40,062 - [INFO] - Epoch 78 [Val] Avg Loss: 0.5907, Avg Acc: 87.6019
+2025-06-17 23:44:40,063 - [INFO] - Epoch 78 - Filter params: Breakpoint=3672.18Hz, Transition Width=90.83
+2025-06-17 23:48:36,598 - [INFO] - Epoch 79 [Train] Avg Loss: 0.6045, Avg Acc: 86.5679
+2025-06-17 23:49:36,075 - [INFO] - Epoch 79 [Val] Avg Loss: 0.5811, Avg Acc: 88.4170
+2025-06-17 23:49:36,076 - [INFO] - Epoch 79 - Filter params: Breakpoint=3671.82Hz, Transition Width=90.82
+2025-06-17 23:53:30,956 - [INFO] - Epoch 80 [Train] Avg Loss: 0.6079, Avg Acc: 86.1466
+2025-06-17 23:54:30,939 - [INFO] - Epoch 80 [Val] Avg Loss: 0.5921, Avg Acc: 87.4303
+2025-06-17 23:54:30,939 - [INFO] - Epoch 80 - Filter params: Breakpoint=3671.46Hz, Transition Width=90.81
+2025-06-17 23:58:22,892 - [INFO] - Epoch 81 [Train] Avg Loss: 0.6028, Avg Acc: 86.5424
+2025-06-17 23:59:22,552 - [INFO] - Epoch 81 [Val] Avg Loss: 0.5781, Avg Acc: 88.5886
+2025-06-17 23:59:22,553 - [INFO] - Epoch 81 - Filter params: Breakpoint=3671.10Hz, Transition Width=90.80
+2025-06-18 00:03:25,829 - [INFO] - Epoch 82 [Train] Avg Loss: 0.6026, Avg Acc: 86.7594
+2025-06-18 00:04:25,184 - [INFO] - Epoch 82 [Val] Avg Loss: 0.5754, Avg Acc: 88.8460
+2025-06-18 00:04:25,184 - [INFO] - Epoch 82 - Filter params: Breakpoint=3670.74Hz, Transition Width=90.80
+2025-06-18 00:04:25,184 - [INFO] - New best validation loss: 0.5754, Acc: 88.8460
+2025-06-18 00:04:25,185 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-18 00:08:21,513 - [INFO] - Epoch 83 [Train] Avg Loss: 0.6042, Avg Acc: 86.4019
+2025-06-18 00:09:21,403 - [INFO] - Epoch 83 [Val] Avg Loss: 0.5758, Avg Acc: 88.6315
+2025-06-18 00:09:21,404 - [INFO] - Epoch 83 - Filter params: Breakpoint=3670.38Hz, Transition Width=90.79
+2025-06-18 00:13:10,101 - [INFO] - Epoch 84 [Train] Avg Loss: 0.6055, Avg Acc: 86.4913
+2025-06-18 00:14:10,636 - [INFO] - Epoch 84 [Val] Avg Loss: 0.5810, Avg Acc: 88.0309
+2025-06-18 00:14:10,637 - [INFO] - Epoch 84 - Filter params: Breakpoint=3670.03Hz, Transition Width=90.78
+2025-06-18 00:18:04,062 - [INFO] - Epoch 85 [Train] Avg Loss: 0.6020, Avg Acc: 86.7339
+2025-06-18 00:19:04,691 - [INFO] - Epoch 85 [Val] Avg Loss: 0.6048, Avg Acc: 86.7439
+2025-06-18 00:19:04,692 - [INFO] - Epoch 85 - Filter params: Breakpoint=3669.67Hz, Transition Width=90.77
+2025-06-18 00:23:04,281 - [INFO] - Epoch 86 [Train] Avg Loss: 0.6063, Avg Acc: 86.1210
+2025-06-18 00:24:04,007 - [INFO] - Epoch 86 [Val] Avg Loss: 0.5840, Avg Acc: 87.9022
+2025-06-18 00:24:04,007 - [INFO] - Epoch 86 - Filter params: Breakpoint=3669.31Hz, Transition Width=90.76
+2025-06-18 00:27:59,719 - [INFO] - Epoch 87 [Train] Avg Loss: 0.6086, Avg Acc: 85.9040
+2025-06-18 00:28:59,294 - [INFO] - Epoch 87 [Val] Avg Loss: 0.5739, Avg Acc: 89.0176
+2025-06-18 00:28:59,294 - [INFO] - Epoch 87 - Filter params: Breakpoint=3668.95Hz, Transition Width=90.75
+2025-06-18 00:28:59,295 - [INFO] - New best validation loss: 0.5739, Acc: 89.0176
+2025-06-18 00:28:59,295 - [INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+2025-06-18 00:32:56,270 - [INFO] - Epoch 88 [Train] Avg Loss: 0.6065, Avg Acc: 86.3764
+2025-06-18 00:33:56,145 - [INFO] - Epoch 88 [Val] Avg Loss: 0.5815, Avg Acc: 88.5028
+2025-06-18 00:33:56,146 - [INFO] - Epoch 88 - Filter params: Breakpoint=3668.59Hz, Transition Width=90.74
+2025-06-18 00:37:47,080 - [INFO] - Epoch 89 [Train] Avg Loss: 0.6077, Avg Acc: 86.1593
+2025-06-18 00:38:46,661 - [INFO] - Epoch 89 [Val] Avg Loss: 0.5758, Avg Acc: 89.0605
+2025-06-18 00:38:46,662 - [INFO] - Epoch 89 - Filter params: Breakpoint=3668.23Hz, Transition Width=90.73
+2025-06-18 00:42:50,012 - [INFO] - Epoch 90 [Train] Avg Loss: 0.6005, Avg Acc: 86.8616
+2025-06-18 00:43:49,798 - [INFO] - Epoch 90 [Val] Avg Loss: 0.5780, Avg Acc: 88.5457
+2025-06-18 00:43:49,798 - [INFO] - Epoch 90 - Filter params: Breakpoint=3667.87Hz, Transition Width=90.73
+2025-06-18 00:47:38,544 - [INFO] - Epoch 91 [Train] Avg Loss: 0.6012, Avg Acc: 86.6318
+2025-06-18 00:48:38,029 - [INFO] - Epoch 91 [Val] Avg Loss: 0.5816, Avg Acc: 87.9451
+2025-06-18 00:48:38,029 - [INFO] - Epoch 91 - Filter params: Breakpoint=3667.51Hz, Transition Width=90.72
+2025-06-18 00:52:35,603 - [INFO] - Epoch 92 [Train] Avg Loss: 0.6031, Avg Acc: 86.5296
+2025-06-18 00:53:34,986 - [INFO] - Epoch 92 [Val] Avg Loss: 0.5739, Avg Acc: 88.4599
+2025-06-18 00:53:34,988 - [INFO] - Epoch 92 - Filter params: Breakpoint=3667.15Hz, Transition Width=90.71
+2025-06-18 00:57:39,520 - [INFO] - Epoch 93 [Train] Avg Loss: 0.6024, Avg Acc: 86.3636
+2025-06-18 00:58:39,784 - [INFO] - Epoch 93 [Val] Avg Loss: 0.5760, Avg Acc: 88.8031
+2025-06-18 00:58:39,784 - [INFO] - Epoch 93 - Filter params: Breakpoint=3666.80Hz, Transition Width=90.70
+2025-06-18 01:02:48,892 - [INFO] - Epoch 94 [Train] Avg Loss: 0.6046, Avg Acc: 86.5935
+2025-06-18 01:03:48,433 - [INFO] - Epoch 94 [Val] Avg Loss: 0.5840, Avg Acc: 88.0309
+2025-06-18 01:03:48,433 - [INFO] - Epoch 94 - Filter params: Breakpoint=3666.56Hz, Transition Width=90.70
+2025-06-18 01:07:43,983 - [INFO] - Epoch 95 [Train] Avg Loss: 0.6024, Avg Acc: 86.5807
+2025-06-18 01:08:43,797 - [INFO] - Epoch 95 [Val] Avg Loss: 0.5841, Avg Acc: 88.4599
+2025-06-18 01:08:43,798 - [INFO] - Epoch 95 - Filter params: Breakpoint=3666.32Hz, Transition Width=90.69
+2025-06-18 01:12:57,579 - [INFO] - Epoch 96 [Train] Avg Loss: 0.6027, Avg Acc: 86.5041
+2025-06-18 01:13:57,168 - [INFO] - Epoch 96 [Val] Avg Loss: 0.5855, Avg Acc: 87.8593
+2025-06-18 01:13:57,169 - [INFO] - Epoch 96 - Filter params: Breakpoint=3666.08Hz, Transition Width=90.69
+2025-06-18 01:18:05,271 - [INFO] - Epoch 97 [Train] Avg Loss: 0.6037, Avg Acc: 86.5424
+2025-06-18 01:19:04,919 - [INFO] - Epoch 97 [Val] Avg Loss: 0.5865, Avg Acc: 88.0309
+2025-06-18 01:19:04,919 - [INFO] - Epoch 97 - Filter params: Breakpoint=3665.84Hz, Transition Width=90.68
+2025-06-18 01:23:04,035 - [INFO] - Epoch 98 [Train] Avg Loss: 0.6055, Avg Acc: 86.4913
+2025-06-18 01:24:04,138 - [INFO] - Epoch 98 [Val] Avg Loss: 0.5828, Avg Acc: 88.4599
+2025-06-18 01:24:04,138 - [INFO] - Epoch 98 - Filter params: Breakpoint=3665.60Hz, Transition Width=90.68
+2025-06-18 01:28:07,929 - [INFO] - Epoch 99 [Train] Avg Loss: 0.6021, Avg Acc: 86.6701
+2025-06-18 01:29:07,443 - [INFO] - Epoch 99 [Val] Avg Loss: 0.5795, Avg Acc: 88.2454
+2025-06-18 01:29:07,444 - [INFO] - Epoch 99 - Filter params: Breakpoint=3665.36Hz, Transition Width=90.67
+2025-06-18 01:33:07,701 - [INFO] - Epoch 100 [Train] Avg Loss: 0.6006, Avg Acc: 86.7722
+2025-06-18 01:34:07,550 - [INFO] - Epoch 100 [Val] Avg Loss: 0.5741, Avg Acc: 88.5028
+2025-06-18 01:34:07,551 - [INFO] - Epoch 100 - Filter params: Breakpoint=3665.24Hz, Transition Width=90.67
+2025-06-18 01:34:07,551 - [INFO] - Training loop finished.
+2025-06-18 01:34:09,563 - [INFO] - Saved training plots to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/training_history.png
+2025-06-18 01:34:09,571 - [INFO] - Saved filter parameters evolution to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/filter_parameters_evolution.csv
+2025-06-18 01:34:14,353 - [INFO] - Generated 2 advanced analysis plots
+2025-06-18 01:34:14,353 - [INFO] - Starting testing...
+2025-06-18 01:34:14,353 - [INFO] - Loading best model from /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/bird_classification_distillation_extract_calls_100_epochs_best_model.pth for testing...
+2025-06-18 01:35:07,716 - [INFO] - Test Accuracy: 0.9022
+2025-06-18 01:35:07,735 - [INFO] - Test Report:
+                       precision    recall  f1-score   support
+
+     Poecile montanus       0.75      0.88      0.81       129
+   Certhia familiaris       0.84      0.86      0.85       198
+            Apus apus       0.97      0.89      0.93       121
+            Bubo bubo       0.89      0.83      0.86       209
+       Periparus ater       0.94      0.73      0.82        60
+         Emberiza cia       0.85      0.85      0.85       156
+Lophophanes cristatus       0.85      0.90      0.87       435
+Certhia brachydactyla       0.85      0.76      0.80       187
+             non-bird       0.98      0.99      0.99       836
+
+             accuracy                           0.90      2331
+            macro avg       0.88      0.86      0.87      2331
+         weighted avg       0.90      0.90      0.90      2331
+
+2025-06-18 01:35:07,735 - [INFO] - Generating confusion matrix...
+2025-06-18 01:35:07,739 - [INFO] - Confusion matrix CSV saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/confusion_matrix.csv
+2025-06-18 01:35:08,172 - [INFO] - Confusion matrix PNG saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/confusion_matrix.png
+2025-06-18 01:35:08,175 - [INFO] - Results saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/results.json
+2025-06-18 01:35:08,176 - [INFO] - Model summary saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/model_summary.txt
+2025-06-18 01:35:08,178 - [INFO] - Results saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16/results.json
+2025-06-18 01:35:08,178 - [INFO] - --- Distillation Training Completed ---
+2025-06-18 01:35:08,178 - [INFO] - Final test accuracy: 0.9022
+2025-06-18 01:35:08,178 - [INFO] - Results and plots saved to: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-17_17-15-16

@@ -1,0 +1,89 @@
+[2025-06-12 10:12:23,269][__main__][INFO] - Starting knowledge distillation training
+[2025-06-12 10:12:23,274][__main__][INFO] - Configuration:
+experiment_name: bird_classification_distillation
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+soft_labels_path: test_soft_labels
+training:
+  epochs: 30
+  batch_size: 16
+  patience: 15
+  min_delta: 0.001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+  - Poecile montanus
+  - Certhia familiaris
+  - Apus apus
+  - Bubo bubo
+  - Periparus ater
+  - Emberiza cia
+  - Lophophanes cristatus
+  - Certhia brachydactyla
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-12 10:12:23,297][__main__][INFO] - Initialized trainer on device: cpu
+[2025-06-12 10:12:23,297][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-12 10:12:23,406][__main__][INFO] - Train samples: 836
+[2025-06-12 10:12:23,406][__main__][INFO] - Val samples: 836
+[2025-06-12 10:12:23,406][__main__][INFO] - Test samples: 836
+[2025-06-12 10:12:23,406][__main__][INFO] - Soft labels info: {'num_classes': 9, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'Periparus ater', 'Emberiza cia', 'Lophophanes cristatus', 'Certhia brachydactyla', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 9986, 'files_processed': 9986}
+[2025-06-12 10:12:23,406][__main__][INFO] - Setting up student model...
+[2025-06-12 10:12:23,444][__main__][INFO] - Student model parameters: 53,516
+[2025-06-12 10:12:23,444][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-12 10:12:24,629][__main__][INFO] - Optimizer: AdamW
+[2025-06-12 10:12:24,630][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-12 10:12:24,630][__main__][INFO] - Setting up distillation loss...
+[2025-06-12 10:12:24,630][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-12 10:12:24,630][__main__][INFO] - Alpha: 0.3, Temperature: 4.0
+[2025-06-12 10:12:24,630][__main__][INFO] - Starting distillation training...
