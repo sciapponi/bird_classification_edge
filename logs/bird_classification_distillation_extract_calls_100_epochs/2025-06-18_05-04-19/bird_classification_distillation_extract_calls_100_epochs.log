@@ -262,3 +262,63 @@ dataset:
 [2025-06-18 08:35:19,084][__main__][INFO] - Epoch 42 [Val] Avg Loss: 0.6294, Avg Acc: 84.9383
 [2025-06-18 08:35:19,085][__main__][INFO] - Epoch 42 - Filter params: Breakpoint=3279.01Hz, Transition Width=80.11
 [2025-06-18 08:39:31,638][__main__][INFO] - Epoch 43 [Train] Avg Loss: 0.6167, Avg Acc: 85.6107
+[2025-06-18 08:40:32,590][__main__][INFO] - Epoch 43 [Val] Avg Loss: 0.6211, Avg Acc: 86.0494
+[2025-06-18 08:40:32,591][__main__][INFO] - Epoch 43 - Filter params: Breakpoint=3263.50Hz, Transition Width=79.72
+[2025-06-18 08:40:32,591][__main__][INFO] - New best validation loss: 0.6211, Acc: 86.0494
+[2025-06-18 08:40:32,592][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+[2025-06-18 08:44:53,328][__main__][INFO] - Epoch 44 [Train] Avg Loss: 0.6171, Avg Acc: 85.9008
+[2025-06-18 08:45:54,824][__main__][INFO] - Epoch 44 [Val] Avg Loss: 0.6349, Avg Acc: 85.0617
+[2025-06-18 08:45:54,825][__main__][INFO] - Epoch 44 - Filter params: Breakpoint=3248.05Hz, Transition Width=79.35
+[2025-06-18 08:49:58,553][__main__][INFO] - Epoch 45 [Train] Avg Loss: 0.6187, Avg Acc: 85.4788
+[2025-06-18 08:50:59,587][__main__][INFO] - Epoch 45 [Val] Avg Loss: 0.6164, Avg Acc: 85.4321
+[2025-06-18 08:50:59,589][__main__][INFO] - Epoch 45 - Filter params: Breakpoint=3232.66Hz, Transition Width=78.97
+[2025-06-18 08:50:59,589][__main__][INFO] - New best validation loss: 0.6164, Acc: 85.4321
+[2025-06-18 08:50:59,589][__main__][INFO] - Saving best model to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/bird_classification_distillation_extract_calls_100_epochs_best_model.pth...
+[2025-06-18 08:55:10,463][__main__][INFO] - Epoch 46 [Train] Avg Loss: 0.6155, Avg Acc: 85.7030
+[2025-06-18 08:56:11,622][__main__][INFO] - Epoch 46 [Val] Avg Loss: 0.6322, Avg Acc: 84.2593
+[2025-06-18 08:56:11,623][__main__][INFO] - Epoch 46 - Filter params: Breakpoint=3217.37Hz, Transition Width=78.59
+[2025-06-18 09:00:18,225][__main__][INFO] - Epoch 47 [Train] Avg Loss: 0.6136, Avg Acc: 86.0987
+[2025-06-18 09:01:18,920][__main__][INFO] - Epoch 47 [Val] Avg Loss: 0.6358, Avg Acc: 84.1358
+[2025-06-18 09:01:18,921][__main__][INFO] - Epoch 47 - Filter params: Breakpoint=3202.13Hz, Transition Width=78.22
+[2025-06-18 09:05:27,530][__main__][INFO] - Epoch 48 [Train] Avg Loss: 0.6080, Avg Acc: 86.4020
+[2025-06-18 09:06:27,252][__main__][INFO] - Epoch 48 [Val] Avg Loss: 0.6209, Avg Acc: 85.2469
+[2025-06-18 09:06:27,252][__main__][INFO] - Epoch 48 - Filter params: Breakpoint=3186.99Hz, Transition Width=77.85
+[2025-06-18 09:10:28,919][__main__][INFO] - Epoch 49 [Train] Avg Loss: 0.6106, Avg Acc: 85.7689
+[2025-06-18 09:11:29,571][__main__][INFO] - Epoch 49 [Val] Avg Loss: 0.6216, Avg Acc: 85.6173
+[2025-06-18 09:11:29,572][__main__][INFO] - Epoch 49 - Filter params: Breakpoint=3171.93Hz, Transition Width=77.48
+[2025-06-18 09:15:33,687][__main__][INFO] - Epoch 50 [Train] Avg Loss: 0.6101, Avg Acc: 86.1514
+[2025-06-18 09:16:34,337][__main__][INFO] - Epoch 50 [Val] Avg Loss: 0.6397, Avg Acc: 82.7160
+[2025-06-18 09:16:34,338][__main__][INFO] - Epoch 50 - Filter params: Breakpoint=3156.91Hz, Transition Width=77.10
+[2025-06-18 09:16:34,338][__main__][INFO] - Training loop finished.
+[2025-06-18 09:16:36,293][__main__][INFO] - Saved training plots to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/training_history.png
+[2025-06-18 09:16:36,300][__main__][INFO] - Saved filter parameters evolution to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/filter_parameters_evolution.csv
+[2025-06-18 09:16:40,626][__main__][INFO] - Generated 2 advanced analysis plots
+[2025-06-18 09:16:40,626][__main__][INFO] - Starting testing...
+[2025-06-18 09:16:40,627][__main__][INFO] - Loading best model from /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/bird_classification_distillation_extract_calls_100_epochs_best_model.pth for testing...
+[2025-06-18 09:17:33,886][__main__][INFO] - Test Accuracy: 0.8691
+[2025-06-18 09:17:33,911][__main__][INFO] - Test Report:
+                       precision    recall  f1-score   support
+
+     Poecile montanus       0.82      0.87      0.85       129
+   Certhia familiaris       0.84      0.87      0.86       198
+            Apus apus       0.96      0.93      0.95       121
+            Bubo bubo       0.87      0.87      0.87       209
+       Periparus ater       0.88      0.85      0.86        60
+         Emberiza cia       0.88      0.83      0.86       156
+Lophophanes cristatus       0.87      0.89      0.88       435
+Certhia brachydactyla       0.81      0.78      0.79       187
+             non-bird       0.97      0.91      0.94       125
+
+             accuracy                           0.87      1620
+            macro avg       0.88      0.87      0.87      1620
+         weighted avg       0.87      0.87      0.87      1620
+
+[2025-06-18 09:17:33,911][__main__][INFO] - Generating confusion matrix...
+[2025-06-18 09:17:33,916][__main__][INFO] - Confusion matrix CSV saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/confusion_matrix.csv
+[2025-06-18 09:17:34,583][__main__][INFO] - Confusion matrix PNG saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/confusion_matrix.png
+[2025-06-18 09:17:34,585][__main__][INFO] - Results saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/results.json
+[2025-06-18 09:17:34,586][__main__][INFO] - Model summary saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/model_summary.txt
+[2025-06-18 09:17:34,588][__main__][INFO] - Results saved to /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19/results.json
+[2025-06-18 09:17:34,588][__main__][INFO] - --- Distillation Training Completed ---
+[2025-06-18 09:17:34,589][__main__][INFO] - Final test accuracy: 0.8691
+[2025-06-18 09:17:34,589][__main__][INFO] - Results and plots saved to: /app/logs/bird_classification_distillation_extract_calls_100_epochs/2025-06-18_05-04-19

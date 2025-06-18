@@ -1,0 +1,23 @@
+Model: Improved_Phi_GRU_ATT
+Total parameters: 53,516
+Trainable parameters: 53,516
+
+Best validation accuracy: 85.43%
+Test accuracy: 86.91%
+Classification Report (Test Set):
+                       precision    recall  f1-score   support
+
+     Poecile montanus       0.82      0.87      0.85       129
+   Certhia familiaris       0.84      0.87      0.86       198
+            Apus apus       0.96      0.93      0.95       121
+            Bubo bubo       0.87      0.87      0.87       209
+       Periparus ater       0.88      0.85      0.86        60
+         Emberiza cia       0.88      0.83      0.86       156
+Lophophanes cristatus       0.87      0.89      0.88       435
+Certhia brachydactyla       0.81      0.78      0.79       187
+             non-bird       0.97      0.91      0.94       125
+
+             accuracy                           0.87      1620
+            macro avg       0.88      0.87      0.87      1620
+         weighted avg       0.87      0.87      0.87      1620
+
