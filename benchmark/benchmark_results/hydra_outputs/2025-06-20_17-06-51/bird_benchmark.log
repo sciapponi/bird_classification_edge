@@ -1,0 +1,10 @@
+[2025-06-20 17:06:54,983][__main__][INFO] - ============================================================
+[2025-06-20 17:06:54,985][__main__][INFO] - 🔬 STATISTICAL ANALYSIS MODE
+[2025-06-20 17:06:54,987][__main__][INFO] - ============================================================
+[2025-06-20 17:06:54,988][__main__][INFO] - 🔬 RUNNING STATISTICAL ANALYSIS...
+[2025-06-20 17:06:57,158][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-20 17:06:57,831][__main__][WARNING] - Bird dataset directory not found: /workspace/benchmark/bird_sound_dataset
+[2025-06-20 17:06:57,833][__main__][WARNING] - No_birds directory not found: /workspace/benchmark/augmented_dataset/no_birds
+[2025-06-20 17:06:57,839][__main__][ERROR] - No audio files found!
+[2025-06-20 17:06:57,840][__main__][ERROR] - Statistical analysis failed: 'label'
+[2025-06-20 17:06:57,840][__main__][ERROR] - ❌ Statistical analysis failed!

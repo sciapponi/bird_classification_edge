@@ -30,11 +30,20 @@ def butter_bandpass(lowcut, highcut, fs, order=4):
     high = highcut / nyquist
     
     # Validate filter parameters to avoid "Digital filter critical frequencies must be 0 < Wn < 1"
-    # Allow high=1.0 but not > 1.0, as scipy can handle the edge case
+    # Adjust highcut if it's at or above Nyquist frequency
+    if high >= 1.0:
+        original_highcut = highcut
+        highcut = min(highcut, fs * 0.49)  # Set to 98% of Nyquist frequency
+        high = highcut / nyquist
+        print(f"WARNING: Filter frequencies too high for sample rate {fs}. Adjusted highcut from {original_highcut}Hz to {highcut}Hz")
+        if low >= high:
+            # If still invalid, return original data
+            raise ValueError(f"Invalid filter parameters after adjustment: lowcut={lowcut}Hz, highcut={highcut}Hz, fs={fs}Hz")
+    
     if low <= 0 or high <= 0 or low >= 1 or high > 1 or low >= high:
         raise ValueError(f"Invalid filter parameters: lowcut={lowcut}Hz, highcut={highcut}Hz, fs={fs}Hz. "
                         f"Normalized frequencies: low={low:.4f}, high={high:.4f}. "
-                        f"Must be 0 < low < high <= 1")
+                        f"Must be 0 < low < high < 1")
     
     b, a = butter(order, [low, high], btype='band')
     return b, a

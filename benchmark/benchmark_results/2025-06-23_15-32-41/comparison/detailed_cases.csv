@@ -1,0 +1,27 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Apus_apus/XC317557-160520_02 - trimmed.mp3,Apus_apus,no_birds,0.35173848271369934,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Apus_apus/XC622568-200602_04 Swift D 0458.mp3,Apus_apus,Lophophanes_cristatus,0.34391099214553833,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Bubo_bubo/XC828962-bubo-bubo-4-guadalbarbo-05-10-2022.mp3,Bubo_bubo,Bubo_bubo,0.7298445105552673,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC629192-210228_0326_eagle owl+12db.mp3,Bubo_bubo,Bubo_bubo,0.6000475883483887,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC621889-2021-02-15-01-10-copulation.mp3,Bubo_bubo,Poecile_montanus,0.23906965553760529,Bubo_bubo,0.6257688403129578,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC955286-bubo-bubo-3-cabra-01-01-2020.mp3,Bubo_bubo,Bubo_bubo,0.47166430950164795,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC504950-Bubo bubo.mp3,Bubo_bubo,no_birds,0.6705819368362427,Bubo_bubo,0.7136598229408264,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC773818-1_HGD_femelle_Verdusse_20221219_pr.mp3,Bubo_bubo,Apus_apus,0.39621081948280334,Bubo_bubo,0.2592656910419464,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC598433-XC-biOsmid3C001-04equII (8).mp3,Certhia_familiaris,Bubo_bubo,0.5337151885032654,Certhia_familiaris,0.6766003966331482,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC198006-Tradkrypare-(2014-06-24 17.53)-LS114750.mp3,Certhia_familiaris,Certhia_familiaris,0.719691812992096,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC471622-2019-04-07 Aleria - Bavella Grimbereau des bois series de cris d alarme vol et nourrissage ++.mp3,Certhia_familiaris,Certhia_brachydactyla,0.48945125937461853,Certhia_brachydactyla,0.6837235689163208,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC703213-XC 2022-02-18 (011) 8.35h ZOOM H4n u NTG1 Gaissau Rheinholz Wbl Gesang und ein weiteres Ind ruft ua 10x hp 1500-6db Bf Sdr ua.mp3,Certhia_familiaris,Periparus_ater,0.4037485718727112,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC536605-Norteño Sandicosa.mp3,Certhia_familiaris,Certhia_familiaris,0.6490026116371155,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC346344-Cerfam-C_Poland_PSZ_9.00_161215-0149.mp3,Certhia_familiaris,Periparus_ater,0.30732107162475586,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC528174-200202_11.mp3,Certhia_familiaris,Emberiza_cia,0.3318052589893341,Certhia_familiaris,0.32240015268325806,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC328803-5190_179-01hipan mp3.mp3,Certhia_familiaris,Bubo_bubo,0.6506071090698242,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC462955-Grimpereau des bois cris fin de nourrissage +.mp3,Certhia_familiaris,Certhia_familiaris,0.5033826231956482,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC203592-30621_187-4m mp3.mp3,Certhia_familiaris,Certhia_familiaris,0.1998293548822403,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC525896-200208_0110.mp3,Poecile_montanus,Periparus_ater,0.6192742586135864,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC791993-czarnoglowka-2.mp3,Poecile_montanus,Apus_apus,0.5203814506530762,Poecile_montanus,0.8542600274085999,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC883009-Willow-Tit-blue-tit-like-call-and-tchay-040324-1353.wav,Poecile_montanus,Periparus_ater,0.4204510748386383,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC484458-54 - STE-251 Mésange boréale pour XC.mp3,Poecile_montanus,Poecile_montanus,0.6994715332984924,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC646072-DM670857 (mp3cut.net)_01_.mp3,Poecile_montanus,Bubo_bubo,0.5278863310813904,no_birds,0.0,False,False,both_incorrect
+"../bird_sound_dataset/Poecile_montanus/XC812029-Poecile-montanus-230625_012,B1-silent-song-male-.mp3",Poecile_montanus,Poecile_montanus,0.5981299877166748,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC307656-LS110150_ParusMontanus_stareBiele.mp3,Poecile_montanus,Periparus_ater,0.7235173583030701,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC354063-Poecmont-c-poland_PSZ_12.15_170128-0788.mp3,Poecile_montanus,Periparus_ater,0.6193950176239014,Poecile_montanus,0.947281539440155,False,True,birdnet_only_correct

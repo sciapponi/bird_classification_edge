@@ -1,0 +1,139 @@
+# Adaptive Threshold Benchmark Configuration  
+# This configuration uses adaptive thresholds to reduce no_birds false positives
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Override benchmark configuration for adaptive threshold testing
+benchmark:
+  name: "adaptive_threshold_benchmark"
+  description: "Benchmark with adaptive thresholds to reduce no_birds false positives"
+  
+  # Standard mode but with optimized thresholds
+  mode:
+    birds_only: false  # Include no_birds class but with better threshold management
+    exclude_no_birds_from_ground_truth: false  # Keep no_birds samples in test set
+    force_fair_preprocessing: true  # Use identical preprocessing for both models
+  
+  # Docker paths
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+
+# BirdNET configuration optimized to reduce no_birds false positives
+birdnet:
+  # ADAPTIVE THRESHOLD STRATEGY
+  confidence_threshold: 0.25  # Higher base threshold to reduce false positives
+  no_birds_threshold: 0.4     # Separate, higher threshold for no_birds classification
+  sensitivity: 1.25
+  
+  # Enable adaptive threshold logic
+  use_adaptive_threshold: true   # Enable the adaptive threshold system
+  adaptive_factor: 1.6          # Factor to apply to confidence_threshold for no_birds decisions
+  
+  # Keep filters disabled for fair comparison
+  disable_location_filter: true
+  disable_time_filter: true
+  
+  # Additional parameters for fine-tuning
+  species_bias_factor: 1.1  # Slight bias towards bird species over no_birds
+  min_detection_duration: 0.5  # Minimum duration for valid bird detection (seconds)
+
+# Student model configuration remains standard
+student_model:
+  inference:
+    confidence_threshold: 0.05  # Keep student model threshold low for comparison
+    device: "auto"
+    
+  # Standard class configuration
+  classes:
+    has_no_birds_class: true
+    no_birds_label: "no_birds"
+
+# Enhanced comparison metrics with focus on no_birds performance
+comparison:
+  metrics:
+    calculate_accuracy: true
+    calculate_precision: true
+    calculate_recall: true
+    calculate_f1: true
+    calculate_confusion_matrix: true
+    calculate_per_class_metrics: true
+    calculate_agreement_analysis: true
+    
+    # Special focus on no_birds performance
+    calculate_no_birds_metrics: true
+    calculate_species_vs_no_birds_confusion: true
+    
+    averaging_methods: ["micro", "macro", "weighted"]
+    
+  # Agreement analysis with special attention to no_birds classification
+  agreement:
+    exact_match: true
+    partial_match: false
+    confidence_weighting: true  # Weight by confidence scores
+    
+    # Special categories for no_birds analysis
+    categories:
+      both_correct: "both_correct"
+      student_only: "student_only_correct"
+      birdnet_only: "birdnet_only_correct"
+      both_incorrect: "both_incorrect"
+      false_no_birds: "false_no_birds_detections"  # Cases where no_birds was incorrectly predicted
+      missed_no_birds: "missed_no_birds_detections"  # Cases where no_birds was missed
+      
+  # Enhanced visualization for threshold analysis
+  visualization:
+    figsize: [20, 12]  # Larger plots for detailed analysis
+    
+    confusion_matrix:
+      normalize: null  # Show raw counts
+      show_percentages: true
+      highlight_no_birds: true  # Special highlighting for no_birds class
+      
+    # Additional plots for threshold analysis
+    threshold_analysis:
+      confidence_distribution: true  # Plot confidence score distributions
+      roc_curve: true  # ROC curve for no_birds vs birds classification
+      precision_recall_curve: true  # PR curve for threshold optimization
+
+# Output configuration with enhanced naming for threshold analysis
+output:
+  naming:
+    student_predictions: "student_predictions_adaptive.csv"
+    birdnet_predictions: "birdnet_predictions_adaptive.csv"
+    comparison_report: "comparison_report_adaptive.json"
+    comparison_summary: "comparison_summary_adaptive.txt"
+    detailed_cases: "detailed_cases_adaptive.csv"
+    threshold_analysis: "threshold_analysis_adaptive.csv"
+    
+  plots:
+    confusion_matrices: "confusion_matrices_adaptive.png"
+    agreement_analysis: "agreement_analysis_adaptive.png"
+    per_class_accuracy: "per_class_accuracy_adaptive.png"
+    confidence_distributions: "confidence_distributions_adaptive.png"
+    roc_curves: "roc_curves_adaptive.png"
+    
+# Advanced debugging and analysis
+debug:
+  files_limit: null  # Use all files for comprehensive analysis
+  max_files_per_class: null
+  
+  # Detailed logging for threshold analysis
+  log_confidence_scores: true
+  log_threshold_decisions: true
+  save_prediction_details: true
+  
+# Experimental settings for threshold optimization
+experimental:
+  # Test multiple threshold combinations
+  threshold_grid_search: false  # Set to true for exhaustive threshold testing
+  threshold_ranges:
+    confidence_threshold: [0.15, 0.2, 0.25, 0.3, 0.35]
+    no_birds_threshold: [0.3, 0.35, 0.4, 0.45, 0.5]
+    
+  # Cross-validation settings
+  cross_validation: false
+  cv_folds: 5 

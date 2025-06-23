@@ -1,0 +1,6 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Apus_apus/XC743927-20220411_203623_Apus apus_Llucmajor.mp3,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC743927-20220411_203623_Apus apus_Llucmajor.mp3
+../bird_sound_dataset/Bubo_bubo/XC839784-B19h52m47s21oct2023c_04h55.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC839784-B19h52m47s21oct2023c_04h55.mp3
+../bird_sound_dataset/Certhia_familiaris/XC701017-cerfam ok1.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC701017-cerfam ok1.mp3
+../bird_sound_dataset/Poecile_montanus/XC354066-Poecmont-qC2_poland_psz_10.30_170128-0761.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC354066-Poecmont-qC2_poland_psz_10.30_170128-0761.mp3
+../augmented_dataset/no_birds/empty_0010.wav,no_birds,no_birds,no_birds,/workspace/augmented_dataset/no_birds/empty_0010.wav

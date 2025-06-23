@@ -1,0 +1,16 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species,birdnet_preprocessing
+../bird_sound_dataset/Poecile_montanus/XC892577-240330_0132_25db_nr.wav,Poecile_montanus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC794939-wt-6803d12a.1.wav,Poecile_montanus,Poecile_montanus,0.9994439482688904,1,{'Poecile_montanus': 0.9994439482688904},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC879067-PARMON120127.wav,Poecile_montanus,Poecile_montanus,0.9744287729263306,1,{'Poecile_montanus': 0.9744287729263306},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC929526-WALDBAUMLÄUFER--9_21--Sumpfw.--A-VOC_240320-5081.wav,Certhia_familiaris,Certhia_familiaris,0.9921483993530273,1,{'Certhia_familiaris': 0.9921483993530273},extract_calls
+"../bird_sound_dataset/Certhia_familiaris/XC807845-Eurasian-Treecreeper,-Seefeld-BE-230606-000.wav",Certhia_familiaris,Certhia_familiaris,0.9997912049293518,1,{'Certhia_familiaris': 0.9997912049293518},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC795538-Grimpereau_des_bois_Certhia_familiaris_song.wav,Certhia_familiaris,Certhia_familiaris,0.9908807277679443,1,{'Certhia_familiaris': 0.9908807277679443},extract_calls
+../bird_sound_dataset/Apus_apus/XC805453-473304981.wav,Apus_apus,Apus_apus,0.8497543931007385,1,{'Apus_apus': 0.8497543931007385},extract_calls
+../bird_sound_dataset/Apus_apus/XC808424-Apus-apus_call-birds-near-the-nest-and-one-in-the-nest_100623_Villarrín-de-Campo.wav,Apus_apus,Apus_apus,0.9921813011169434,1,{'Apus_apus': 0.9921813011169434},extract_calls
+../bird_sound_dataset/Apus_apus/XC904577-05-08-2024_7h55_martinet-noir.wav,Apus_apus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC872757-240213_0087_wav.wav,Bubo_bubo,Bubo_bubo,0.8537812232971191,1,{'Bubo_bubo': 0.8537812232971191},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC806630-Hubro04052023-2.wav,Bubo_bubo,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC953294-Eurasian-Eagle-owl_NEILAKSHAN1_20231208_011102_alarm2_xeno.wav,Bubo_bubo,no_birds,0.0,0,{},extract_calls
+../augmented_dataset/no_birds/empty_0348.wav,no_birds,Bubo_bubo,0.975098192691803,1,{'Bubo_bubo': 0.975098192691803},extract_calls
+../augmented_dataset/no_birds/esc50_0009.wav,no_birds,no_birds,0.0,0,{},extract_calls
+../augmented_dataset/no_birds/empty_0374.wav,no_birds,no_birds,0.0,0,{},extract_calls

@@ -1,0 +1,35 @@
+[2025-06-23 15:43:33,715][__main__][INFO] - ============================================================
+[2025-06-23 15:43:33,715][__main__][INFO] - 🧪 BENCHMARK IMPROVEMENTS TEST MODE
+[2025-06-23 15:43:33,715][__main__][INFO] - ============================================================
+[2025-06-23 15:43:33,716][__main__][INFO] - 🧪 RUNNING BENCHMARK IMPROVEMENTS TEST...
+[2025-06-23 15:43:33,716][__main__][INFO] - This is a quick validation to ensure new features work correctly
+[2025-06-23 15:43:33,716][__main__][INFO] - 🔧 Testing adaptive threshold configuration...
+[2025-06-23 15:43:33,716][__main__][INFO] - 🎯 Testing birds-only mode configuration...
+[2025-06-23 15:43:33,716][__main__][INFO] - 🚀 Running mini benchmark test (limited files)...
+[2025-06-23 15:43:33,718][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-23 15:43:33,725][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-23 15:43:33,773][__main__][INFO] - Limited Poecile_montanus to 3 files
+[2025-06-23 15:43:33,773][__main__][INFO] - Found 3 files for Poecile_montanus
+[2025-06-23 15:43:33,774][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-23 15:43:33,798][__main__][INFO] - Limited Certhia_familiaris to 3 files
+[2025-06-23 15:43:33,798][__main__][INFO] - Found 3 files for Certhia_familiaris
+[2025-06-23 15:43:33,799][__main__][INFO] - Processing species: Apus_apus
+[2025-06-23 15:43:33,820][__main__][INFO] - Limited Apus_apus to 3 files
+[2025-06-23 15:43:33,821][__main__][INFO] - Found 3 files for Apus_apus
+[2025-06-23 15:43:33,821][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-23 15:43:33,844][__main__][INFO] - Limited Bubo_bubo to 3 files
+[2025-06-23 15:43:33,844][__main__][INFO] - Found 3 files for Bubo_bubo
+[2025-06-23 15:43:33,845][__main__][INFO] - Scanning no_birds dataset: /workspace/augmented_dataset/no_birds
+[2025-06-23 15:43:33,869][__main__][INFO] - Limited no_birds to 3 files
+[2025-06-23 15:43:33,869][__main__][INFO] - Found 3 no_birds files
+[2025-06-23 15:43:33,871][__main__][INFO] - Total audio files discovered: 15
+[2025-06-23 15:43:33,873][__main__][INFO] - Class distribution:
+[2025-06-23 15:43:33,874][__main__][INFO] -   Poecile_montanus: 3 files
+[2025-06-23 15:43:33,874][__main__][INFO] -   Certhia_familiaris: 3 files
+[2025-06-23 15:43:33,874][__main__][INFO] -   Apus_apus: 3 files
+[2025-06-23 15:43:33,875][__main__][INFO] -   Bubo_bubo: 3 files
+[2025-06-23 15:43:33,875][__main__][INFO] -   no_birds: 3 files
+[2025-06-23 15:43:33,875][__main__][INFO] - ✅ Audio discovery OK: Found 15 files
+[2025-06-23 15:43:35,617][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-23 15:43:36,564][__main__][ERROR] - ❌ Test FAILED with error: __init__() got an unexpected keyword argument 'no_birds_threshold'
+[2025-06-23 15:43:36,568][__main__][ERROR] - ❌ Test mode failed!

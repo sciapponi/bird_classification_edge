@@ -1,0 +1,27 @@
+# Mini Benchmark Configuration
+# Complete benchmark pipeline but with very limited dataset for testing
+
+defaults:
+  - benchmark
+
+# Override for mini benchmark testing
+benchmark:
+  name: "mini_benchmark_test"
+  description: "Complete benchmark pipeline with limited dataset for testing"
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+    output_dir: "benchmark_results"
+
+# Use single threshold for testing
+birdnet:
+  confidence_threshold: 0.25  # Single threshold for all classifications
+  use_adaptive_threshold: false
+  adaptive_factor: 1.0
+
+# Mini test settings - will run COMPLETE pipeline but with few files
+debug:
+  files_limit: 15  # Very limited for fast testing
+  max_files_per_class: 3  # Small sample per class 

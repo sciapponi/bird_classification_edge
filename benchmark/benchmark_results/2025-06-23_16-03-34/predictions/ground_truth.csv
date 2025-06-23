@@ -1,0 +1,9 @@
+audio_path,label,category,species,full_path
+"../bird_sound_dataset/Apus_apus/XC327528-Gierzwaluwen, AN, 180716 0745 uur.mp3",Apus_apus,bird,Apus_apus,"/workspace/bird_sound_dataset/Apus_apus/XC327528-Gierzwaluwen, AN, 180716 0745 uur.mp3"
+../bird_sound_dataset/Bubo_bubo/XC310915-Uhu4_20160401_2010.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC310915-Uhu4_20160401_2010.mp3
+../bird_sound_dataset/Bubo_bubo/XC399487-180113UhuAlarmWeibchengesangFH 1644.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC399487-180113UhuAlarmWeibchengesangFH 1644.mp3
+../bird_sound_dataset/Certhia_familiaris/XC761618-certhia_2022_11_17-10_32_47_morava.wav,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC761618-certhia_2022_11_17-10_32_47_morava.wav
+../bird_sound_dataset/Certhia_familiaris/XC487431- ЛОД1 1230 150719.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC487431- ЛОД1 1230 150719.mp3
+../bird_sound_dataset/Certhia_familiaris/XC748104-20220912_175546  leśny ogrodowy czarny OK.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC748104-20220912_175546  leśny ogrodowy czarny OK.mp3
+../bird_sound_dataset/Poecile_montanus/XC395249-20161209_Soumaintrain_Mésange boréale_02.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC395249-20161209_Soumaintrain_Mésange boréale_02.mp3
+../bird_sound_dataset/Poecile_montanus/XC422526-Mesange boreale thin call.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC422526-Mesange boreale thin call.mp3

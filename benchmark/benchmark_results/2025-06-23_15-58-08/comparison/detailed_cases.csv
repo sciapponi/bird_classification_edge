@@ -1,0 +1,2 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Certhia_familiaris/XC499275-Trädkrypare_08.mp3,Certhia_familiaris,Poecile_montanus,0.31280848383903503,Certhia_familiaris,0.9273180365562439,False,True,birdnet_only_correct

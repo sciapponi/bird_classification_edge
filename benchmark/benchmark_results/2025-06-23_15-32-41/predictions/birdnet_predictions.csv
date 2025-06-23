@@ -1,0 +1,100 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species,birdnet_preprocessing
+../bird_sound_dataset/Apus_apus/XC316981-160516_02b.mp3,Apus_apus,Apus_apus,0.9930654764175415,1,{'Apus_apus': 0.9930654764175415},extract_calls
+../bird_sound_dataset/Apus_apus/XC184290-rondonecomune.mp3,Apus_apus,Apus_apus,0.9768508672714233,1,{'Apus_apus': 0.9768508672714233},extract_calls
+"../bird_sound_dataset/Apus_apus/XC256409-Common Swift 2015 06 26 Kent, Sandwich - St Peters Church at dusk various calls (1).mp3",Apus_apus,Apus_apus,0.9998152852058411,1,{'Apus_apus': 0.9998152852058411},extract_calls
+../bird_sound_dataset/Apus_apus/XC418453-martinet noir migr.mp3,Apus_apus,Apus_apus,0.9784788489341736,1,{'Apus_apus': 0.9784788489341736},extract_calls
+../bird_sound_dataset/Apus_apus/XC955808-MARTINET-NOIR_Cris-en-vol_JARDIN_20240717_22H10_P-Z-PB.wav,Apus_apus,Apus_apus,0.9985523819923401,1,{'Apus_apus': 0.9985523819923401},extract_calls
+../bird_sound_dataset/Apus_apus/XC723217-220423_001_240619_Gierzwaluw.mp3,Apus_apus,Apus_apus,0.9115229249000549,1,{'Apus_apus': 0.9115229249000549},extract_calls
+../bird_sound_dataset/Apus_apus/XC500252-180701_05 Swift (2) D 1059 XCu.mp3,Apus_apus,Apus_apus,0.9178271889686584,1,{'Apus_apus': 0.9178271889686584},extract_calls
+../bird_sound_dataset/Apus_apus/XC317557-160520_02 - trimmed.mp3,Apus_apus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Apus_apus/XC921406-Apus-apus_2024-07-17-0840h_A-Salgueira_Vigo_Parábola.wav,Apus_apus,Apus_apus,0.9948773980140686,1,{'Apus_apus': 0.9948773980140686},extract_calls
+../bird_sound_dataset/Apus_apus/XC580072-swift 30-07-20.mp3,Apus_apus,Apus_apus,0.8240481019020081,1,{'Apus_apus': 0.8240481019020081},extract_calls
+../bird_sound_dataset/Apus_apus/XC376920-martinet pâle (17).mp3,Apus_apus,Apus_apus,0.9932413101196289,1,{'Apus_apus': 0.9932413101196289},extract_calls
+../bird_sound_dataset/Apus_apus/XC642900-B17h51m18s26apr2021.mp3,Apus_apus,Apus_apus,0.9920584559440613,1,{'Apus_apus': 0.9920584559440613},extract_calls
+../bird_sound_dataset/Apus_apus/XC816229-Common-Swift_flight-call_20230713_0558.mp3,Apus_apus,Apus_apus,0.9850724339485168,1,{'Apus_apus': 0.9850724339485168},extract_calls
+../bird_sound_dataset/Apus_apus/XC919970-Wed-Jul-03-2024-07_52_58-Swift.wav,Apus_apus,Apus_apus,0.9875909090042114,1,{'Apus_apus': 0.9875909090042114},extract_calls
+../bird_sound_dataset/Apus_apus/XC622568-200602_04 Swift D 0458.mp3,Apus_apus,no_birds,0.0,0,{},extract_calls
+"../bird_sound_dataset/Apus_apus/XC483430-190622_1366 1402. Mauersegler. HR, Trogir Downtown. Stephan Risch.mp3",Apus_apus,Apus_apus,0.865978479385376,1,{'Apus_apus': 0.865978479385376},extract_calls
+../bird_sound_dataset/Apus_apus/XC662361-210709_5246 tm 5249 Gierzwaluw.mp3,Apus_apus,Apus_apus,0.999022364616394,1,{'Apus_apus': 0.999022364616394},extract_calls
+../bird_sound_dataset/Apus_apus/XC346611-LS103152 Common Swift call B.mp3,Apus_apus,Apus_apus,0.6174008250236511,1,{'Apus_apus': 0.6174008250236511},extract_calls
+../bird_sound_dataset/Apus_apus/XC655857-210610_3607 Gierzwaluwen.mp3,Apus_apus,Apus_apus,0.9994169473648071,1,{'Apus_apus': 0.9994169473648071},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC763265-221124_006a.mp3,Bubo_bubo,Bubo_bubo,0.9622064232826233,1,{'Bubo_bubo': 0.9622064232826233},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC612676-chant_femelle.mp3,Bubo_bubo,Bubo_bubo,0.6312656998634338,1,{'Bubo_bubo': 0.6312656998634338},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC828962-bubo-bubo-4-guadalbarbo-05-10-2022.mp3,Bubo_bubo,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC771778-buho_dueto.wav,Bubo_bubo,Bubo_bubo,0.9825918674468994,1,{'Bubo_bubo': 0.9825918674468994},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC604994-Oehoe zang1.mp3,Bubo_bubo,Bubo_bubo,0.9580258131027222,1,{'Bubo_bubo': 0.9580258131027222},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC771777-buho_dueto1.wav,Bubo_bubo,Bubo_bubo,0.9391545057296753,1,{'Bubo_bubo': 0.9391545057296753},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC629192-210228_0326_eagle owl+12db.mp3,Bubo_bubo,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC754689-221008_10.mp3,Bubo_bubo,Bubo_bubo,0.9562941193580627,1,{'Bubo_bubo': 0.9562941193580627},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC545589-BUBBUB 2255h 11042020.mp3,Bubo_bubo,Bubo_bubo,0.7460896372795105,1,{'Bubo_bubo': 0.7460896372795105},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC782262-230216_001b.wav,Bubo_bubo,Bubo_bubo,0.946964681148529,1,{'Bubo_bubo': 0.946964681148529},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC621889-2021-02-15-01-10-copulation.mp3,Bubo_bubo,Bubo_bubo,0.6257688403129578,1,{'Bubo_bubo': 0.6257688403129578},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC767247-221209_005a.mp3,Bubo_bubo,Bubo_bubo,0.9886807203292847,1,{'Bubo_bubo': 0.9886807203292847},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC358292-Bubo_07_D0276.mp3,Bubo_bubo,Bubo_bubo,0.8656783103942871,1,{'Bubo_bubo': 0.8656783103942871},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC711181-birdnet_mobile_2380543526_recording_420 (online-audio-converter.com).mp3,Bubo_bubo,Bubo_bubo,0.6639643311500549,1,{'Bubo_bubo': 0.6639643311500549},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC682458-Stor hornugle i baghaven Øby d. 24 okt kl. 21.53.mp3,Bubo_bubo,Bubo_bubo,0.941231906414032,1,{'Bubo_bubo': 0.941231906414032},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC955286-bubo-bubo-3-cabra-01-01-2020.mp3,Bubo_bubo,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC523516-GR-MONED-BAR_20190209_064002_Gufo reale_canto f (serie note tipo A - 4 note).mp3,Bubo_bubo,Bubo_bubo,0.32340189814567566,1,{'Bubo_bubo': 0.32340189814567566},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC504950-Bubo bubo.mp3,Bubo_bubo,Bubo_bubo,0.7136598229408264,1,{'Bubo_bubo': 0.7136598229408264},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC346533-uhu_MW_Mstein_20161215_0437.mp3,Bubo_bubo,Bubo_bubo,0.6804646849632263,1,{'Bubo_bubo': 0.6804646849632263},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC773818-1_HGD_femelle_Verdusse_20221219_pr.mp3,Bubo_bubo,Bubo_bubo,0.2592656910419464,1,{'Bubo_bubo': 0.2592656910419464},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC598433-XC-biOsmid3C001-04equII (8).mp3,Certhia_familiaris,Certhia_familiaris,0.6766003966331482,1,{'Certhia_familiaris': 0.6766003966331482},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC198006-Tradkrypare-(2014-06-24 17.53)-LS114750.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC471622-2019-04-07 Aleria - Bavella Grimbereau des bois series de cris d alarme vol et nourrissage ++.mp3,Certhia_familiaris,Certhia_brachydactyla,0.6837235689163208,2,"{'Certhia_brachydactyla': 0.6837235689163208, 'Certhia_familiaris': 0.33193889260292053}",extract_calls
+../bird_sound_dataset/Certhia_familiaris/trekryper_call120412-014.mp3,Certhia_familiaris,Certhia_familiaris,0.3262398838996887,1,{'Certhia_familiaris': 0.3262398838996887},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC217324-0375hernhiN-renw mp3.mp3,Certhia_familiaris,Certhia_familiaris,0.8466622829437256,1,{'Certhia_familiaris': 0.8466622829437256},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC883833-Waldbaumläufer.mp3,Certhia_familiaris,Certhia_familiaris,0.7572419047355652,1,{'Certhia_familiaris': 0.7572419047355652},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC932224-Waldbaumläufer_2024-01-16_07-56_Korb_Buocher-Höhe_Audiomoth_22.wav,Certhia_familiaris,Certhia_familiaris,0.8605833649635315,1,{'Certhia_familiaris': 0.8605833649635315},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC395588-20170330_Coutarnoux_Grimpereau des bois_02.mp3,Certhia_familiaris,Certhia_familiaris,0.3885190784931183,1,{'Certhia_familiaris': 0.3885190784931183},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC741058-DM-_20220625_060441-6.25_C.famil-call.mp3,Certhia_familiaris,Certhia_familiaris,0.9449506998062134,1,{'Certhia_familiaris': 0.9449506998062134},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC749179-MIXPRE-528.mp3,Certhia_familiaris,Certhia_familiaris,0.2354634553194046,1,{'Certhia_familiaris': 0.2354634553194046},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC399409-170411WaldbaumläuferGesangFH 1640.mp3,Certhia_familiaris,Certhia_familiaris,0.9933521747589111,1,{'Certhia_familiaris': 0.9933521747589111},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC703213-XC 2022-02-18 (011) 8.35h ZOOM H4n u NTG1 Gaissau Rheinholz Wbl Gesang und ein weiteres Ind ruft ua 10x hp 1500-6db Bf Sdr ua.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC536605-Norteño Sandicosa.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC781184-Træløber-(Certhia-familiaris)-Matr_20230218-0926.mp3,Certhia_familiaris,Certhia_familiaris,0.3590919077396393,1,{'Certhia_familiaris': 0.3590919077396393},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC346344-Cerfam-C_Poland_PSZ_9.00_161215-0149.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC528174-200202_11.mp3,Certhia_familiaris,Certhia_familiaris,0.32240015268325806,1,{'Certhia_familiaris': 0.32240015268325806},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC328803-5190_179-01hipan mp3.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/Tradkrypare-2012-05-13.mp3,Certhia_familiaris,Certhia_familiaris,0.5488611459732056,1,{'Certhia_familiaris': 0.5488611459732056},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC659958-kratkokljuni pampas.mp3,Certhia_familiaris,Certhia_familiaris,0.7362686991691589,1,{'Certhia_familiaris': 0.7362686991691589},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC200662-T05.mp3,Certhia_familiaris,Certhia_familiaris,0.9979346990585327,1,{'Certhia_familiaris': 0.9979346990585327},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC157852-Kortsnavelboomkruiper_20111017_06_roep.mp3,Certhia_familiaris,Certhia_familiaris,0.9515535831451416,1,{'Certhia_familiaris': 0.9515535831451416},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC676170-Trädkrypare_17.mp3,Certhia_familiaris,Certhia_familiaris,0.9939391613006592,1,{'Certhia_familiaris': 0.9939391613006592},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC704179-XC 2022-02-24 (050) 11.25h ZOOM H4n u NTG1 Düns Flana Interaktion Wbl-Gbl Wbl ruft (Gbl rief vorher) 10x 10x hp 1200-6db 300-48db.mp3,Certhia_familiaris,Certhia_familiaris,0.8015176057815552,2,"{'Certhia_familiaris': 0.8015176057815552, 'Certhia_brachydactyla': 0.16348926723003387}",extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC462955-Grimpereau des bois cris fin de nourrissage +.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC394065-Bkr_LumandaEst_170923_0738.mp3,Certhia_familiaris,Certhia_familiaris,0.1680552065372467,1,{'Certhia_familiaris': 0.1680552065372467},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC628994-Treecreeper 14 March 2021 1143 2 Lea Cottage.mp3,Certhia_familiaris,Certhia_familiaris,0.9958871006965637,1,{'Certhia_familiaris': 0.9958871006965637},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC786463-CERFAM_230317_kl0915_laul_Dendropark_TT_XC.mp3,Certhia_familiaris,Certhia_familiaris,0.999235987663269,1,{'Certhia_familiaris': 0.999235987663269},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC749200-MIXPRE-543.mp3,Certhia_familiaris,Certhia_familiaris,0.5407260656356812,1,{'Certhia_familiaris': 0.5407260656356812},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC704174-XC 2022-02-24 (007) 7.30h ZOOM H4n u NTG1 Düns Flana Wbl Teil 1 Gesang 10x hp 1200-6db.mp3,Certhia_familiaris,Certhia_familiaris,0.949711263179779,1,{'Certhia_familiaris': 0.949711263179779},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC716573-Certhia familiaris_SONG_Ibañeta_220415_0846.mp3,Certhia_familiaris,Certhia_familiaris,0.9883165955543518,1,{'Certhia_familiaris': 0.9883165955543518},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC203592-30621_187-4m mp3.mp3,Certhia_familiaris,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC711322-XC 2022-03-27 (026) ZOOM H4n u NTG1 Schesa Wm Teil 3 10x hp 1200-6db 300-48db.mp3,Poecile_montanus,Poecile_montanus,0.9990924596786499,1,{'Poecile_montanus': 0.9990924596786499},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC759686-2022-11-04_14_19[1].mp3,Poecile_montanus,Poecile_montanus,0.17389801144599915,1,{'Poecile_montanus': 0.17389801144599915},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC525896-200208_0110.mp3,Poecile_montanus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC791993-czarnoglowka-2.mp3,Poecile_montanus,Poecile_montanus,0.8542600274085999,1,{'Poecile_montanus': 0.8542600274085999},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC883009-Willow-Tit-blue-tit-like-call-and-tchay-040324-1353.wav,Poecile_montanus,no_birds,0.0,0,{},extract_calls
+"../bird_sound_dataset/Poecile_montanus/XC759943-Fyrremejse,-Kasted-mose,-17-8-2022.wav",Poecile_montanus,Poecile_montanus,0.1940430998802185,1,{'Poecile_montanus': 0.1940430998802185},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC930240-POEMON_chant_20052023_MonetiersLBains.wav,Poecile_montanus,Poecile_montanus,0.9897304773330688,1,{'Poecile_montanus': 0.9897304773330688},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC208518-Default Project.mp3,Poecile_montanus,Poecile_montanus,0.9704757332801819,1,{'Poecile_montanus': 0.9704757332801819},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC402797-180215_168 0914 Königsbrunn--Lech River Lowlands SSI .mp3,Poecile_montanus,Poecile_montanus,0.9970090985298157,1,{'Poecile_montanus': 0.9970090985298157},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC281664-417 1 Matkop 1 Zang.mp3,Poecile_montanus,Poecile_montanus,0.9960178732872009,1,{'Poecile_montanus': 0.9960178732872009},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC862811-PARMON140315.wav,Poecile_montanus,Poecile_montanus,0.9208234548568726,1,{'Poecile_montanus': 0.9208234548568726},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC484458-54 - STE-251 Mésange boréale pour XC.mp3,Poecile_montanus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC602394-Talltita_18.mp3,Poecile_montanus,Poecile_montanus,0.9357534646987915,1,{'Poecile_montanus': 0.9357534646987915},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC580597-Talltita_16.mp3,Poecile_montanus,Poecile_montanus,0.9580872058868408,1,{'Poecile_montanus': 0.9580872058868408},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC740601-weidenm0723.mp3,Poecile_montanus,Poecile_montanus,0.999543309211731,1,{'Poecile_montanus': 0.999543309211731},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC686367-POEMON AIASTE 211114_3904.mp3,Poecile_montanus,Poecile_montanus,0.9969635605812073,1,{'Poecile_montanus': 0.9969635605812073},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC354018-Poecmont-s3_poland_psz_10.01_170128-0752.mp3,Poecile_montanus,Poecile_montanus,0.9917466640472412,1,{'Poecile_montanus': 0.9917466640472412},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC646072-DM670857 (mp3cut.net)_01_.mp3,Poecile_montanus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC354016-Poecmont-s1_poland_psz_10.01_170128-0752.mp3,Poecile_montanus,Poecile_montanus,0.6891582608222961,1,{'Poecile_montanus': 0.6891582608222961},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC462478-Mesange boreale contrechants de deux oiseaux belle ambiance ++.mp3,Poecile_montanus,Poecile_montanus,0.9967265129089355,1,{'Poecile_montanus': 0.9967265129089355},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC458382-B04h29m49s01jun2018_plus_02m08s_WillowTit_song_VolUpHighPass.mp3,Poecile_montanus,Poecile_montanus,0.9534111618995667,1,{'Poecile_montanus': 0.9534111618995667},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC357210-Poecmont-s1_poland_psz_10.05_170227-1323.mp3,Poecile_montanus,Poecile_montanus,0.9921452403068542,1,{'Poecile_montanus': 0.9921452403068542},extract_calls
+"../bird_sound_dataset/Poecile_montanus/XC812029-Poecile-montanus-230625_012,B1-silent-song-male-.mp3",Poecile_montanus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/weidenmeise.mp3,Poecile_montanus,Poecile_montanus,0.9985999464988708,1,{'Poecile_montanus': 0.9985999464988708},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC803214-Poecile-montanus-song-Astarpe-220320-c.mp3,Poecile_montanus,Poecile_montanus,0.9262834191322327,1,{'Poecile_montanus': 0.9262834191322327},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC307656-LS110150_ParusMontanus_stareBiele.mp3,Poecile_montanus,no_birds,0.0,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC653189-Mesange boreale chant etire 2.mp3,Poecile_montanus,Poecile_montanus,0.9899116158485413,1,{'Poecile_montanus': 0.9899116158485413},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC354063-Poecmont-c-poland_PSZ_12.15_170128-0788.mp3,Poecile_montanus,Poecile_montanus,0.947281539440155,1,{'Poecile_montanus': 0.947281539440155},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC747635-parmon_202209_10_SHpva_0728v.mp3,Poecile_montanus,Poecile_montanus,0.9960156083106995,1,{'Poecile_montanus': 0.9960156083106995},extract_calls

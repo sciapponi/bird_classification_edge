@@ -1,0 +1,16 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Poecile_montanus/XC892577-240330_0132_25db_nr.wav,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC892577-240330_0132_25db_nr.wav
+../bird_sound_dataset/Poecile_montanus/XC794939-wt-6803d12a.1.wav,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC794939-wt-6803d12a.1.wav
+../bird_sound_dataset/Poecile_montanus/XC879067-PARMON120127.wav,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC879067-PARMON120127.wav
+../bird_sound_dataset/Certhia_familiaris/XC929526-WALDBAUMLÄUFER--9_21--Sumpfw.--A-VOC_240320-5081.wav,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC929526-WALDBAUMLÄUFER--9_21--Sumpfw.--A-VOC_240320-5081.wav
+"../bird_sound_dataset/Certhia_familiaris/XC807845-Eurasian-Treecreeper,-Seefeld-BE-230606-000.wav",Certhia_familiaris,bird,Certhia_familiaris,"/workspace/bird_sound_dataset/Certhia_familiaris/XC807845-Eurasian-Treecreeper,-Seefeld-BE-230606-000.wav"
+../bird_sound_dataset/Certhia_familiaris/XC795538-Grimpereau_des_bois_Certhia_familiaris_song.wav,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC795538-Grimpereau_des_bois_Certhia_familiaris_song.wav
+../bird_sound_dataset/Apus_apus/XC805453-473304981.wav,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC805453-473304981.wav
+../bird_sound_dataset/Apus_apus/XC808424-Apus-apus_call-birds-near-the-nest-and-one-in-the-nest_100623_Villarrín-de-Campo.wav,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC808424-Apus-apus_call-birds-near-the-nest-and-one-in-the-nest_100623_Villarrín-de-Campo.wav
+../bird_sound_dataset/Apus_apus/XC904577-05-08-2024_7h55_martinet-noir.wav,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC904577-05-08-2024_7h55_martinet-noir.wav
+../bird_sound_dataset/Bubo_bubo/XC872757-240213_0087_wav.wav,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC872757-240213_0087_wav.wav
+../bird_sound_dataset/Bubo_bubo/XC806630-Hubro04052023-2.wav,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC806630-Hubro04052023-2.wav
+../bird_sound_dataset/Bubo_bubo/XC953294-Eurasian-Eagle-owl_NEILAKSHAN1_20231208_011102_alarm2_xeno.wav,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC953294-Eurasian-Eagle-owl_NEILAKSHAN1_20231208_011102_alarm2_xeno.wav
+../augmented_dataset/no_birds/empty_0348.wav,no_birds,no_birds,no_birds,/workspace/augmented_dataset/no_birds/empty_0348.wav
+../augmented_dataset/no_birds/esc50_0009.wav,no_birds,no_birds,no_birds,/workspace/augmented_dataset/no_birds/esc50_0009.wav
+../augmented_dataset/no_birds/empty_0374.wav,no_birds,no_birds,no_birds,/workspace/augmented_dataset/no_birds/empty_0374.wav

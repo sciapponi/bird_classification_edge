@@ -1,0 +1,38 @@
+[2025-06-20 17:13:49,164][__main__][INFO] - 📁 Statistical analysis directory: statistical_analysis_2025-06-20_17-13-49
+[2025-06-20 17:13:49,165][__main__][INFO] -    Output will be saved to: benchmark_results/statistical_analysis_2025-06-20_17-13-49/comparison/
+[2025-06-20 17:13:49,166][__main__][INFO] - ============================================================
+[2025-06-20 17:13:49,166][__main__][INFO] - 🔬 STATISTICAL ANALYSIS MODE
+[2025-06-20 17:13:49,167][__main__][INFO] - ============================================================
+[2025-06-20 17:13:49,167][__main__][INFO] - 🔬 RUNNING STATISTICAL ANALYSIS...
+[2025-06-20 17:13:50,907][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-20 17:13:51,751][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-20 17:13:51,754][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-20 17:13:51,871][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-20 17:13:51,874][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-20 17:13:52,062][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-20 17:13:52,065][__main__][INFO] - Processing species: Apus_apus
+[2025-06-20 17:13:52,119][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-20 17:13:52,120][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-20 17:13:52,196][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-20 17:13:52,199][__main__][INFO] - Scanning no_birds dataset: /workspace/augmented_dataset/no_birds
+[2025-06-20 17:13:52,294][__main__][INFO] - Found 836 no_birds files
+[2025-06-20 17:13:52,318][__main__][INFO] - Total audio files discovered: 5076
+[2025-06-20 17:13:52,331][__main__][INFO] - Class distribution:
+[2025-06-20 17:13:52,332][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-20 17:13:52,333][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-20 17:13:52,334][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-20 17:13:52,335][__main__][INFO] -   no_birds: 836 files
+[2025-06-20 17:13:52,336][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-20 17:13:52,342][__main__][INFO] - 📊 Statistical Analysis Results:
+[2025-06-20 17:13:52,342][__main__][INFO] -   Current dataset: 5076 samples
+[2025-06-20 17:13:52,343][__main__][INFO] -   Recommended: 1591 samples
+[2025-06-20 17:13:52,344][__main__][INFO] -   Status: ADEQUATE
+[2025-06-20 17:13:52,345][__main__][INFO] -   Can detect 5.0% improvement: True
+[2025-06-20 17:13:52,346][__main__][INFO] - 
+[2025-06-20 17:13:52,348][__main__][INFO] - 📈 STATISTICAL POWER ANALYSIS:
+[2025-06-20 17:13:52,349][__main__][INFO] -   • Confidence Level: 95.0%
+[2025-06-20 17:13:52,350][__main__][INFO] -   • Statistical Power: 80.0%
+[2025-06-20 17:13:52,351][__main__][INFO] -   • Minimum Effect Size: 5.0%
+[2025-06-20 17:13:52,351][__main__][INFO] -   • Recommended Runs: 3
+[2025-06-20 17:13:52,352][__main__][INFO] - 
+[2025-06-20 17:13:52,354][__main__][INFO] - ✅ Statistical analysis completed successfully!

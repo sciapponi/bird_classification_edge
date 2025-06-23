@@ -1,0 +1,32 @@
+# Test Configuration for Benchmark Improvements
+# This configuration enables test mode for quick validation of new features
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Enable test mode
+test_mode: true
+
+# Override for quick testing
+benchmark:
+  name: "benchmark_improvements_test"
+  description: "Quick test of benchmark improvements (adaptive thresholds, birds-only mode, preprocessing alignment)"
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+    output_dir: "benchmark_results"
+    predictions_dir: null  # Will be set at runtime (test mode)
+    comparison_dir: null  # Will be set at runtime (test mode)
+
+# Use single threshold for testing
+birdnet:
+  confidence_threshold: 0.25  # Single threshold for all classifications
+  use_adaptive_threshold: false
+  adaptive_factor: 1.0
+
+# Quick test settings
+debug:
+  files_limit: 30  # Very limited for fast testing
+  max_files_per_class: 5  # Small sample per class 

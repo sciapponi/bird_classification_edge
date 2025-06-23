@@ -1,0 +1,37 @@
+# Multiple Runs Benchmark Configuration
+# This configuration enables multiple benchmark runs for statistical validation
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Enable multiple runs mode
+multiple_runs_mode: true
+num_runs: 5  # Number of benchmark runs to execute
+
+# Statistical validation parameters
+statistical_validation:
+  confidence_level: 0.95
+  minimum_detectable_difference: 0.03  # 3% minimum difference
+  random_seed_base: 42  # Base for random seeds (42, 43, 44, ...)
+
+# Use limited but consistent sample size for multiple runs
+debug:
+  files_limit: 200  # Fixed sample size across runs for consistency
+  max_files_per_class: 25  # Balanced per class
+
+# BirdNET configuration for consistent results
+birdnet:
+  confidence_threshold: 0.25
+  no_birds_threshold: 0.4
+  use_adaptive_threshold: true
+
+# Output directory for multiple runs analysis
+benchmark:
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+    output_dir: "benchmark_results"
+    predictions_dir: null  # Will be set at runtime (multiple runs mode)
+    comparison_dir: null  # Will be set at runtime (multiple runs mode) 

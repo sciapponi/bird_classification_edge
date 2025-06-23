@@ -1,0 +1,23 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Apus_apus/XC414304-APUS_APUS_DUETT 2017-05-06.mp3,Apus_apus,Apus_apus,0.7064990401268005,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Apus_apus/XC815141-M7.wav,Apus_apus,Periparus_ater,0.37854695320129395,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Bubo_bubo/XC823830-Eurasian-eagle-owl-hanle-230809-012.mp3,Bubo_bubo,Poecile_montanus,0.2512049376964569,Bubo_bubo,0.01,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC677049-210925_1806 mp3.mp3,Certhia_familiaris,Certhia_brachydactyla,0.6546726226806641,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC457042-pełzacz leśny Kobiór 2 śpiew.mp3,Certhia_familiaris,Periparus_ater,0.7055810689926147,Periparus_ater,0.943817675113678,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC198006-Tradkrypare-(2014-06-24 17.53)-LS114750.mp3,Certhia_familiaris,Certhia_familiaris,0.719691812992096,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC759205-Trädkrypare-20221090746-Åkröken.wav,Certhia_familiaris,Certhia_brachydactyla,0.3634234070777893,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC590438-treecreeper-ad-D14H.mp3,Certhia_familiaris,Periparus_ater,0.28601256012916565,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC405756-Eurasian Treecreeper Calls Bagmere Nature Reserve 24 Feb 2018 at 1635pm.mp3,Certhia_familiaris,Certhia_familiaris,0.37217697501182556,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC309079-DM550181_480m_00s__540m_00sCertFamiSpev.mp3,Certhia_familiaris,Certhia_familiaris,0.4915279150009155,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC502168-Willow tit0700.mp3,Poecile_montanus,Periparus_ater,0.15979832410812378,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC155411-Poecmont_Poland_PSZ_2013_11_23_384.mp3,Poecile_montanus,Poecile_montanus,0.7305019497871399,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC841120-2023-11-09-07_56.wav,Poecile_montanus,Certhia_familiaris,0.3687882125377655,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC236198-150414_12.mp3,Poecile_montanus,Periparus_ater,0.4834495782852173,Poecile_montanus,0.9560401439666748,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC710077-XC 2022-03-20 (015) 9.35h ZOOM H4n u NTG1 Nenzing Triegel Wm Teil 1 10x.mp3,Poecile_montanus,Poecile_montanus,0.6027966141700745,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC794941-wt-6803d11d.wav,Poecile_montanus,Lophophanes_cristatus,0.45731592178344727,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC858258-MVI_7260.mp3,Poecile_montanus,Certhia_familiaris,0.40790507197380066,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC813615-LS_53687-Songar-Tit-calls-A-Hume-s-Warbler-calls-B.mp3,Poecile_montanus,Poecile_montanus,0.28078436851501465,Bubo_bubo,0.01,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC813617-LS_53690-Songar-Tit-calls-B.mp3,Poecile_montanus,Periparus_ater,0.21845899522304535,Bubo_bubo,0.01,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC354070-Poecmont-Csubs_poland_psz_9.38_170128-0745.mp3,Poecile_montanus,Periparus_ater,0.6170397400856018,Poecile_montanus,0.8302109241485596,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC817080-230515_2104_WillowTit_call_w_BlackbilledCapercaillie_Terelj_20230515_0656.mp3,Poecile_montanus,Bubo_bubo,0.564973771572113,Bubo_bubo,0.01,False,False,both_incorrect
+"../bird_sound_dataset/Poecile_montanus/XC770655-25-09-22-(mésange-boréale,-chant-+-cri,-Promenade-rivière-Cherapont).mp3",Poecile_montanus,Bubo_bubo,0.6185232996940613,Poecile_montanus,0.7776313424110413,False,True,birdnet_only_correct

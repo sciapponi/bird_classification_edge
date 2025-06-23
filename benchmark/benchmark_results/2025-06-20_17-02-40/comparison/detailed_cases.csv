@@ -1,0 +1,6 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Poecile_montanus/XC892577-240330_0132_25db_nr.wav,Poecile_montanus,Poecile_montanus,0.7086364030838013,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Apus_apus/XC904577-05-08-2024_7h55_martinet-noir.wav,Apus_apus,Certhia_familiaris,0.39289844036102295,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Bubo_bubo/XC806630-Hubro04052023-2.wav,Bubo_bubo,Periparus_ater,0.5505239367485046,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Bubo_bubo/XC953294-Eurasian-Eagle-owl_NEILAKSHAN1_20231208_011102_alarm2_xeno.wav,Bubo_bubo,Bubo_bubo,0.36152321100234985,no_birds,0.0,True,False,student_only_correct
+../augmented_dataset/no_birds/empty_0348.wav,no_birds,no_birds,0.7209601402282715,Bubo_bubo,0.975098192691803,True,False,student_only_correct

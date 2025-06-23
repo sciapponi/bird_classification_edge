@@ -20,10 +20,24 @@ from sklearn.metrics import (
     classification_report, confusion_matrix
 )
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, ListConfig
 
 logger = logging.getLogger(__name__)
 
+def convert_listconfig_to_list(obj):
+    """
+    Recursively convert ListConfig objects to regular lists for JSON serialization.
+    """
+    if isinstance(obj, ListConfig):
+        return [convert_listconfig_to_list(item) for item in obj]
+    elif isinstance(obj, DictConfig):
+        return {key: convert_listconfig_to_list(value) for key, value in obj.items()}
+    elif isinstance(obj, dict):
+        return {key: convert_listconfig_to_list(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_listconfig_to_list(item) for item in obj]
+    else:
+        return obj
 
 class ModelComparator:
     """
@@ -38,6 +52,12 @@ class ModelComparator:
             config: Configuration for comparison
         """
         self.config = config
+        # Extract exclude_classes configuration
+        self.exclude_classes = getattr(config.metrics, 'exclude_classes', [])
+        self.birds_only_mode = getattr(config.get('benchmark', {}).get('mode', {}), 'birds_only', False)
+        
+        logger.info(f"ModelComparator initialized with exclude_classes: {self.exclude_classes}")
+        logger.info(f"Birds-only mode: {self.birds_only_mode}")
         
     def compare_predictions(self, 
                           ground_truth: List[str],
@@ -62,13 +82,24 @@ class ModelComparator:
         """
         logger.info("Comparing model predictions")
         
+        # Apply filtering for birds-only mode or exclude_classes
+        if self.exclude_classes or self.birds_only_mode:
+            logger.info(f"Applying class filtering - exclude_classes: {self.exclude_classes}, birds_only: {self.birds_only_mode}")
+            (ground_truth, student_predictions, birdnet_predictions, 
+             student_confidences, birdnet_confidences, audio_paths) = self._filter_excluded_classes(
+                ground_truth, student_predictions, birdnet_predictions,
+                student_confidences, birdnet_confidences, audio_paths
+            )
+            logger.info(f"After filtering: {len(ground_truth)} samples remaining")
+        
         # Convert to numpy arrays for easier processing
         y_true = np.array(ground_truth)
         y_pred_student = np.array(student_predictions)
         y_pred_birdnet = np.array(birdnet_predictions)
         
-        # Get unique classes
+        # Get unique classes (after filtering)
         all_classes = sorted(list(set(ground_truth + student_predictions + birdnet_predictions)))
+        logger.info(f"Classes in analysis: {all_classes}")
         
         # Calculate metrics for both models
         student_metrics = self._calculate_metrics(y_true, y_pred_student, all_classes)
@@ -107,11 +138,94 @@ class ModelComparator:
             'summary': {
                 'total_samples': len(ground_truth),
                 'num_classes': len(all_classes),
-                'classes': all_classes
+                'classes': all_classes,
+                'excluded_classes': self.exclude_classes,
+                'birds_only_mode': self.birds_only_mode
             }
         }
         
         return results
+    
+    def _filter_excluded_classes(self, ground_truth: List[str], student_predictions: List[str], 
+                                birdnet_predictions: List[str], student_confidences: List[float],
+                                birdnet_confidences: List[float], audio_paths: List[str]) -> tuple:
+        """
+        Filter out excluded classes from all data.
+        
+        Args:
+            ground_truth: List of true labels
+            student_predictions: List of student model predictions
+            birdnet_predictions: List of BirdNET predictions
+            student_confidences: List of student model confidences
+            birdnet_confidences: List of BirdNET confidences
+            audio_paths: List of audio file paths
+            
+        Returns:
+            Tuple of filtered lists
+        """
+        # Determine classes to exclude
+        classes_to_exclude = set(self.exclude_classes)
+        
+        # In birds-only mode, automatically exclude no_birds
+        if self.birds_only_mode:
+            classes_to_exclude.add('no_birds')
+        
+        if not classes_to_exclude:
+            return (ground_truth, student_predictions, birdnet_predictions,
+                   student_confidences, birdnet_confidences, audio_paths)
+        
+        logger.info(f"Filtering out classes: {classes_to_exclude}")
+        
+        # Create mask for samples to keep
+        keep_mask = []
+        for i, gt in enumerate(ground_truth):
+            # Keep sample if ground truth is NOT in excluded classes
+            keep_sample = gt not in classes_to_exclude
+            keep_mask.append(keep_sample)
+        
+        # Apply filtering
+        filtered_ground_truth = [ground_truth[i] for i in range(len(ground_truth)) if keep_mask[i]]
+        filtered_student_pred = [student_predictions[i] for i in range(len(student_predictions)) if keep_mask[i]]
+        filtered_birdnet_pred = [birdnet_predictions[i] for i in range(len(birdnet_predictions)) if keep_mask[i]]
+        filtered_student_conf = [student_confidences[i] for i in range(len(student_confidences)) if keep_mask[i]]
+        filtered_birdnet_conf = [birdnet_confidences[i] for i in range(len(birdnet_confidences)) if keep_mask[i]]
+        filtered_audio_paths = [audio_paths[i] for i in range(len(audio_paths)) if keep_mask[i]]
+        
+        # Now also filter predictions that are in excluded classes (convert them to most likely bird class)
+        filtered_student_pred = self._remap_excluded_predictions(filtered_student_pred, classes_to_exclude)
+        filtered_birdnet_pred = self._remap_excluded_predictions(filtered_birdnet_pred, classes_to_exclude)
+        
+        logger.info(f"Samples before filtering: {len(ground_truth)}")
+        logger.info(f"Samples after filtering: {len(filtered_ground_truth)}")
+        
+        return (filtered_ground_truth, filtered_student_pred, filtered_birdnet_pred,
+                filtered_student_conf, filtered_birdnet_conf, filtered_audio_paths)
+    
+    def _remap_excluded_predictions(self, predictions: List[str], excluded_classes: set) -> List[str]:
+        """
+        Remap predictions that are in excluded classes to 'unknown' or handle them appropriately.
+        
+        Args:
+            predictions: List of predictions
+            excluded_classes: Set of classes to exclude
+            
+        Returns:
+            List of remapped predictions
+        """
+        # For birds-only mode, if a model predicts no_birds, it's essentially an error
+        # We'll keep the prediction as-is for accuracy calculation
+        # (this will be counted as incorrect if ground truth is a bird species)
+        
+        remapped = []
+        for pred in predictions:
+            if pred in excluded_classes:
+                # In birds-only mode, keep the excluded prediction as-is
+                # This will show up as an error in the confusion matrix
+                remapped.append(pred)
+            else:
+                remapped.append(pred)
+        
+        return remapped
     
     def _calculate_metrics(self, y_true: np.ndarray, y_pred: np.ndarray, classes: List[str]) -> Dict:
         """Calculate classification metrics."""
@@ -255,34 +369,41 @@ class ModelComparator:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
+        # Get custom naming from config if available
+        naming_config = getattr(self.config, 'output', {}).get('naming', {})
+        plots_config = getattr(self.config, 'output', {}).get('plots', {})
+        
         # 1. JSON report (machine-readable)
-        json_path = output_path / 'comparison_report.json'
+        json_filename = naming_config.get('comparison_report', 'comparison_report.json')
+        json_path = output_path / json_filename
         with open(json_path, 'w') as f:
-            json.dump(results, f, indent=2)
+            json.dump(convert_listconfig_to_list(results), f, indent=2)
         logger.info(f"JSON report saved to: {json_path}")
         
         # 2. Text summary (human-readable)
-        text_path = output_path / 'comparison_summary.txt'
+        summary_filename = naming_config.get('comparison_summary', 'comparison_summary.txt')
+        text_path = output_path / summary_filename
         self._save_text_summary(results, text_path)
         
         # 3. Detailed cases CSV
         if results['agreement_analysis']['detailed_cases']:
             cases_df = pd.DataFrame(results['agreement_analysis']['detailed_cases'])
-            cases_path = output_path / 'detailed_cases.csv'
+            cases_filename = naming_config.get('detailed_cases', 'detailed_cases.csv')
+            cases_path = output_path / cases_filename
             cases_df.to_csv(cases_path, index=False)
             logger.info(f"Detailed cases saved to: {cases_path}")
         
         # 4. Comprehensive metrics comparison table
-        self._save_metrics_comparison_table(results, output_path)
+        self._save_metrics_comparison_table(results, output_path, naming_config)
         
         # 5. Per-class detailed metrics table
-        self._save_per_class_metrics_table(results, output_path)
+        self._save_per_class_metrics_table(results, output_path, naming_config)
         
         # 6. Visualizations
-        self._save_plots(results, output_path)
+        self._save_plots(results, output_path, plots_config)
         
         # 7. Enhanced metrics visualization
-        self._plot_comprehensive_metrics_comparison(results, output_path)
+        self._plot_comprehensive_metrics_comparison(results, output_path, plots_config)
 
     def _save_text_summary(self, results: Dict, file_path: Path):
         """Save human-readable text summary."""
@@ -337,25 +458,28 @@ class ModelComparator:
         
         logger.info(f"Text summary saved to: {file_path}")
     
-    def _save_plots(self, results: Dict, output_dir: Path):
+    def _save_plots(self, results: Dict, output_dir: Path, plots_config: Dict = None):
         """Generate and save visualization plots."""
         try:
             # Set style
             plt.style.use('default')
             
+            if plots_config is None:
+                plots_config = {}
+            
             # 1. Confusion matrices
-            self._plot_confusion_matrices(results, output_dir)
+            self._plot_confusion_matrices(results, output_dir, plots_config)
             
             # 2. Agreement analysis
-            self._plot_agreement_analysis(results, output_dir)
+            self._plot_agreement_analysis(results, output_dir, plots_config)
             
             # 3. Per-class comparison
-            self._plot_per_class_comparison(results, output_dir)
+            self._plot_per_class_comparison(results, output_dir, plots_config)
             
         except Exception as e:
             logger.error(f"Error generating plots: {e}")
     
-    def _plot_confusion_matrices(self, results: Dict, output_dir: Path):
+    def _plot_confusion_matrices(self, results: Dict, output_dir: Path, plots_config: Dict = None):
         """Plot confusion matrices for both models."""
         try:
             cm_data = results['confusion_matrices']
@@ -394,7 +518,8 @@ class ModelComparator:
             axes[1].set_ylabel('True')
             
             plt.tight_layout()
-            plot_path = output_dir / 'confusion_matrices.png'
+            filename = plots_config.get('confusion_matrices', 'confusion_matrices.png') if plots_config else 'confusion_matrices.png'
+            plot_path = output_dir / filename
             plt.savefig(plot_path, dpi=300, bbox_inches='tight')
             plt.close()
             
@@ -403,7 +528,7 @@ class ModelComparator:
         except Exception as e:
             logger.error(f"Error plotting confusion matrices: {e}")
     
-    def _plot_agreement_analysis(self, results: Dict, output_dir: Path):
+    def _plot_agreement_analysis(self, results: Dict, output_dir: Path, plots_config: Dict = None):
         """Plot agreement analysis."""
         try:
             agreement = results['agreement_analysis']
@@ -432,7 +557,8 @@ class ModelComparator:
             axes[1].grid(True, alpha=0.3)
             
             plt.tight_layout()
-            plot_path = output_dir / 'agreement_analysis.png'
+            filename = plots_config.get('agreement_analysis', 'agreement_analysis.png') if plots_config else 'agreement_analysis.png'
+            plot_path = output_dir / filename
             plt.savefig(plot_path, dpi=300, bbox_inches='tight')
             plt.close()
             
@@ -441,7 +567,7 @@ class ModelComparator:
         except Exception as e:
             logger.error(f"Error plotting agreement analysis: {e}")
     
-    def _plot_per_class_comparison(self, results: Dict, output_dir: Path):
+    def _plot_per_class_comparison(self, results: Dict, output_dir: Path, plots_config: Dict = None):
         """Plot per-class accuracy comparison."""
         try:
             per_class = results['per_class_analysis']
@@ -471,7 +597,8 @@ class ModelComparator:
             ax.set_ylim(0, 1.0)
             
             plt.tight_layout()
-            plot_path = output_dir / 'per_class_accuracy.png'
+            filename = plots_config.get('per_class_accuracy', 'per_class_accuracy.png') if plots_config else 'per_class_accuracy.png'
+            plot_path = output_dir / filename
             plt.savefig(plot_path, dpi=300, bbox_inches='tight')
             plt.close()
             
@@ -480,7 +607,7 @@ class ModelComparator:
         except Exception as e:
             logger.error(f"Error plotting per-class comparison: {e}")
 
-    def _save_metrics_comparison_table(self, results: Dict, output_dir: Path):
+    def _save_metrics_comparison_table(self, results: Dict, output_dir: Path, naming_config: Dict = None):
         """Save comprehensive metrics comparison table."""
         try:
             student_metrics = results['detailed_metrics']['student']
@@ -549,7 +676,7 @@ class ModelComparator:
             logger.error(f"Error saving metrics comparison table: {e}")
             return None
 
-    def _save_per_class_metrics_table(self, results: Dict, output_dir: Path):
+    def _save_per_class_metrics_table(self, results: Dict, output_dir: Path, naming_config: Dict = None):
         """Save detailed per-class metrics comparison table."""
         try:
             student_per_class = results['detailed_metrics']['student']['per_class']
@@ -592,7 +719,7 @@ class ModelComparator:
             logger.error(f"Error saving per-class metrics table: {e}")
             return None
 
-    def _plot_comprehensive_metrics_comparison(self, results: Dict, output_dir: Path):
+    def _plot_comprehensive_metrics_comparison(self, results: Dict, output_dir: Path, plots_config: Dict = None):
         """Create comprehensive metrics comparison visualization."""
         try:
             student_metrics = results['detailed_metrics']['student']
@@ -712,7 +839,8 @@ class ModelComparator:
                               f'{count}\n({percentage:.1f}%)', ha='center', va='bottom', fontsize=10)
             
             plt.tight_layout()
-            plot_path = output_dir / 'comprehensive_metrics_comparison.png'
+            filename = plots_config.get('comprehensive_metrics_comparison', 'comprehensive_metrics_comparison.png') if plots_config else 'comprehensive_metrics_comparison.png'
+            plot_path = output_dir / filename
             plt.savefig(plot_path, dpi=300, bbox_inches='tight')
             plt.close()
             
@@ -767,8 +895,8 @@ def main(cfg: DictConfig) -> None:
         
         logger.info(f"Merged predictions: {len(merged_df)} rows")
         
-        # Initialize comparator
-        comparator = ModelComparator(cfg.comparison)
+        # Initialize comparator - pass the full config for access to benchmark.mode
+        comparator = ModelComparator(cfg)
         
         # Generate comparison
         results = comparator.compare_predictions(

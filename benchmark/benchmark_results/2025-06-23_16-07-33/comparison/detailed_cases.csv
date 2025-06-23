@@ -1,0 +1,2 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Poecile_montanus/XC354066-Poecmont-qC2_poland_psz_10.30_170128-0761.mp3,Poecile_montanus,Lophophanes_cristatus,0.2794205844402313,Poecile_montanus,0.9356088638305664,False,True,birdnet_only_correct

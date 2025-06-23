@@ -1,0 +1,51 @@
+[2025-06-20 17:15:59,739][__main__][INFO] - 📁 Timestamped benchmark directory: 2025-06-20_17-15-59
+[2025-06-20 17:15:59,741][__main__][INFO] -    Predictions: /workspace/benchmark/benchmark_results/2025-06-20_17-15-59/predictions
+[2025-06-20 17:15:59,742][__main__][INFO] -    Comparison: /workspace/benchmark/benchmark_results/2025-06-20_17-15-59/comparison
+[2025-06-20 17:15:59,744][__main__][INFO] - ============================================================
+[2025-06-20 17:15:59,745][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-20 17:15:59,745][__main__][INFO] - ============================================================
+[2025-06-20 17:15:59,746][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-20 17:15:59,747][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-20 17:15:59,747][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-20 17:15:59,748][__main__][INFO] -    • Both models see identical audio data
+[2025-06-20 17:15:59,760][__main__][INFO] - 🔧 ADAPTIVE THRESHOLDS: no_birds threshold = 0.4
+[2025-06-20 17:15:59,761][__main__][INFO] - ============================================================
+[2025-06-20 17:15:59,762][__main__][INFO] - Working directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-20_17-15-51
+[2025-06-20 17:15:59,762][__main__][INFO] - Hydra output directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-20_17-15-51
+[2025-06-20 17:15:59,763][__main__][INFO] - 
+========================================
+[2025-06-20 17:15:59,764][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-20 17:15:59,765][__main__][INFO] - ========================================
+[2025-06-20 17:15:59,767][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-20 17:15:59,783][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-20 17:15:59,983][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-20 17:15:59,987][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-20 17:16:00,095][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-20 17:16:00,097][__main__][INFO] - Processing species: Apus_apus
+[2025-06-20 17:16:00,180][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-20 17:16:00,182][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-20 17:16:00,238][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-20 17:16:00,240][__main__][INFO] - Scanning no_birds dataset: /workspace/augmented_dataset/no_birds
+[2025-06-20 17:16:00,282][__main__][INFO] - Found 836 no_birds files
+[2025-06-20 17:16:00,295][__main__][INFO] - Total audio files discovered: 5076
+[2025-06-20 17:16:00,300][__main__][INFO] - Class distribution:
+[2025-06-20 17:16:00,301][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-20 17:16:00,302][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-20 17:16:00,305][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-20 17:16:00,305][__main__][INFO] -   no_birds: 836 files
+[2025-06-20 17:16:00,306][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-20 17:16:00,494][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/benchmark_results/2025-06-20_17-15-59/predictions/ground_truth.csv
+[2025-06-20 17:16:00,494][__main__][INFO] - 
+========================================
+[2025-06-20 17:16:00,495][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-20 17:16:00,496][__main__][INFO] - ========================================
+[2025-06-20 17:16:00,496][__main__][INFO] - Starting student model predictions
+[2025-06-20 17:16:04,288][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-20 17:16:05,736][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-20 17:16:05,740][benchmark.predict_student][INFO] - PyTorch CUDA available: False
+[2025-06-20 17:16:05,908][benchmark.predict_student][INFO] - Using device: cpu
+[2025-06-20 17:16:06,300][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/config/bird_classification.yaml
+[2025-06-20 17:16:06,479][benchmark.predict_student][INFO] - Loaded model from: /workspace/best_distillation_model.pt
+[2025-06-20 17:16:06,484][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-20 17:16:06,485][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-20 17:16:06,486][benchmark.predict_student][INFO] - Confidence threshold: 0.05

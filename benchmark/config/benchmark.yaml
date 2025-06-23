@@ -4,26 +4,36 @@
 defaults:
   - _self_
 
+# Global test mode for quick validation
+test_mode: false  # Set to true to run quick tests instead of full benchmark
+
 # Benchmark pipeline configuration
 benchmark:
   name: "bird_classification_benchmark"
   description: "Comparison between student model and BirdNET"
   
+  # BENCHMARK MODE CONFIGURATION
+  mode:
+    birds_only: false  # If true, excludes no_birds class from evaluation
+    exclude_no_birds_from_ground_truth: false  # If true, removes no_birds samples from test set
+    force_fair_preprocessing: true  # Use identical preprocessing for both models
+  
   # Input/Output paths (can be overridden via CLI)
   paths:
-    audio_dir: "bird_sound_dataset"  # Directory with audio files to process (class subdirectories)
-    no_birds_dir: "augmented_dataset/no_birds"  # Directory with no_birds samples
+    audio_dir: "/workspace/bird_sound_dataset"  # Directory with audio files to process (class subdirectories)
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"  # Directory with no_birds samples
     ground_truth: null  # Auto-generated from folder structure
-    output_dir: "results/"  # Base output directory
+    output_dir: "benchmark_results"  # Base output directory for timestamped results
     
     # Model paths
-    student_model: "best_distillation_model.pt"  # Student model checkpoint
-    student_config: "config/bird_classification.yaml"  # Optional student model config
+    student_model: "/workspace/best_distillation_model.pt"  # Student model checkpoint
+    student_config: "/workspace/config/bird_classification.yaml"  # Student model config
     
-    # Derived paths (auto-generated)
-    segments_dir: "${benchmark.paths.output_dir}/segments"
-    predictions_dir: "results/predictions"
-    comparison_dir: "results/comparison"
+    # Derived paths (auto-generated with timestamp)
+    # These will be updated at runtime with timestamp: benchmark_results/YYYY-MM-DD_HH-MM-SS/
+    segments_dir: null  # Will be set at runtime
+    predictions_dir: null  # Will be set at runtime  
+    comparison_dir: null  # Will be set at runtime
 
 # Audio segmentation configuration
 segmentation:
@@ -94,9 +104,13 @@ student_model:
 
 # BirdNET prediction configuration
 birdnet:
-  # Analysis parameters
-  confidence_threshold: 0.1
+  # Analysis parameters  
+  confidence_threshold: 0.2  # Single threshold for all classifications (simplified system)
   sensitivity: 1.25  # BirdNET sensitivity parameter
+  
+  # Threshold strategies (simplified - single threshold approach)
+  use_adaptive_threshold: false  # Disabled - using single threshold approach
+  adaptive_factor: 1.0  # Not used when adaptive threshold is disabled
   
   # Filtering (disabled for fair comparison)
   disable_location_filter: true
@@ -263,6 +277,7 @@ debug:
   dev_mode: false
   test_with_subset: false  # Test with small subset of data
   subset_size: 10  # Number of files to process in test mode
+  files_limit: null  # Alternative name for subset_size (for convenience)
   
   # Profiling
   enable_profiling: false

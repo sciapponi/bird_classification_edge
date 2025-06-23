@@ -1,0 +1,3 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Certhia_familiaris/XC748104-20220912_175546  leśny ogrodowy czarny OK.mp3,Certhia_familiaris,Certhia_brachydactyla,0.3680446445941925,Certhia_familiaris,0.6181250214576721,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC422526-Mesange boreale thin call.mp3,Poecile_montanus,Emberiza_cia,0.4186970591545105,Bubo_bubo,0.01,False,False,both_incorrect

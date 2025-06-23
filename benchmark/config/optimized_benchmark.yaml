@@ -1,0 +1,128 @@
+# Optimized Benchmark Configuration
+# This configuration combines birds-only mode with improved adaptive thresholds
+# for the most accurate comparison between student model and BirdNET
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Override benchmark configuration for optimized comparison
+benchmark:
+  name: "optimized_benchmark"
+  description: "Optimized benchmark with adaptive thresholds and fair bird species comparison"
+  
+  # Standard mode with optimized settings
+  mode:
+    birds_only: false  # Keep all classes but use optimized thresholds
+    exclude_no_birds_from_ground_truth: false  # Include no_birds for full evaluation
+    force_fair_preprocessing: true  # Use identical preprocessing for both models
+  
+  # Docker paths
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+
+# BirdNET configuration with optimized adaptive thresholds
+birdnet:
+  # Simplified single threshold strategy  
+  confidence_threshold: 0.18  # Optimized single threshold for all classifications
+  sensitivity: 1.25
+  
+  # Simplified approach without adaptive thresholds
+  use_adaptive_threshold: false  # Use single threshold approach
+  adaptive_factor: 1.0          # Not used when adaptive is disabled
+  
+  # Keep filters disabled for fair comparison
+  disable_location_filter: true
+  disable_time_filter: true
+  
+  # Additional optimization parameters
+  species_bias_factor: 1.1  # Slight bias towards bird species over no_birds
+  min_detection_duration: 0.3  # Minimum duration for valid bird detection (seconds)
+
+# Student model configuration optimized for comparison
+student_model:
+  inference:
+    confidence_threshold: 0.05  # Keep student model threshold low to catch more detections
+    device: "auto"
+    
+  # Standard class configuration
+  classes:
+    has_no_birds_class: true
+    no_birds_label: "no_birds"
+
+# Enhanced comparison metrics with focus on both accuracy and fairness
+comparison:
+  metrics:
+    calculate_accuracy: true
+    calculate_precision: true
+    calculate_recall: true
+    calculate_f1: true
+    calculate_confusion_matrix: true
+    calculate_per_class_metrics: true
+    calculate_agreement_analysis: true
+    
+    # Standard averaging for complete comparison
+    averaging_methods: ["micro", "macro", "weighted"]
+    
+  # Agreement analysis with detailed categories
+  agreement:
+    exact_match: true
+    partial_match: false
+    confidence_weighting: true  # Weight by confidence scores for better analysis
+    
+    # Detailed categories for analysis
+    categories:
+      both_correct: "both_correct"
+      student_only: "student_only_correct"
+      birdnet_only: "birdnet_only_correct"
+      both_incorrect: "both_incorrect"
+      
+  # Enhanced visualization for comprehensive analysis
+  visualization:
+    figsize: [20, 12]  # Larger plots for detailed analysis
+    
+    confusion_matrix:
+      normalize: null  # Show raw counts
+      show_percentages: true
+      
+    # Additional analysis plots
+    confidence_analysis:
+      distribution_plots: true  # Plot confidence score distributions
+      threshold_analysis: true  # Show effect of different thresholds
+
+# Output configuration with enhanced naming
+output:
+  naming:
+    student_predictions: "student_predictions_optimized.csv"
+    birdnet_predictions: "birdnet_predictions_optimized.csv"
+    comparison_report: "comparison_report_optimized.json"
+    comparison_summary: "comparison_summary_optimized.txt"
+    detailed_cases: "detailed_cases_optimized.csv"
+    
+  plots:
+    confusion_matrices: "confusion_matrices_optimized.png"
+    agreement_analysis: "agreement_analysis_optimized.png"
+    per_class_accuracy: "per_class_accuracy_optimized.png"
+    comprehensive_metrics_comparison: "comprehensive_metrics_optimized.png"
+    
+# Advanced debugging for optimization analysis
+debug:
+  files_limit: null  # Use all files for comprehensive analysis
+  max_files_per_class: null
+  
+  # Enhanced logging for threshold analysis
+  log_confidence_scores: true
+  log_threshold_decisions: true
+  save_prediction_details: true
+  
+# Experimental settings for advanced analysis
+experimental:
+  # Performance analysis
+  measure_processing_time: true
+  compare_preprocessing_methods: true
+  
+  # Threshold optimization
+  analyze_threshold_sensitivity: true
+  confidence_calibration: true 

@@ -1,0 +1,14 @@
+[2025-06-20 16:59:42,087][__main__][INFO] - ============================================================
+[2025-06-20 16:59:42,088][__main__][INFO] - 🧪 BENCHMARK IMPROVEMENTS TEST MODE
+[2025-06-20 16:59:42,088][__main__][INFO] - ============================================================
+[2025-06-20 16:59:42,088][__main__][INFO] - 🧪 RUNNING BENCHMARK IMPROVEMENTS TEST...
+[2025-06-20 16:59:42,089][__main__][INFO] - This is a quick validation to ensure new features work correctly
+[2025-06-20 16:59:42,089][__main__][INFO] - 🔧 Testing adaptive threshold configuration...
+[2025-06-20 16:59:42,091][__main__][INFO] - ✅ Adaptive threshold OK: no_birds(0.45) > base(0.3)
+[2025-06-20 16:59:42,092][__main__][INFO] - 🎯 Testing birds-only mode configuration...
+[2025-06-20 16:59:42,093][__main__][INFO] - 🚀 Running mini benchmark test (limited files)...
+[2025-06-20 16:59:42,094][__main__][WARNING] - Bird dataset directory not found: /workspace/benchmark/bird_sound_dataset
+[2025-06-20 16:59:42,094][__main__][WARNING] - No_birds directory not found: /workspace/benchmark/augmented_dataset/no_birds
+[2025-06-20 16:59:42,118][__main__][ERROR] - No audio files found!
+[2025-06-20 16:59:42,118][__main__][ERROR] - ❌ Test FAILED: No audio files discovered
+[2025-06-20 16:59:42,119][__main__][ERROR] - ❌ Test mode failed!

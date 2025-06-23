@@ -1,0 +1,42 @@
+[2025-06-23 15:26:32,635][__main__][INFO] - ============================================================
+[2025-06-23 15:26:32,636][__main__][INFO] - 🧪 BENCHMARK IMPROVEMENTS TEST MODE
+[2025-06-23 15:26:32,636][__main__][INFO] - ============================================================
+[2025-06-23 15:26:32,636][__main__][INFO] - 🧪 RUNNING BENCHMARK IMPROVEMENTS TEST...
+[2025-06-23 15:26:32,636][__main__][INFO] - This is a quick validation to ensure new features work correctly
+[2025-06-23 15:26:32,637][__main__][INFO] - 🔧 Testing adaptive threshold configuration...
+[2025-06-23 15:26:32,637][__main__][INFO] - ✅ Adaptive threshold OK: no_birds(0.45) > base(0.3)
+[2025-06-23 15:26:32,638][__main__][INFO] - 🎯 Testing birds-only mode configuration...
+[2025-06-23 15:26:32,638][__main__][INFO] - 🚀 Running mini benchmark test (limited files)...
+[2025-06-23 15:26:32,639][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-23 15:26:32,643][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-23 15:26:32,678][__main__][INFO] - Limited Poecile_montanus to 3 files
+[2025-06-23 15:26:32,678][__main__][INFO] - Found 3 files for Poecile_montanus
+[2025-06-23 15:26:32,679][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-23 15:26:32,705][__main__][INFO] - Limited Certhia_familiaris to 3 files
+[2025-06-23 15:26:32,706][__main__][INFO] - Found 3 files for Certhia_familiaris
+[2025-06-23 15:26:32,707][__main__][INFO] - Processing species: Apus_apus
+[2025-06-23 15:26:32,724][__main__][INFO] - Limited Apus_apus to 3 files
+[2025-06-23 15:26:32,725][__main__][INFO] - Found 3 files for Apus_apus
+[2025-06-23 15:26:32,725][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-23 15:26:32,756][__main__][INFO] - Limited Bubo_bubo to 3 files
+[2025-06-23 15:26:32,764][__main__][INFO] - Found 3 files for Bubo_bubo
+[2025-06-23 15:26:32,781][__main__][INFO] - Scanning no_birds dataset: /workspace/augmented_dataset/no_birds
+[2025-06-23 15:26:32,871][__main__][INFO] - Limited no_birds to 3 files
+[2025-06-23 15:26:32,872][__main__][INFO] - Found 3 no_birds files
+[2025-06-23 15:26:32,878][__main__][INFO] - Total audio files discovered: 15
+[2025-06-23 15:26:32,883][__main__][INFO] - Class distribution:
+[2025-06-23 15:26:32,883][__main__][INFO] -   Poecile_montanus: 3 files
+[2025-06-23 15:26:32,883][__main__][INFO] -   Certhia_familiaris: 3 files
+[2025-06-23 15:26:32,884][__main__][INFO] -   Apus_apus: 3 files
+[2025-06-23 15:26:32,884][__main__][INFO] -   Bubo_bubo: 3 files
+[2025-06-23 15:26:32,884][__main__][INFO] -   no_birds: 3 files
+[2025-06-23 15:26:32,909][__main__][INFO] - ✅ Audio discovery OK: Found 15 files
+[2025-06-23 15:26:33,590][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-23 15:26:33,840][benchmark.predict_birdnet][INFO] - BirdNET initialized with 8 target species
+[2025-06-23 15:26:33,841][benchmark.predict_birdnet][INFO] - Target species: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus']
+[2025-06-23 15:26:33,841][benchmark.predict_birdnet][INFO] - Confidence threshold: 0.3
+[2025-06-23 15:26:33,841][benchmark.predict_birdnet][INFO] - Segmented mode: True, Duration: 3.0s
+[2025-06-23 15:26:33,841][__main__][INFO] - ✅ BirdNET predictor initialization OK
+[2025-06-23 15:26:33,842][benchmark.predict_birdnet][INFO] - Cleaned up temporary species list file
+[2025-06-23 15:26:33,842][__main__][INFO] - 🎉 ALL TESTS PASSED! Benchmark improvements are working correctly.
+[2025-06-23 15:26:33,843][__main__][INFO] - ✅ Test mode completed successfully!

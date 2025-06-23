@@ -1,0 +1,52 @@
+{
+  "statistical_requirements": {
+    "statistical_parameters": {
+      "confidence_level": 0.95,
+      "power": 0.8,
+      "effect_size": 0.05,
+      "significance_level": 0.050000000000000044
+    },
+    "sample_size_requirements": {
+      "minimum_required": 1326,
+      "recommended": 1591,
+      "per_class_minimum": 177
+    },
+    "multiple_runs": {
+      "recommended_runs": 3,
+      "minimum_runs": 3
+    },
+    "recommendations": {
+      "total_samples": "At least 1591 samples for 5.0% effect detection",
+      "per_class": "At least 177 samples per class",
+      "runs": "Run benchmark 3 times for robust statistics",
+      "significance": "Use \u03b1=0.050 for statistical significance testing"
+    }
+  },
+  "current_dataset": {
+    "total_samples": 5076,
+    "per_class_distribution": {
+      "Certhia_familiaris": 1325,
+      "Poecile_montanus": 1248,
+      "Bubo_bubo": 860,
+      "no_birds": 836,
+      "Apus_apus": 807
+    },
+    "min_per_class": 807,
+    "max_per_class": 1325,
+    "class_balance_ratio": 0.609056603773585
+  },
+  "requirements_check": {
+    "meets_sample_size": true,
+    "meets_per_class_minimum": true,
+    "overall_adequate": true,
+    "sample_size_ratio": 3.1904462602137023,
+    "improvement_detectable": 0.05
+  },
+  "recommendations": {
+    "current_status": "ADEQUATE",
+    "action_needed": "None",
+    "target_total_samples": 1591,
+    "target_per_class": 177,
+    "suggested_runs": 3
+  }
+}

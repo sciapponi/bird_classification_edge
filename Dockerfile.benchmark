@@ -22,6 +22,9 @@ RUN apt-get update && apt-get install -y \
     portaudio19-dev \
     libasound2-dev \
     libsndfile1 \
+    libhdf5-dev \
+    libhdf5-serial-dev \
+    hdf5-tools \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
@@ -32,7 +35,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python -m pip install --upgrade pip
 
 # Install PyTorch with CUDA support first (to avoid conflicts)
-RUN pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 torchaudio==2.0.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 # Create workspace directory
 WORKDIR /workspace
@@ -44,20 +47,14 @@ COPY benchmark/requirements.txt /workspace/benchmark_requirements.txt
 # Install Python packages
 RUN pip install -r requirements.txt
 
-# Install additional packages for benchmark
-RUN pip install numba resampy
+# Install benchmark-specific requirements
+RUN pip install -r benchmark_requirements.txt
 
-# Create user (CHANGE THESE VALUES ACCORDING TO YOUR `id` COMMAND OUTPUT)
-ARG USER_ID=1000
-ARG USER_GROUP_ID=1000
-RUN groupadd -g $USER_GROUP_ID docker_user && \
-    useradd -u $USER_ID -g $USER_GROUP_ID -ms /bin/bash docker_user
+# Install additional packages for benchmark (including statistical analysis)
+RUN pip install numba resampy psutil
 
-# Set proper permissions for workspace
-RUN chown -R docker_user:docker_user /workspace
-
-# Switch to user
-USER docker_user
+# For testing, skip user creation - run as root (simplified)
+# This is fine for benchmarking purposes
 
 # Set default command (will be overridden by run script)
 CMD ["/bin/bash"] 

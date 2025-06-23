@@ -36,7 +36,8 @@ class StudentModelPredictor:
                  model_path: str,
                  config_path: str,
                  device: str = "auto",
-                 confidence_threshold: float = 0.1):
+                 confidence_threshold: float = 0.1,
+                 force_bird_prediction: bool = False):
         """
         Initialize student model predictor.
         
@@ -45,10 +46,12 @@ class StudentModelPredictor:
             config_path: Path to model configuration file
             device: Device to run model on ("auto", "cpu", "cuda")
             confidence_threshold: Minimum confidence threshold
+            force_bird_prediction: If True, always predict best bird species instead of no_birds (for birds-only mode)
         """
         self.model_path = model_path
         self.config_path = config_path
         self.confidence_threshold = confidence_threshold
+        self.force_bird_prediction = force_bird_prediction
         
         # Setup device
         if device == "auto":
@@ -304,7 +307,29 @@ class StudentModelPredictor:
                 
                 confidence = confidence.item()
                 predicted_idx = predicted_idx.item()
-                predicted_class = self.class_names[predicted_idx]
+                
+                # Apply threshold logic with force_bird_prediction support
+                if self.force_bird_prediction:
+                    # In birds-only mode, never predict no_birds
+                    # Find best bird species (exclude last class which is "no_birds")
+                    bird_probabilities = probabilities[0][:-1]  # Exclude no_birds
+                    if len(bird_probabilities) > 0:
+                        bird_confidence, bird_idx = torch.max(bird_probabilities, 0)
+                        predicted_class = self.class_names[bird_idx.item()]
+                        confidence = bird_confidence.item()
+                        predicted_idx = bird_idx.item()
+                        logger.debug(f"Force bird prediction: {predicted_class} with confidence {confidence:.3f}")
+                    else:
+                        # Fallback if no bird classes available
+                        predicted_class = self.class_names[predicted_idx]
+                elif confidence >= self.confidence_threshold:
+                    # Standard threshold logic
+                    predicted_class = self.class_names[predicted_idx]
+                else:
+                    # Below threshold - classify as no_birds
+                    predicted_class = "no_birds"
+                    predicted_idx = len(self.class_names) - 1
+                    confidence = 0.0
             
             return {
                 'audio_path': str(audio_path),
@@ -316,11 +341,23 @@ class StudentModelPredictor:
             
         except Exception as e:
             logger.error(f"Failed to predict {audio_path}: {e}")
+            # Apply force_bird_prediction logic even in exception case
+            if self.force_bird_prediction and len(self.class_names) > 1:
+                # Choose first bird species (assuming no_birds is last)
+                fallback_class = self.class_names[0]
+                fallback_idx = 0
+                fallback_confidence = 0.01
+                logger.debug(f"Force bird prediction (exception): {fallback_class}")
+            else:
+                fallback_class = "no_birds"
+                fallback_idx = len(self.class_names) - 1
+                fallback_confidence = 0.0
+                
             return {
                 'audio_path': str(audio_path),
-                'predicted_class': "no_birds",
-                'predicted_idx': len(self.class_names) - 1,
-                'confidence': 0.0,
+                'predicted_class': fallback_class,
+                'predicted_idx': fallback_idx,
+                'confidence': fallback_confidence,
                 'all_probabilities': [0.0] * len(self.class_names),
                 'error': str(e)
             }
@@ -401,12 +438,16 @@ def main(cfg: DictConfig) -> None:
     logger.info("Starting student model prediction")
     logger.info(f"Configuration: {cfg.student_model}")
     
+    # Check if birds-only mode is enabled
+    force_bird_prediction = cfg.benchmark.mode.get('exclude_no_birds_from_ground_truth', False)
+    
     # Initialize predictor
     predictor = StudentModelPredictor(
         model_path=os.path.join(original_cwd, cfg.benchmark.paths.student_model),
         config_path=os.path.join(original_cwd, cfg.benchmark.paths.student_config),
         device=cfg.student_model.inference.device,
-        confidence_threshold=cfg.student_model.inference.confidence_threshold
+        confidence_threshold=cfg.student_model.inference.confidence_threshold,
+        force_bird_prediction=force_bird_prediction
     )
     
     try:

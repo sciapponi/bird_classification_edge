@@ -1,0 +1,3 @@
+- debug.files_limit=100
+- birdnet.confidence_threshold=0.1
+- birdnet.no_birds_threshold=0.3

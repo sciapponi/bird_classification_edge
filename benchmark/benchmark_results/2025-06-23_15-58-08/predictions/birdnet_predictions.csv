@@ -1,0 +1,9 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species,birdnet_preprocessing
+../bird_sound_dataset/Apus_apus/XC921725-Apus-apus_2024-07-18-0740h_A-Salgueira_Vigo_Parábola.wav,Apus_apus,Apus_apus,0.949081301689148,1,{'Apus_apus': 0.949081301689148},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC952821-bubo.wav,Bubo_bubo,Bubo_bubo,0.7236209511756897,1,{'Bubo_bubo': 0.7236209511756897},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC349071-uhu_W_mariastein_20170102_2347.mp3,Bubo_bubo,Bubo_bubo,0.7059625387191772,1,{'Bubo_bubo': 0.7059625387191772},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC946739-Mon-Nov-04-2024-15-51-24-Treecreeper.wav,Certhia_familiaris,Certhia_familiaris,0.6626302003860474,1,{'Certhia_familiaris': 0.6626302003860474},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC638144-210327_005b.mp3,Certhia_familiaris,Certhia_familiaris,0.8670241832733154,1,{'Certhia_familiaris': 0.8670241832733154},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC499275-Trädkrypare_08.mp3,Certhia_familiaris,Certhia_familiaris,0.9273180365562439,1,{'Certhia_familiaris': 0.9273180365562439},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC198962-Parus montanus_Falo_140904_01.mp3,Poecile_montanus,Poecile_montanus,0.9988130331039429,1,{'Poecile_montanus': 0.9988130331039429},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC323606-WillowTit2LS110132.mp3,Poecile_montanus,Poecile_montanus,0.9850550889968872,1,{'Poecile_montanus': 0.9850550889968872},extract_calls

@@ -1,0 +1,27 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Apus_apus/XC775004-Apus-palidus_2023.01.08_12.02_02.mp3,Apus_apus,Periparus_ater,0.5838809609413147,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Apus_apus/XC817782-Pale-208..-2.mp3,Apus_apus,Apus_apus,0.6038993000984192,no_birds,0.0,True,False,student_only_correct
+"../bird_sound_dataset/Apus_apus/XC918877-Tiggläte-boplats-28,-2024-07-05-22_11.mp3",Apus_apus,Certhia_familiaris,0.21493810415267944,no_birds,0.0,False,False,both_incorrect
+"../bird_sound_dataset/Apus_apus/XC578624-Gierzwaluw, flight calls at dusk, IGS, 080720, 2150 uur.mp3",Apus_apus,no_birds,0.5852854251861572,Apus_apus,0.993164598941803,False,True,birdnet_only_correct
+../bird_sound_dataset/Apus_apus/XC814474-230626_004_13.30_A.apus.mp3,Apus_apus,Apus_apus,0.7372661232948303,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC637572-ih_7.4.2021__HAJEK_AAAA210408_VYR_ZAJIMAVE_2.mp3,Bubo_bubo,Periparus_ater,0.6042671203613281,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Bubo_bubo/XC423810-Chouette cheveche quemandage (5).mp3,Bubo_bubo,Bubo_bubo,0.3519589304924011,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC343508-Uhu-161119.mp3,Bubo_bubo,Bubo_bubo,0.743139922618866,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC376962-170623_0044-Bubo bubo.mp3,Bubo_bubo,Bubo_bubo,0.6871177554130554,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC807276-Uhu_GUGNY_20230603_023947.mp3,Bubo_bubo,no_birds,0.5195310711860657,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC464323-CERFAM sri190326_0311 vetepere.mp3,Certhia_familiaris,Certhia_familiaris,0.7382202744483948,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC684780-KUNGSFÅ211101.mp3,Certhia_familiaris,Certhia_familiaris,0.7806715965270996,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC807101-230604_0468.mp3,Certhia_familiaris,Certhia_familiaris,0.7733965516090393,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC471625-2019-04-07 Aleria - Bavella Grimpereau des bois cris d excitations puis serie de cris de contact.mp3,Certhia_familiaris,Certhia_familiaris,0.5655792355537415,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC641231-XC Waldbaumläufer bei Nest Bazora Gavadura 2021-04-21 (MONO-050) 10.20h MESZ Ausschnitt norm -5db hp 1000-12db.mp3,Certhia_familiaris,Periparus_ater,0.3503877520561218,Certhia_familiaris,0.551701545715332,False,True,birdnet_only_correct
+"../bird_sound_dataset/Certhia_familiaris/XC702960-WALDBAUMLÄUFER, Gesang  14.02.2022  Seeholz  11_31  VOC_220214-9117  .mp3",Certhia_familiaris,Certhia_familiaris,0.4211355745792389,no_birds,0.0,True,False,student_only_correct
+"../bird_sound_dataset/Certhia_familiaris/XC788091-24-03-23-(grimpereau-des-bois,-chant,-Wanne).wav",Certhia_familiaris,Lophophanes_cristatus,0.26226332783699036,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC751169-Alpenmeise CH.mp3,Poecile_montanus,Bubo_bubo,0.4709443747997284,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC794938-wt-6803d12.wav,Poecile_montanus,Poecile_montanus,0.3422975242137909,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC813616-LS_53689-Songar-Tit-call-A.mp3,Poecile_montanus,Poecile_montanus,0.39236733317375183,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC438276-B09h39m05s15may2018_plus_20m48s_WillowTit_song_VolUp_AggessiveHighPass.mp3,Poecile_montanus,Poecile_montanus,0.6388840079307556,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC790521-Talltita_läte.mp3,Poecile_montanus,Poecile_montanus,0.7199333906173706,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC281668-417 6 Matkop 6 Roep.mp3,Poecile_montanus,Poecile_montanus,0.4755455255508423,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC407985-Granmeis 2 XC Flagstad Vang Elias A. Ryberg20180329150959_229.mp3,Poecile_montanus,Periparus_ater,0.31993356347084045,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC310764-Willow Tit call very good 2016 02 29 Combe Wood_1083_short.mp3,Poecile_montanus,Certhia_familiaris,0.34249162673950195,Poecile_montanus,0.8885400295257568,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC404523-Willow Tit Call Bagmere Reserve Cheshire UK 15 Feb 2018.mp3,Poecile_montanus,no_birds,0.6611811518669128,no_birds,0.0,False,False,both_incorrect

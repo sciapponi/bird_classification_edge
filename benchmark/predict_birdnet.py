@@ -39,7 +39,10 @@ class BirdNETPredictor:
     
     def __init__(self, 
                  target_species: List[str],
-                 confidence_threshold: float = 0.1,
+                 confidence_threshold: float = 0.2,
+                 use_adaptive_threshold: bool = False,
+                 adaptive_factor: float = 1.0,
+                 force_bird_prediction: bool = False,
                  species_list_path: Optional[str] = None,
                  model_path: Optional[str] = None,
                  segment_duration: float = 3.0,
@@ -52,7 +55,10 @@ class BirdNETPredictor:
         
         Args:
             target_species: List of target species (underscore format)
-            confidence_threshold: Minimum confidence for predictions
+            confidence_threshold: Single confidence threshold for all classifications
+            use_adaptive_threshold: Use adaptive threshold strategies (currently disabled)
+            adaptive_factor: Factor for adaptive threshold calculations (not used when adaptive disabled)
+            force_bird_prediction: If True, always predict best bird species instead of no_birds (for birds-only mode)
             species_list_path: Path to custom species list file
             model_path: Path to the TFLite classification model (FP32 preferred for highest accuracy). 
                 If None, BirdNET's default path is used.
@@ -64,6 +70,9 @@ class BirdNETPredictor:
         """
         self.target_species = target_species
         self.confidence_threshold = confidence_threshold
+        self.use_adaptive_threshold = use_adaptive_threshold
+        self.adaptive_factor = adaptive_factor
+        self.force_bird_prediction = force_bird_prediction
         self.model_path = model_path
         self.segment_duration = segment_duration
         self.sample_rate = sample_rate
@@ -145,6 +154,33 @@ class BirdNETPredictor:
                 f.write(f"{species}\n")
         
         return self.temp_species_file
+    
+    def _apply_adaptive_threshold_strategy(self, top_species: str, top_confidence: float, 
+                                         species_confidences: Dict[str, float]) -> tuple:
+        """
+        Apply simplified threshold strategy for bird classification.
+        
+        Args:
+            top_species: Species with highest confidence
+            top_confidence: Highest confidence score
+            species_confidences: All species confidences
+            
+        Returns:
+            Tuple of (predicted_class, final_confidence)
+        """
+        # Check if we should force bird prediction (birds-only mode)
+        if self.force_bird_prediction and species_confidences:
+            # Always predict the best bird species, regardless of threshold
+            logger.debug(f"Force bird prediction: {top_species} with confidence {top_confidence:.3f} (threshold bypassed)")
+            return top_species, top_confidence
+        
+        # Standard single threshold approach
+        if top_confidence >= self.confidence_threshold:
+            logger.debug(f"Bird classification: {top_species} with confidence {top_confidence:.3f} >= {self.confidence_threshold:.3f}")
+            return top_species, top_confidence
+        else:
+            logger.debug(f"No-birds classification: {top_confidence:.3f} < {self.confidence_threshold:.3f}")
+            return "no_birds", 0.0
     
     def _preprocess_audio_segment(self, audio_path: str) -> Optional[str]:
         """
@@ -256,11 +292,18 @@ class BirdNETPredictor:
             temp_file = self._preprocess_audio_segment(str(audio_path))
             
             if temp_file is None:
-                logger.warning(f"Preprocessing failed for {audio_path}, returning no_birds")
+                logger.warning(f"Preprocessing failed for {audio_path}")
+                fallback_class = "no_birds"
+                fallback_confidence = 0.0
+                if self.force_bird_prediction and self.target_species:
+                    fallback_class = self.target_species[0]
+                    fallback_confidence = 0.01
+                    logger.debug(f"Force bird prediction (preprocessing failed): {fallback_class}")
+                
                 return {
                     'audio_path': str(audio_path),
-                    'predicted_class': "no_birds",
-                    'confidence': 0.0,
+                    'predicted_class': fallback_class,
+                    'confidence': fallback_confidence,
                     'all_detections': [],
                     'species_confidences': {},
                     'num_detections': 0,
@@ -309,31 +352,52 @@ class BirdNETPredictor:
                 if project_species not in species_confidences or confidence > species_confidences[project_species]:
                     species_confidences[project_species] = confidence
             
-            # Determine top prediction
+            # Determine top prediction with adaptive threshold
             if species_confidences:
                 top_species = max(species_confidences.keys(), key=lambda x: species_confidences[x])
                 top_confidence = species_confidences[top_species]
+                
+                # Enhanced adaptive threshold logic
+                predicted_class, final_confidence = self._apply_adaptive_threshold_strategy(
+                    top_species, top_confidence, species_confidences
+                )
+                    
             else:
-                # No detections - classify as no_birds
-                top_species = "no_birds"
-                top_confidence = 0.0
+                # No detections
+                if self.force_bird_prediction:
+                    # Force bird prediction: choose first target species with minimal confidence
+                    predicted_class = self.target_species[0] if self.target_species else "no_birds"
+                    final_confidence = 0.01  # Minimal confidence to indicate forced prediction
+                    logger.debug(f"Force bird prediction (no detections): {predicted_class} with minimal confidence")
+                else:
+                    # Standard behavior: classify as no_birds
+                    predicted_class = "no_birds"
+                    final_confidence = 0.0
             
             return {
                 'audio_path': str(audio_path),
-                'predicted_class': top_species,
-                'confidence': top_confidence,
+                'predicted_class': predicted_class,
+                'confidence': final_confidence,
                 'all_detections': all_detections,
                 'species_confidences': species_confidences,
                 'num_detections': len(all_detections),
-                'preprocessing_method': 'extract_calls' if self.extract_calls else 'random_clip'
+                'preprocessing_method': 'extract_calls' if self.extract_calls else 'random_clip',
+                'adaptive_threshold_applied': self.use_adaptive_threshold and len(species_confidences) > 0
             }
             
         except Exception as e:
             logger.error(f"Failed to predict {audio_path}: {e}")
+            fallback_class = "no_birds"
+            fallback_confidence = 0.0
+            if self.force_bird_prediction and self.target_species:
+                fallback_class = self.target_species[0]
+                fallback_confidence = 0.01
+                logger.debug(f"Force bird prediction (exception): {fallback_class}")
+            
             return {
                 'audio_path': str(audio_path),
-                'predicted_class': "no_birds",
-                'confidence': 0.0,
+                'predicted_class': fallback_class,
+                'confidence': fallback_confidence,
                 'all_detections': [],
                 'species_confidences': {},
                 'num_detections': 0,
@@ -401,30 +465,51 @@ class BirdNETPredictor:
                 if project_species not in species_confidences or confidence > species_confidences[project_species]:
                     species_confidences[project_species] = confidence
             
-            # Determine top prediction
+            # Determine top prediction with adaptive threshold
             if species_confidences:
                 top_species = max(species_confidences.keys(), key=lambda x: species_confidences[x])
                 top_confidence = species_confidences[top_species]
+                
+                # Enhanced adaptive threshold logic
+                predicted_class, final_confidence = self._apply_adaptive_threshold_strategy(
+                    top_species, top_confidence, species_confidences
+                )
+                    
             else:
-                # No detections - classify as no_birds
-                top_species = "no_birds"
-                top_confidence = 0.0
+                # No detections
+                if self.force_bird_prediction:
+                    # Force bird prediction: choose first target species with minimal confidence
+                    predicted_class = self.target_species[0] if self.target_species else "no_birds"
+                    final_confidence = 0.01  # Minimal confidence to indicate forced prediction
+                    logger.debug(f"Force bird prediction (no detections): {predicted_class} with minimal confidence")
+                else:
+                    # Standard behavior: classify as no_birds
+                    predicted_class = "no_birds"
+                    final_confidence = 0.0
             
             return {
                 'audio_path': str(audio_path),
-                'predicted_class': top_species,
-                'confidence': top_confidence,
+                'predicted_class': predicted_class,
+                'confidence': final_confidence,
                 'all_detections': all_detections,
                 'species_confidences': species_confidences,
-                'num_detections': len(all_detections)
+                'num_detections': len(all_detections),
+                'adaptive_threshold_applied': self.use_adaptive_threshold and len(species_confidences) > 0
             }
             
         except Exception as e:
             logger.error(f"Failed to predict {audio_path}: {e}")
+            fallback_class = "no_birds"
+            fallback_confidence = 0.0
+            if self.force_bird_prediction and self.target_species:
+                fallback_class = self.target_species[0]
+                fallback_confidence = 0.01
+                logger.debug(f"Force bird prediction (exception): {fallback_class}")
+            
             return {
                 'audio_path': str(audio_path),
-                'predicted_class': "no_birds",
-                'confidence': 0.0,
+                'predicted_class': fallback_class,
+                'confidence': fallback_confidence,
                 'all_detections': [],
                 'species_confidences': {},
                 'num_detections': 0,

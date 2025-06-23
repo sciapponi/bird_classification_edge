@@ -1,0 +1,101 @@
+# Birds-Only Benchmark Configuration
+# This configuration excludes no_birds class for fair comparison on bird species only
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Override benchmark mode for birds-only evaluation
+benchmark:
+  name: "birds_only_benchmark"
+  description: "Comparison between student model and BirdNET - Bird species only (no no_birds class)"
+  
+  # BIRDS-ONLY MODE CONFIGURATION
+  mode:
+    birds_only: true  # Exclude no_birds class from evaluation metrics
+    exclude_no_birds_from_ground_truth: true  # Remove no_birds samples from test set
+    force_fair_preprocessing: true  # Use identical preprocessing for both models
+  
+  # Docker paths
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+
+# Override BirdNET configuration for optimal bird species detection
+birdnet:
+  # Optimized threshold for bird species detection (single threshold approach)
+  confidence_threshold: 0.50  # Optimized for bird species detection
+  sensitivity: 1.25
+  
+  # Simplified threshold strategy
+  use_adaptive_threshold: false  # Single threshold approach
+  adaptive_factor: 1.0
+  
+  # Filtering remains disabled for fair comparison
+  disable_location_filter: true
+  disable_time_filter: true
+
+# Student model inference settings remain the same but ensure no_birds class is handled
+student_model:
+  inference:
+    confidence_threshold: 0.05  # Keep student model threshold low for fair comparison
+  
+  # Safe preprocessing parameters to avoid filter warnings
+  preprocessing:
+    sample_rate: 32000
+    clip_duration: 3.0
+    lowcut: 150.0
+    highcut: 15000.0  # Reduced from 16000 to avoid Nyquist frequency issues
+    extract_calls: true
+  
+  # Override class configuration for birds-only mode
+  classes:
+    has_no_birds_class: true  # Model still has the class but we'll filter it out in evaluation
+    no_birds_label: "no_birds"
+
+# Comparison configuration for birds-only evaluation
+comparison:
+  # Focus on bird species metrics only
+  metrics:
+    calculate_accuracy: true
+    calculate_precision: true
+    calculate_recall: true
+    calculate_f1: true
+    calculate_confusion_matrix: true
+    calculate_per_class_metrics: true
+    calculate_agreement_analysis: true
+    
+    # Birds-only specific metrics
+    averaging_methods: ["micro", "macro", "weighted"]
+    exclude_classes: ["no_birds"]  # Exclude no_birds from all metrics calculations
+    
+  # Agreement analysis for bird species only
+  agreement:
+    exact_match: true
+    exclude_no_birds_from_agreement: true  # Don't consider no_birds predictions in agreement analysis
+    
+  # Visualization settings for birds-only
+  visualization:
+    confusion_matrix:
+      exclude_classes: ["no_birds"]  # Don't show no_birds in confusion matrix
+      normalize: "true"  # Normalize by true class for better bird species comparison
+      
+# Output file naming for birds-only benchmark
+output:
+  naming:
+    student_predictions: "student_predictions_birds_only.csv"
+    birdnet_predictions: "birdnet_predictions_birds_only.csv"
+    comparison_report: "comparison_report_birds_only.json"
+    comparison_summary: "comparison_summary_birds_only.txt"
+    detailed_cases: "detailed_cases_birds_only.csv"
+    
+  plots:
+    confusion_matrices: "confusion_matrices_birds_only.png"
+    agreement_analysis: "agreement_analysis_birds_only.png"
+    per_class_accuracy: "per_class_accuracy_birds_only.png"
+
+# Debug settings for testing
+debug:
+  files_limit: null  # Use all available files
+  max_files_per_class: null  # Use all files per class for comprehensive evaluation 

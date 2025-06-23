@@ -1,0 +1,134 @@
+[2025-06-05 15:43:13,664][__main__][INFO] - Starting knowledge distillation training
+[2025-06-05 15:43:13,666][__main__][INFO] - Configuration:
+experiment_name: distillation_test
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+soft_labels_path: test_soft_labels
+training:
+  epochs: 3
+  batch_size: 4
+  patience: 10
+  min_delta: 0.001
+  seed: 42
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  weight_decay: 0.01
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-06
+dataset:
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes: null
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 50
+  augmentation:
+    enabled: false
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+[2025-06-05 15:43:13,666][__main__][INFO] - Initialized trainer on device: cpu
+[2025-06-05 15:43:13,666][__main__][INFO] - Setting up data loaders with soft labels...
+[2025-06-05 15:43:13,735][__main__][INFO] - Train samples: 3020
+[2025-06-05 15:43:13,735][__main__][INFO] - Val samples: 685
+[2025-06-05 15:43:13,735][__main__][INFO] - Test samples: 685
+[2025-06-05 15:43:13,735][__main__][INFO] - Soft labels info: {'num_classes': 5, 'target_species': ['Poecile montanus', 'Certhia familiaris', 'Apus apus', 'Bubo bubo', 'non-bird'], 'confidence_threshold': 0.05, 'total_files_with_soft_labels': 8, 'files_processed': 8}
+[2025-06-05 15:43:13,735][__main__][INFO] - Setting up student model...
+[2025-06-05 15:43:13,751][__main__][INFO] - Student model parameters: 53,256
+[2025-06-05 15:43:13,751][__main__][INFO] - Setting up optimizer and scheduler...
+[2025-06-05 15:43:14,429][__main__][INFO] - Optimizer: AdamW
+[2025-06-05 15:43:14,429][__main__][INFO] - Scheduler: ReduceLROnPlateau
+[2025-06-05 15:43:14,429][__main__][INFO] - Setting up distillation loss...
+[2025-06-05 15:43:14,429][__main__][INFO] - Using Standard DistillationLoss
+[2025-06-05 15:43:14,429][__main__][INFO] - Alpha: 0.3, Temperature: 4.0
+[2025-06-05 15:43:14,429][__main__][INFO] - Starting distillation training...
+[2025-06-05 15:43:17,780][__main__][INFO] - Epoch 0, Batch 0/378, Loss: 1.1191 (Hard: 1.5949, Soft: 0.0088)
+[2025-06-05 15:44:52,127][__main__][INFO] - Epoch 0, Batch 50/378, Loss: 1.0280 (Hard: 1.4151, Soft: 0.1249)
+[2025-06-05 15:46:00,548][__main__][INFO] - Epoch 0, Batch 100/378, Loss: 0.7591 (Hard: 0.9398, Soft: 0.3375)
+[2025-06-05 15:47:37,468][__main__][INFO] - Epoch 0, Batch 150/378, Loss: 0.6781 (Hard: 0.8016, Soft: 0.3900)
+[2025-06-05 15:48:57,167][__main__][INFO] - Epoch 0, Batch 200/378, Loss: 0.5336 (Hard: 0.5720, Soft: 0.4439)
+[2025-06-05 15:50:23,561][__main__][INFO] - Epoch 0, Batch 250/378, Loss: 0.6626 (Hard: 0.7883, Soft: 0.3693)
+[2025-06-05 15:55:07,367][__main__][INFO] - Epoch 0, Batch 300/378, Loss: 0.7407 (Hard: 0.8951, Soft: 0.3805)
+[2025-06-05 15:56:54,509][__main__][INFO] - Epoch 0, Batch 350/378, Loss: 0.6417 (Hard: 0.7326, Soft: 0.4296)
+[2025-06-05 15:59:39,541][__main__][INFO] - Epoch 0: Train Loss: 0.7637, Train Acc: 67.45%, Val Loss: 0.6694, Val Acc: 78.25%
+[2025-06-05 15:59:39,543][__main__][INFO] -   Hard Loss: 0.9611, Soft Loss: 0.3029, Alpha: 0.300
+[2025-06-05 15:59:39,611][__main__][INFO] - New best model saved! Val Acc: 78.25%
+[2025-06-05 15:59:40,857][__main__][INFO] - Epoch 1, Batch 0/378, Loss: 0.6331 (Hard: 0.7215, Soft: 0.4270)
+[2025-06-05 16:01:00,875][__main__][INFO] - Epoch 1, Batch 50/378, Loss: 0.5490 (Hard: 0.6080, Soft: 0.4113)
+[2025-06-05 16:02:14,468][__main__][INFO] - Epoch 1, Batch 100/378, Loss: 0.7498 (Hard: 0.9465, Soft: 0.2909)
+[2025-06-05 16:03:40,369][__main__][INFO] - Epoch 1, Batch 150/378, Loss: 0.6770 (Hard: 0.7405, Soft: 0.5289)
+[2025-06-05 16:04:51,884][__main__][INFO] - Epoch 1, Batch 200/378, Loss: 0.4951 (Hard: 0.5132, Soft: 0.4529)
+[2025-06-05 16:06:03,411][__main__][INFO] - Epoch 1, Batch 250/378, Loss: 0.6523 (Hard: 0.7468, Soft: 0.4318)
+[2025-06-05 16:07:32,751][__main__][INFO] - Epoch 1, Batch 300/378, Loss: 0.7741 (Hard: 0.9624, Soft: 0.3349)
+[2025-06-05 16:08:56,339][__main__][INFO] - Epoch 1, Batch 350/378, Loss: 0.3973 (Hard: 0.3377, Soft: 0.5361)
+[2025-06-05 16:11:23,692][__main__][INFO] - Epoch 1: Train Loss: 0.6281, Train Acc: 80.33%, Val Loss: 0.6452, Val Acc: 80.00%
+[2025-06-05 16:11:23,696][__main__][INFO] -   Hard Loss: 0.7139, Soft Loss: 0.4279, Alpha: 0.300
+[2025-06-05 16:11:23,727][__main__][INFO] - New best model saved! Val Acc: 80.00%
+[2025-06-05 16:11:24,860][__main__][INFO] - Epoch 2, Batch 0/378, Loss: 0.8171 (Hard: 0.9759, Soft: 0.4466)
+[2025-06-05 16:12:30,264][__main__][INFO] - Epoch 2, Batch 50/378, Loss: 0.4976 (Hard: 0.4758, Soft: 0.5484)
+[2025-06-05 16:13:57,069][__main__][INFO] - Epoch 2, Batch 100/378, Loss: 0.4481 (Hard: 0.4377, Soft: 0.4722)
+[2025-06-05 16:15:14,518][__main__][INFO] - Epoch 2, Batch 150/378, Loss: 0.5657 (Hard: 0.6549, Soft: 0.3574)
+[2025-06-05 16:16:29,270][__main__][INFO] - Epoch 2, Batch 200/378, Loss: 0.5414 (Hard: 0.5689, Soft: 0.4771)
+[2025-06-05 16:17:31,856][__main__][INFO] - Epoch 2, Batch 250/378, Loss: 0.5231 (Hard: 0.5026, Soft: 0.5711)
+[2025-06-05 16:18:38,246][__main__][INFO] - Epoch 2, Batch 300/378, Loss: 0.5785 (Hard: 0.6581, Soft: 0.3928)
+[2025-06-05 16:20:03,506][__main__][INFO] - Epoch 2, Batch 350/378, Loss: 0.4388 (Hard: 0.3821, Soft: 0.5712)
+[2025-06-05 16:22:47,809][__main__][INFO] - Epoch 2: Train Loss: 0.5955, Train Acc: 81.95%, Val Loss: 0.6130, Val Acc: 82.92%
+[2025-06-05 16:22:47,854][__main__][INFO] -   Hard Loss: 0.6573, Soft Loss: 0.4513, Alpha: 0.300
+[2025-06-05 16:22:48,082][__main__][INFO] - New best model saved! Val Acc: 82.92%
+[2025-06-05 16:22:48,082][__main__][INFO] - Training completed!
+[2025-06-05 16:22:48,082][__main__][INFO] - Best validation accuracy: 82.92%
+[2025-06-05 16:22:48,086][__main__][INFO] - Testing best model...
+[2025-06-05 16:25:47,424][__main__][INFO] - Test Accuracy: 81.31%
+[2025-06-05 16:25:47,529][__main__][INFO] - Classification Report:
+              precision    recall  f1-score   support
+
+     Class_0       0.92      0.64      0.75       187
+     Class_1       0.83      0.89      0.86       198
+     Class_2       0.74      0.93      0.82       121
+     Class_3       0.75      0.91      0.83       129
+     Class_4       0.97      0.60      0.74        50
+
+    accuracy                           0.81       685
+   macro avg       0.84      0.80      0.80       685
+weighted avg       0.83      0.81      0.81       685
+
+[2025-06-05 16:25:49,431][__main__][INFO] - Training plots saved to distillation_training_history.png
+[2025-06-05 16:25:49,431][__main__][INFO] - Distillation training completed successfully!
+[2025-06-05 16:25:49,431][__main__][INFO] - Final test accuracy: 81.31%

@@ -7,14 +7,14 @@ defaults:
 # Override only the essential paths - modify these!
 benchmark:
   paths:
-    audio_dir: "../bird_sound_dataset"               # Use project's bird dataset directory
-    no_birds_dir: "../augmented_dataset/no_birds"   # Directory with no_birds samples
-    student_model: "../best_distillation_model.pt"  # Use the trained model in project root
-    student_config: "../config/bird_classification.yaml" # Student model configuration
+    audio_dir: "/workspace/bird_sound_dataset"               # Use project's bird dataset directory
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"   # Directory with no_birds samples
+    student_model: "/workspace/best_distillation_model.pt"  # Use the trained model in project root
+    student_config: "/workspace/config/bird_classification.yaml" # Student model configuration
     ground_truth: null                               # Auto-generated from folder structure
-    output_dir: "results"
-    predictions_dir: "results/predictions"
-    comparison_dir: "results/comparison"
+    output_dir: "benchmark_results"
+    predictions_dir: null  # Will be set at runtime with timestamp
+    comparison_dir: null  # Will be set at runtime with timestamp
     
 # Simplified settings for quick testing
 segmentation:

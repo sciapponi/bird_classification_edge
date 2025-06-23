@@ -1,4 +1,5 @@
 audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+<<<<<<< HEAD
 ../bird_sound_dataset/Poecile_montanus/XC770114-Glanskop-zang-en-roep---Zeist---2021-01-08---1147-copy.wav,Poecile_montanus,Periparus_ater,0.5503027439117432,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Poecile_montanus/XC794938-wt-6803d12.wav,Poecile_montanus,Poecile_montanus,0.34229710698127747,no_birds,0.0,True,False,student_only_correct
 ../bird_sound_dataset/Poecile_montanus/XC841120-2023-11-09-07_56.wav,Poecile_montanus,Certhia_familiaris,0.36879491806030273,Lophophanes_cristatus,0.20094303786754608,False,False,both_incorrect
@@ -2109,81 +2110,99 @@ audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,b
 ../bird_sound_dataset/Emberiza_cia/XC199398-emberiza cia 2 castillo de las guardas 03-10-2014.mp3,Emberiza_cia,Emberiza_cia,0.7508497834205627,no_birds,0.0,True,False,student_only_correct
 ../bird_sound_dataset/Emberiza_cia/XC688465-Bruant fou pluk sourd en vol +.mp3,Emberiza_cia,Bubo_bubo,0.24763140082359314,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Emberiza_cia/XC799081-Kaya-Çintesi---Emli-Vadisi---20052022----1800-.mp3,Emberiza_cia,Periparus_ater,0.23110921680927277,Emberiza_cia,0.8873105049133301,False,True,birdnet_only_correct
+=======
+../bird_sound_dataset/Apus_apus/XC327459-160716_02.mp3,Apus_apus,Apus_apus,0.4642273187637329,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Apus_apus/XC325791-Common Swift ZMB nestling 5 July 2016 (2).mp3,Apus_apus,Apus_apus,0.6624611616134644,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Apus_apus/XC907036-26052024_rondoni_ore2116.mp3,Apus_apus,no_birds,0.4136853814125061,Apus_apus,0.9348458051681519,False,True,birdnet_only_correct
+"../bird_sound_dataset/Apus_apus/XC328863-XC-Gierzwaluwen, AN 170716 2141 uur VERTRAAGD.mp3",Apus_apus,Bubo_bubo,0.29644858837127686,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Apus_apus/XC747598-220710_CommonSwift_screams_Burabai_OC.mp3,Apus_apus,Apus_apus,0.7637135982513428,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Apus_apus/XC910923-Swift-06-06-24.mp3,Apus_apus,Certhia_brachydactyla,0.3749493956565857,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Apus_apus/XC650186-210521_0415_karmana.mp3,Apus_apus,Bubo_bubo,0.2821768522262573,no_birds,0.0,False,False,both_incorrect
+"../bird_sound_dataset/Apus_apus/XC918877-Tiggläte-boplats-28,-2024-07-05-22_11.mp3",Apus_apus,Certhia_familiaris,0.21493801474571228,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Apus_apus/XC573646-apus 5 2.mp3,Apus_apus,Apus_apus,0.48784175515174866,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Apus_apus/XC486171-190628-110401andorinhaopreto.mp3,Apus_apus,Poecile_montanus,0.31510668992996216,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Bubo_bubo/XC477613-190505-Grand-duc d_Europe@Jazki.mp3,Bubo_bubo,Bubo_bubo,0.7529184222221375,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC726391-matleverans.mp3,Bubo_bubo,Bubo_bubo,0.5287538766860962,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC836726-2022.02.23-19h07-Grands-ducs-chants-et-accouplement.mp3,Bubo_bubo,Bubo_bubo,0.2975633442401886,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC423810-Chouette cheveche quemandage (5).mp3,Bubo_bubo,Bubo_bubo,0.3519591689109802,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC657906-Uhu_20210620_0024.mp3,Bubo_bubo,Bubo_bubo,0.540713369846344,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC897710-mp_11.4.2022-RAKOS_KKKK-vyr-rakos-19-33.mp3,Bubo_bubo,Bubo_bubo,0.7434279918670654,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC961744-hibougrandduc.mp3,Bubo_bubo,no_birds,0.6370289325714111,Bubo_bubo,0.8116061687469482,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC621889-2021-02-15-01-10-copulation.mp3,Bubo_bubo,Poecile_montanus,0.23906975984573364,Bubo_bubo,0.6257807016372681,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC733205-220420_0222_stepnoy+12db.mp3,Bubo_bubo,Bubo_bubo,0.3156292140483856,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC729673-berguvshonalarm.mp3,Bubo_bubo,no_birds,0.7077498435974121,Bubo_bubo,0.8907262682914734,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC724064-argauvungar.mp3,Bubo_bubo,Bubo_bubo,0.36582496762275696,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC462192-Bub_kokku2.mp3,Bubo_bubo,Bubo_bubo,0.7933100461959839,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC424144-Hibou grand duc compil.mp3,Bubo_bubo,Poecile_montanus,0.46391573548316956,Bubo_bubo,0.6835116147994995,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC524192-GR-MONED-BAR_20191007_175502_Gufo reale_richiamo_juv (ottobre)_serie.mp3,Bubo_bubo,Bubo_bubo,0.595928966999054,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC702379-Grand duc femelle chant filtered 2 +.mp3,Bubo_bubo,Bubo_bubo,0.668133020401001,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/20100322_EagleOwl_Uppsala.mp3,Bubo_bubo,no_birds,0.5763564109802246,Bubo_bubo,0.45342817902565,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC459969-190209 Uhu MWGesang FH 1721 Cut1.mp3,Bubo_bubo,Bubo_bubo,0.7210231423377991,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC735782-boomkruiperroep190622marselaer.mp3,Certhia_brachydactyla,Certhia_familiaris,0.17259402573108673,Certhia_familiaris,0.2303166538476944,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC385625-CERBRA220717-T017_CALL (2).mp3,Certhia_brachydactyla,Certhia_familiaris,0.36119067668914795,Certhia_brachydactyla,0.9278340339660645,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC566458-grimpereau.mp3,Certhia_brachydactyla,Certhia_familiaris,0.3658485412597656,Certhia_brachydactyla,0.9653210639953613,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC391351-54448_0300-02´ mp3.mp3,Certhia_brachydactyla,Periparus_ater,0.3836331367492676,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC819598-ZOOM0066_TrLR_Certhia_brachydactyla_cut1.wav,Certhia_brachydactyla,Certhia_brachydactyla,0.6893584728240967,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC566322-raspinell 861.mp3,Certhia_brachydactyla,Certhia_familiaris,0.48095354437828064,Certhia_brachydactyla,0.44878479838371277,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC415500-Certhiabrach-c_poland_psz_5.30_180514-4891.mp3,Certhia_brachydactyla,Periparus_ater,0.4364353120326996,Certhia_brachydactyla,0.5665233731269836,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC700568-ZOritaOM0059_01_ö-11.mp3,Certhia_brachydactyla,Bubo_bubo,0.37877005338668823,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC474508-CERBRA-JdP-20190515-1634.mp3,Certhia_brachydactyla,Certhia_familiaris,0.5434286594390869,Certhia_brachydactyla,0.9371058344841003,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC917058-2024.06.27-10h18-Grimpereau-begging.mp3,Certhia_brachydactyla,Certhia_familiaris,0.5827226042747498,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC877796-Default_trädgårds-20240226-090109-.mp3,Certhia_brachydactyla,Certhia_brachydactyla,0.7472966909408569,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC575846-m 12 8.mp3,Certhia_brachydactyla,Periparus_ater,0.38596364855766296,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC377487-certhia brachydactyla 2 (esperanza poveda) linares de la sierra 01-05-2017.mp3,Certhia_brachydactyla,Certhia_familiaris,0.5441733598709106,Certhia_brachydactyla,0.9880334138870239,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC742077-zSpiirSpp0003_02_mp3 (7).mp3,Certhia_brachydactyla,Certhia_brachydactyla,0.4258258640766144,no_birds,0.0,True,False,student_only_correct
+"../bird_sound_dataset/Certhia_brachydactyla/XC962427-20250121_1114_Grimpereau-des-jardins_Corneille-noire_Geai-des-chenes,.mp3",Certhia_brachydactyla,Periparus_ater,0.36561155319213867,Certhia_brachydactyla,0.9038894772529602,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC692729-XC 2021-12-22 Bludesch Jordan 9.45h (000 - 0.08) Gbl Rufe 20x hp 1800-6db.mp3,Certhia_brachydactyla,Lophophanes_cristatus,0.5517444014549255,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC607963-TTK mix 4 o 6.mp3,Certhia_brachydactyla,Periparus_ater,0.29715320467948914,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC164164-791_cerbra_kutsu_Marokko_Des Cedres_2012-04-27.mp3,Certhia_brachydactyla,Certhia_brachydactyla,0.4021788537502289,Periparus_ater,0.20814895629882812,True,False,student_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC614471-pełzacz ogrodowy Glinka 11.01.2021    14.10.mp3,Certhia_brachydactyla,Periparus_ater,0.2309839427471161,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC523716-Short-toed_Tree_creep_NL.mp3,Certhia_brachydactyla,Certhia_familiaris,0.374698281288147,Certhia_brachydactyla,0.8193309307098389,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC474516-190504-201057trepadeiradosul.mp3,Certhia_brachydactyla,Bubo_bubo,0.19858507812023163,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC391358-54448_0566-02´ mp3.mp3,Certhia_brachydactyla,Certhia_familiaris,0.43463823199272156,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_brachydactyla/XC246594-Voice00374 agateador(1)(1).mp3,Certhia_brachydactyla,no_birds,0.3646983802318573,Certhia_brachydactyla,0.9862443804740906,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_brachydactyla/XC329786-TTK2b.mp3,Certhia_brachydactyla,Certhia_familiaris,0.5294014811515808,Certhia_familiaris,0.35835501551628113,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC461891-2019.02.18_11.26_01t.mp3,Certhia_familiaris,Certhia_familiaris,0.6992465853691101,Certhia_brachydactyla,0.7407093048095703,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC623393-LS_57002 Taigaboomkruiper call A.mp3,Certhia_familiaris,Certhia_familiaris,0.6931290030479431,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC389286-31602_055-02´ mp3.mp3,Certhia_familiaris,Periparus_ater,0.17425118386745453,Certhia_familiaris,0.3301973342895508,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC791059-CERFAM-SPACVA-BOŠNJACI.mp3,Certhia_familiaris,Certhia_brachydactyla,0.24538138508796692,Certhia_familiaris,0.3193940222263336,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC387481-Waldbaumläufer.mp3,Certhia_familiaris,Certhia_brachydactyla,0.5793122053146362,Certhia_brachydactyla,0.7793460488319397,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC186444-LS_30334 -1 x mp3.mp3,Certhia_familiaris,no_birds,0.2609402537345886,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC507550-STE-356 pelzacz 201119 zytno.mp3,Certhia_familiaris,Certhia_familiaris,0.8109071254730225,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC598433-XC-biOsmid3C001-04equII (8).mp3,Certhia_familiaris,Bubo_bubo,0.5337186455726624,Certhia_familiaris,0.7769371867179871,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC145193-Taigaboomkruiper daurica_20130629_21_roep.mp3,Certhia_familiaris,Certhia_familiaris,0.23650003969669342,Poecile_montanus,0.13127754628658295,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC405759-Eurasian Treecreeper Song Bagmere Nature Reserve 25 Feb 2018 at 1032am.mp3,Certhia_familiaris,Certhia_familiaris,0.7728183269500732,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC234422-554982_47-07sp-renw mp3.mp3,Certhia_familiaris,Poecile_montanus,0.5428219437599182,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC373620-3436-01_000-05ku mp3.mp3,Certhia_familiaris,Periparus_ater,0.19547805190086365,Certhia_familiaris,0.8453447818756104,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC940662-CERFAM_cri_2_240315_Cordon.mp3,Certhia_familiaris,Certhia_familiaris,0.4890146553516388,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC193241-2_unknown_kernu_estonia_16.08.2014_0705.mp3,Certhia_familiaris,Periparus_ater,0.5689648389816284,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC544698-1626-1729684-7221.mp3,Certhia_familiaris,Bubo_bubo,0.41660383343696594,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC831224-cerfam-call-dubica-22.9.mp3,Certhia_familiaris,Emberiza_cia,0.23671354353427887,Certhia_familiaris,0.6144558787345886,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC405756-Eurasian Treecreeper Calls Bagmere Nature Reserve 24 Feb 2018 at 1635pm.mp3,Certhia_familiaris,Certhia_familiaris,0.3721866011619568,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC652892-20170403treecrpr1.mp3,Certhia_familiaris,Certhia_familiaris,0.7320444583892822,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC308694-160313WaldbaumläuferGesangFH1edit 49.mp3,Certhia_familiaris,Certhia_familiaris,0.803916871547699,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC401496-walbaumläufer180105_0012.mp3,Certhia_familiaris,Certhia_familiaris,0.45982128381729126,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC168018-grimpereau des bois Lac d_estaing 22 juillet 2012 11h.mp3,Certhia_familiaris,no_birds,0.25424113869667053,Certhia_familiaris,0.9316210746765137,False,True,birdnet_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC701229-Röst_087-1-1-1-1-1.mp3,Certhia_familiaris,Bubo_bubo,0.4052736759185791,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Emberiza_cia/XC148915-Klippsparv-song+locklate-(2013-04-01 10.45)-LS113216 (2).mp3,Emberiza_cia,Periparus_ater,0.3761952519416809,Emberiza_cia,0.9942008256912231,False,True,birdnet_only_correct
+>>>>>>> ed74597 (no bird benchmark)
 ../bird_sound_dataset/Emberiza_cia/XC716525-20220418_Bruant_fou_cri_col_du_Rousset_Vercors.mp3,Emberiza_cia,Periparus_ater,0.2297126054763794,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC724311-220515_009.mp3,Emberiza_cia,Periparus_ater,0.48502397537231445,Emberiza_cia,0.9589657783508301,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC900571-Rock-Bunting_Kokpek.mp3,Emberiza_cia,Periparus_ater,0.49453166127204895,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC473297-171015_0412.mp3,Emberiza_cia,Periparus_ater,0.3165832757949829,Emberiza_cia,0.46964961290359497,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC702375-Bruant fou vol +.mp3,Emberiza_cia,Emberiza_cia,0.524543046951294,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Emberiza_cia/XC418457-bruant fou chant et cris PAS + printas.mp3,Emberiza_cia,Emberiza_cia,0.5584339499473572,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Emberiza_cia/XC663457-muciatto.mp3,Emberiza_cia,Emberiza_cia,0.5415751338005066,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Emberiza_cia/XC181924-Rock Bunting_20140405_01_zang.mp3,Emberiza_cia,Periparus_ater,0.3521784842014313,Emberiza_cia,0.9132865071296692,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC742839-220624_1230 rock bunting song_pyrenees.mp3,Emberiza_cia,Periparus_ater,0.6611955165863037,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC574609-200704-008_HP10N6_17h15_Ecia-song.mp3,Emberiza_cia,Periparus_ater,0.28574246168136597,Emberiza_cia,0.9867766499519348,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC199397-emberiza cia castillo de las guardas 03-10-2014.mp3,Emberiza_cia,Bubo_bubo,0.33948951959609985,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC574576-DSCN0340 Escribano Montesino. Leiva.mp3,Emberiza_cia,Periparus_ater,0.3703107535839081,Emberiza_cia,0.9903192520141602,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC469844-Bruant fou male chant 01052019 - Plan d Aups.mp3,Emberiza_cia,Periparus_ater,0.5779474973678589,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC148916-Klippsparv-song+locklate2-(2013-04-01 10.43)-LS113215 (2).mp3,Emberiza_cia,Periparus_ater,0.4017866253852844,Emberiza_cia,0.9945313334465027,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC489088-190718_07A Trol klippsparv sel.mp3,Emberiza_cia,no_birds,0.40642502903938293,Emberiza_cia,0.38040992617607117,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC595272-20201008_150218 cia.mp3,Emberiza_cia,Periparus_ater,0.27174198627471924,Emberiza_cia,0.40257447957992554,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC743437-T728_1.mp3,Emberiza_cia,Periparus_ater,0.30392786860466003,Emberiza_cia,0.6734738945960999,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC661031-210522_001c.mp3,Emberiza_cia,Periparus_ater,0.2976464629173279,Emberiza_cia,0.8062072396278381,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC545497-Bruant_fou_cht_26.6.19.mp3,Emberiza_cia,Periparus_ater,0.32319915294647217,Emberiza_cia,0.9654684662818909,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC417969-Rock Bunting 13.04.2018 UK ZOOM0077.mp3,Emberiza_cia,Periparus_ater,0.6280913949012756,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC392896-170524_0093.mp3,Emberiza_cia,Periparus_ater,0.26860666275024414,Emberiza_cia,0.9541385769844055,False,True,birdnet_only_correct
+../bird_sound_dataset/Emberiza_cia/XC483344-cia_2019.06.16_15.38_01.mp3,Emberiza_cia,Periparus_ater,0.28291597962379456,Emberiza_cia,0.9970611929893494,False,True,birdnet_only_correct
+../bird_sound_dataset/Emberiza_cia/XC825820-emberiza-cia-guadiatillo-10-05-2022.mp3,Emberiza_cia,Periparus_ater,0.4280925989151001,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Emberiza_cia/XC557015-mp3-Zigolo muc petraro.mp3,Emberiza_cia,Certhia_familiaris,0.6474428772926331,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Emberiza_cia/XC265770-emberiza cia ruta del agua 27-04-2015.mp3,Emberiza_cia,Emberiza_cia,0.23768313229084015,no_birds,0.0,True,False,student_only_correct
 ../bird_sound_dataset/Emberiza_cia/XC325089-160526_11.mp3,Emberiza_cia,Certhia_familiaris,0.27997151017189026,Emberiza_cia,0.956095278263092,False,True,birdnet_only_correct
-"../bird_sound_dataset/Emberiza_cia/XC173841-Emberiza_cia,7.4.2014.mp3",Emberiza_cia,Periparus_ater,0.31453007459640503,Emberiza_cia,0.9918743968009949,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC711848-220325_01Emberiza cia 18.30 Pedroso.mp3,Emberiza_cia,Emberiza_cia,0.527367353439331,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Emberiza_cia/XC599688-20201101 08h17 Bruant fou XC.mp3,Emberiza_cia,Periparus_ater,0.31133267283439636,Emberiza_cia,0.6931356191635132,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC759080-Emberiza-cia_NFC_Riudecols_221102_0645.mp3,Emberiza_cia,Bubo_bubo,0.6788529753684998,no_birds,0.0,False,False,both_incorrect
-"../bird_sound_dataset/Emberiza_cia/XC178268-Bruant fou Sierra nevada 1350 m, 4 mai 2014 19h.mp3",Emberiza_cia,Periparus_ater,0.3217860758304596,Emberiza_cia,0.99819415807724,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC341200-emberiza cia setefilla 28-06-2016.mp3,Emberiza_cia,Periparus_ater,0.33895349502563477,Emberiza_cia,0.9972835779190063,False,True,birdnet_only_correct
-../bird_sound_dataset/Emberiza_cia/XC747755-220713_1A_Rock Bunting_juvenile_calls_Ala Archa-Lower Gate_OC.mp3,Emberiza_cia,Periparus_ater,0.4114517271518707,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Emberiza_cia/XC550922-200417_1321-ampl-cut.mp3,Emberiza_cia,Emberiza_cia,0.6280643939971924,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Emberiza_cia/XC553902-200503-011_HP10N6_21h20_Ecia-song.mp3,Emberiza_cia,Emberiza_cia,0.25700443983078003,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC900219-Lopcri3_Pinhal-de-Belverde-e-Verdizela.wav,Lophophanes_cristatus,Certhia_familiaris,0.4098220765590668,Lophophanes_cristatus,0.9807673692703247,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC900218-Lopcri2_Pinhal-de-Belverde-e-Verdizela.wav,Lophophanes_cristatus,Bubo_bubo,0.39056625962257385,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC861919-Crested-Tit-Glenmore-wing-whirr-130124-0900.wav,Lophophanes_cristatus,Periparus_ater,0.2354600727558136,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC815554-230423-110329ChapimPoupa.wav,Lophophanes_cristatus,Certhia_brachydactyla,0.46156927943229675,no_birds,0.0,False,False,both_incorrect
-"../bird_sound_dataset/Lophophanes_cristatus/XC832153-Crested-Tit-call-very-good-2023-09-03-Nordaskog,-Hallands,-Sweden_2645_short.wav",Lophophanes_cristatus,Periparus_ater,0.46165573596954346,Lophophanes_cristatus,0.7370128035545349,False,True,birdnet_only_correct
-"../bird_sound_dataset/Lophophanes_cristatus/XC780653-15-02-23-(mésange-huppée,-cri-4,-Wanne).wav",Lophophanes_cristatus,Periparus_ater,0.7296945452690125,Lophophanes_cristatus,0.9422875046730042,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC788309-Lop.cri.1_Lagoa-da-Estacada.wav,Lophophanes_cristatus,Certhia_familiaris,0.3838927447795868,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC795682-Crested-Tit-song-22-apr-TMP-1219.wav,Lophophanes_cristatus,Periparus_ater,0.3976994752883911,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC933129-Lophophanes-cristatus_240910_090150_410.wav,Lophophanes_cristatus,Lophophanes_cristatus,0.35994625091552734,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC778011-Lophophanes-cristatus_call_02_02_23_Piedrafita-de-Babia.wav,Lophophanes_cristatus,Periparus_ater,0.6265507340431213,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC788886-Lop.cri.3_Tabosa-do-Carregal.wav,Lophophanes_cristatus,Certhia_familiaris,0.5082072615623474,Lophophanes_cristatus,0.8023949265480042,False,True,birdnet_only_correct
-"../bird_sound_dataset/Lophophanes_cristatus/XC832154-Firecrest-call-very-good-2023-09-03-Nordaskog,-Hallands,-Sweden_2645_short.wav",Lophophanes_cristatus,Periparus_ater,0.23347169160842896,Lophophanes_cristatus,0.2365269958972931,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC788885-Lop.cri.2_Tabosa-do-Carregal.wav,Lophophanes_cristatus,Bubo_bubo,0.41338375210762024,Lophophanes_cristatus,0.9994210004806519,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC842341-2023-11-16-07_46-(1).wav,Lophophanes_cristatus,Certhia_familiaris,0.4169134795665741,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC788313-Lop.cri.top2_Lagoa-da-Estacada.wav,Lophophanes_cristatus,Certhia_brachydactyla,0.6897753477096558,Lophophanes_cristatus,0.8861355781555176,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC779331-Crested-Tit.wav,Lophophanes_cristatus,Periparus_ater,0.31147027015686035,Lophophanes_cristatus,0.9776903986930847,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC842340-2023-11-16-07_46.wav,Lophophanes_cristatus,Certhia_familiaris,0.3739129900932312,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC505285-XCLophophanes cristatus_Ordino_191101_0253.wav,Lophophanes_cristatus,Periparus_ater,0.24399541318416595,Lophophanes_cristatus,0.6604332327842712,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC858626-PARCRI231001.wav,Lophophanes_cristatus,Periparus_ater,0.359332412481308,Lophophanes_cristatus,0.16996830701828003,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC788311-Lop.cri.top1_Lagoa-da-Estacada.wav,Lophophanes_cristatus,Certhia_brachydactyla,0.25809216499328613,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC839022-10-23-2023_9h26_mésange-huppée_export.wav,Lophophanes_cristatus,Lophophanes_cristatus,0.7618358731269836,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC900217-Lopcri1_Pinhal-de-Belverde-e-Verdizela.wav,Lophophanes_cristatus,Bubo_bubo,0.41724058985710144,Lophophanes_cristatus,0.9657149910926819,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC768947-2022-12-16-09h48m59s-kuifmees-marselaer.wav,Lophophanes_cristatus,Certhia_brachydactyla,0.34202897548675537,Lophophanes_cristatus,0.42858588695526123,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC959141-241102-184432ChapimPoupa.wav,Lophophanes_cristatus,Periparus_ater,0.2400309145450592,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC788346-Lop.cri.1_Mata-da-Machada.wav,Lophophanes_cristatus,Poecile_montanus,0.24998024106025696,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC833143-10-01-2023_10h32_mésange-huppée_export.wav,Lophophanes_cristatus,Lophophanes_cristatus,0.7221174836158752,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC775006-XC-2023-01-11-(0054)-TASCAM-P-X8-u-NTG5---Schlins-Galscherlend---Hm-mit-Km-ua-norm--3db-hp-1000-6db-300-24db.wav,Lophophanes_cristatus,Periparus_ater,0.2796536087989807,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC831041-2023-09-22-11_31.wav,Lophophanes_cristatus,Periparus_ater,0.5486606955528259,Lophophanes_cristatus,0.660072922706604,False,True,birdnet_only_correct
+../bird_sound_dataset/Emberiza_cia/XC120260-RB.1.mp3,Emberiza_cia,Apus_apus,0.6065459251403809,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Emberiza_cia/XC947754-Emberiza-cia_241113_114033_00.wav,Emberiza_cia,Periparus_ater,0.31238341331481934,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Emberiza_cia/XC743437-T728_1.mp3,Emberiza_cia,Periparus_ater,0.30392786860466003,Emberiza_cia,0.6734738945960999,False,True,birdnet_only_correct
+../bird_sound_dataset/Emberiza_cia/XC142198-2013070907_Emberiza cia_M_F Deroussen.mp3,Emberiza_cia,Emberiza_cia,0.5083926916122437,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Emberiza_cia/XC788877-Emb.cia.1_Baloiço-de-Pendilhe.wav,Emberiza_cia,Periparus_ater,0.6825821995735168,Emberiza_cia,0.9949657320976257,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC771570-Haubenmeise_Schongau.mp3,Lophophanes_cristatus,Periparus_ater,0.2667016386985779,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC788310-Lop.cri.2_Lagoa-da-Estacada.wav,Lophophanes_cristatus,Certhia_brachydactyla,0.45846694707870483,Periparus_ater,0.7712503671646118,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC856985-Lophophanes-cristatus_2-birds-call-when-feeding-pine-tree_171223_Lama-Grande.wav,Lophophanes_cristatus,Lophophanes_cristatus,0.33261948823928833,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC900201-Lopcri1_Lagoa-da-Estacada.wav,Lophophanes_cristatus,Periparus_ater,0.3572394549846649,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC711724-220329-075357_tome.mp3,Lophophanes_cristatus,Periparus_ater,0.3250991106033325,Lophophanes_cristatus,0.9160175323486328,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC950288-241020_0392-unbestimmter-Ruf-Burgdorfer-Holz-1555.mp3,Lophophanes_cristatus,Periparus_ater,0.19750730693340302,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC195426-Crested Tit Lophophanes cristatus scoticus.mp3,Lophophanes_cristatus,Bubo_bubo,0.22311940789222717,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC327546-PARCRI09h01m49s18jul2016 (2).mp3,Lophophanes_cristatus,Certhia_familiaris,0.3221733272075653,Lophophanes_cristatus,0.9922844767570496,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC265551-30867_000-08ü mp3.mp3,Lophophanes_cristatus,Certhia_familiaris,0.4063131511211395,Lophophanes_cristatus,0.964431881904602,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC593755-wiergotek rdzawogardły Żwaków 8.10.2020    6.45.mp3,Lophophanes_cristatus,Periparus_ater,0.34244897961616516,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC302688-lophophanes cristatus sierra de las nieves 02-02-2016.mp3,Lophophanes_cristatus,Poecile_montanus,0.3261638581752777,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/Loph_cri_mit_20100515a3_roep_LS100111z.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.6225352883338928,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/HaubenmeiseKuekenViernhH25-04-2010-9Uhr.mp3,Lophophanes_cristatus,Periparus_ater,0.29673531651496887,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC385876-170504_16.mp3,Lophophanes_cristatus,Periparus_ater,0.2638530135154724,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC780618-Tofsmes_24.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.6789856553077698,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC291393-lophophanes cristatus 2 ruta galaroza 21-10-2015.mp3,Lophophanes_cristatus,Bubo_bubo,0.21163338422775269,Lophophanes_cristatus,0.9818905591964722,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC643464-Mesange huppee trille d alarme aigrelette odd +.mp3,Lophophanes_cristatus,Apus_apus,0.6178866028785706,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC788309-Lop.cri.1_Lagoa-da-Estacada.wav,Lophophanes_cristatus,Certhia_familiaris,0.3838927447795868,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC170889-lophophanes cristatus mi campo 15-03-2014.mp3,Lophophanes_cristatus,Certhia_familiaris,0.36726894974708557,no_birds,0.0,False,False,both_incorrect
+<<<<<<< HEAD
 ../bird_sound_dataset/Lophophanes_cristatus/XC449219-Lophophanes-cristatus-Regulus-ignicapila-Mayol-Haute-Loire-010119-contact-call.mp3,Lophophanes_cristatus,Poecile_montanus,0.3311443030834198,Lophophanes_cristatus,0.8043122887611389,False,True,birdnet_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC308917-5105_059-01hiaudequ mp3(128 kBits).mp3,Lophophanes_cristatus,Periparus_ater,0.3348611891269684,Lophophanes_cristatus,0.9867721199989319,False,True,birdnet_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC283769-06YY-02-6i mp3.mp3,Lophophanes_cristatus,Periparus_ater,0.1734933853149414,Lophophanes_cristatus,0.959290623664856,False,True,birdnet_only_correct
@@ -2253,10 +2272,17 @@ audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,b
 ../bird_sound_dataset/Lophophanes_cristatus/XC295607-31162_000-03hiequ mp3.mp3,Lophophanes_cristatus,Certhia_familiaris,0.5381006002426147,Lophophanes_cristatus,0.10148908942937851,False,True,birdnet_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC522654-2019-12-28 Gambaiseuil Mesange huppe cri de type pouillot brun + 2.mp3,Lophophanes_cristatus,Periparus_ater,0.4448544681072235,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC265556-30867_131-02ü mp3.mp3,Lophophanes_cristatus,Periparus_ater,0.21855086088180542,no_birds,0.0,False,False,both_incorrect
+=======
+../bird_sound_dataset/Lophophanes_cristatus/XC833812-000101_0920.mp3,Lophophanes_cristatus,Bubo_bubo,0.2180740237236023,Lophophanes_cristatus,0.8483030200004578,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC694836-200714_1968-7.15_Per.crist.mp3,Lophophanes_cristatus,Periparus_ater,0.22583892941474915,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC611543-190511_02A Tofsmes gärdsmyg taltrast bofink mindre flug.mp3,Lophophanes_cristatus,Periparus_ater,0.49951332807540894,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC688527-XC 2021-11-21 (STE-071) Röns Fichtenstangeholz Kleinvögel Nr1 20x hp 1500-6db 10x hp 2000-6db.mp3,Lophophanes_cristatus,Certhia_familiaris,0.47199565172195435,Lophophanes_cristatus,0.23010501265525818,False,True,birdnet_only_correct
+"../bird_sound_dataset/Lophophanes_cristatus/XC836617-kuifmees,-romania.mp3",Lophophanes_cristatus,Poecile_montanus,0.2411879301071167,no_birds,0.0,False,False,both_incorrect
+>>>>>>> ed74597 (no bird benchmark)
 ../bird_sound_dataset/Lophophanes_cristatus/XC503824-Lophophanes cristatus_2019.10.22_11.56_01.mp3,Lophophanes_cristatus,Apus_apus,0.5326758623123169,Lophophanes_cristatus,0.9971127510070801,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/PCRI14h27m27s06jun2011 (2).mp3,Lophophanes_cristatus,Periparus_ater,0.4151991009712219,Lophophanes_cristatus,0.5716389417648315,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC341909-Cincia Ciuffo monterosso (online-audio-converter.com).mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.7134987711906433,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC419687-Lophophanes cristatus_song_2016.12.11.mp3,Lophophanes_cristatus,Poecile_montanus,0.3979851007461548,Lophophanes_cristatus,0.9838889837265015,False,True,birdnet_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC597410-Mésange huppé (1).mp3,Lophophanes_cristatus,Periparus_ater,0.1693354994058609,no_birds,0.0,False,False,both_incorrect
+<<<<<<< HEAD
 ../bird_sound_dataset/Lophophanes_cristatus/XC378446-170311_05.mp3,Lophophanes_cristatus,Periparus_ater,0.2242765575647354,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC897967-Lophophanes-cristatus_240421_092551_50.mp3,Lophophanes_cristatus,Certhia_familiaris,0.37012383341789246,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC615129-Haubenmeise bettelt.mp3,Lophophanes_cristatus,Certhia_familiaris,0.4123404622077942,no_birds,0.0,False,False,both_incorrect
@@ -2390,62 +2416,21 @@ audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,b
 ../bird_sound_dataset/Lophophanes_cristatus/XC679263-XLS_58229 Kuifmees call A.mp3,Lophophanes_cristatus,Certhia_familiaris,0.43189266324043274,Lophophanes_cristatus,0.9876165986061096,False,True,birdnet_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC522657-2019-12-28 Gambaiseuil Mesange huppe cri de vol cris type pouillot brun + aussi roitelet huppe.mp3,Lophophanes_cristatus,Periparus_ater,0.6759660243988037,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC348230-DR0000_0051.mp3,Lophophanes_cristatus,Certhia_familiaris,0.2716503143310547,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/HaubenmeisePull-ViernhHeide-29-04-2010-15Uhr40.mp3,Lophophanes_cristatus,Periparus_ater,0.47287821769714355,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC688527-XC 2021-11-21 (STE-071) Röns Fichtenstangeholz Kleinvögel Nr1 20x hp 1500-6db 10x hp 2000-6db.mp3,Lophophanes_cristatus,Certhia_familiaris,0.47199565172195435,Lophophanes_cristatus,0.23010501265525818,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC858028-Kuifmeesvordenstein_070419.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.4621044099330902,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC535933-2018-10-16 Cap Ferret Mesange huppee cri type PGS.mp3,Lophophanes_cristatus,Periparus_ater,0.6934086680412292,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC700089-220130_1648_Haubenmeise.mp3,Lophophanes_cristatus,Bubo_bubo,0.43604564666748047,Lophophanes_cristatus,0.9682095050811768,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC120176-Lophophanes_cristatus_Estonia_Jarek_Matusiak_20100430-0072.mp3,Lophophanes_cristatus,Periparus_ater,0.359012246131897,Lophophanes_cristatus,0.9829687476158142,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC435398-BIF2662-1_PFR14435_2-10_180214_BIO_ectit-mitratus-2-FC_d_bw_hoerschbs_REF-S_C.mp3,Lophophanes_cristatus,Periparus_ater,0.3243357539176941,Lophophanes_cristatus,0.27585047483444214,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC694836-200714_1968-7.15_Per.crist.mp3,Lophophanes_cristatus,Periparus_ater,0.22583892941474915,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC662785-kuifmees chaamse bossen 20210710.mp3,Lophophanes_cristatus,Certhia_familiaris,0.4587743878364563,Certhia_familiaris,0.13800208270549774,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC390518-kuifmees_stulph2.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.6913502216339111,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC808218-parcri_202306_11_sh_0738Vv.mp3,Lophophanes_cristatus,Poecile_montanus,0.41928160190582275,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC522656-2019-12-28 Gambaiseuil Mesange huppe cri de type pouillot brun +.mp3,Lophophanes_cristatus,Periparus_ater,0.42041918635368347,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC356940-Lophopcrist-c1_poland_psz_9.30_170225-1257.mp3,Lophophanes_cristatus,Certhia_familiaris,0.4797688126564026,Lophophanes_cristatus,0.4268277585506439,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC378449-170311_07.mp3,Lophophanes_cristatus,Periparus_ater,0.6064810156822205,Certhia_brachydactyla,0.11630982905626297,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC282774-30986_179i-05 mp3.mp3,Lophophanes_cristatus,Poecile_montanus,0.5882197022438049,Periparus_ater,0.20587033033370972,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/HaubenmeisePull-ViernhHeide-29-04-2010-15Uhr30.mp3,Lophophanes_cristatus,Periparus_ater,0.2686322331428528,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC265553-30867_000-13ü mp3.mp3,Lophophanes_cristatus,Periparus_ater,0.18187427520751953,Lophophanes_cristatus,0.7529929876327515,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC614980-Mésange huppée.mp3,Lophophanes_cristatus,Periparus_ater,0.6064549684524536,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC777357-Mésange_huppé221211_0752.mp3,Lophophanes_cristatus,Certhia_familiaris,0.31705546379089355,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC488698-Tofsmes_lock_Stensjöns_NR_Bjuråker_20190723_0748_AA_redigerad_202001.mp3,Lophophanes_cristatus,Periparus_ater,0.6681663990020752,Lophophanes_cristatus,0.6935971975326538,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC380061-mesange huppee juvs u.mp3,Lophophanes_cristatus,Certhia_familiaris,0.33944737911224365,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC716861-20220414_0719 Mallerenga emplomallada XC.mp3,Lophophanes_cristatus,Bubo_bubo,0.492590993642807,no_birds,0.0,False,False,both_incorrect
+=======
+../bird_sound_dataset/Lophophanes_cristatus/XC286890-lofophanes cristatus 4 observatorio del alcebrón 02-10-2015.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.6412010788917542,no_birds,0.0,True,False,student_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC170119-300 - Identity unknown.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.767388105392456,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC335150-L.cristatus.mp3,Lophophanes_cristatus,Bubo_bubo,0.2517915666103363,no_birds,0.0,False,False,both_incorrect
-"../bird_sound_dataset/Lophophanes_cristatus/XC137488-259 Lophophanes cristatus, Proveyzieux, Chartreuse (France) 10-06-12.mp3",Lophophanes_cristatus,Certhia_familiaris,0.2794920802116394,Lophophanes_cristatus,0.14508278667926788,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC533712-Mesange huppee trille pure type nonette ++.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.3440726399421692,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC739331-DCR_0010_14h55c_15h30.mp3,Lophophanes_cristatus,Poecile_montanus,0.25208181142807007,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC166930-Lophcrist-C_Poland_PSZ_2014_02_05_1462.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.7435895204544067,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC682705-TOFSM211025.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.5815094709396362,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC598574-Mésange huppée (2).mp3,Lophophanes_cristatus,Certhia_familiaris,0.44687166810035706,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC422631-Mesange huppee cri de quemandage.mp3,Lophophanes_cristatus,Periparus_ater,0.44088682532310486,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC536242-czubatka call5  Gostynka 19.03.2020   7.22.mp3,Lophophanes_cristatus,Periparus_ater,0.3097513020038605,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC331760-crested tit_20150626_093325_prepared.mp3,Lophophanes_cristatus,Certhia_brachydactyla,0.6222892999649048,Lophophanes_cristatus,0.5652919411659241,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC684102-TOFSM211031.mp3,Lophophanes_cristatus,Poecile_montanus,0.625491738319397,Lophophanes_cristatus,0.8260276913642883,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC617809-210123_0203 Haubenmeise.mp3,Lophophanes_cristatus,Poecile_montanus,0.6799420118331909,Lophophanes_cristatus,0.6920705437660217,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC622079-210216_11.Lophophanescristatussisalde 12.30 contact call unha parella.mp3,Lophophanes_cristatus,Periparus_ater,0.5464220643043518,Lophophanes_cristatus,0.40707269310951233,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC536224-czubatka call 2 6.53.mp3,Lophophanes_cristatus,Poecile_montanus,0.26872390508651733,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC397071-020836_700-04ß´ mp3.mp3,Lophophanes_cristatus,Periparus_ater,0.3146713376045227,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC286888-lofophanes cristatus 2 observatorio del alcebrón 02-10-2015.mp3,Lophophanes_cristatus,Certhia_familiaris,0.2606387436389923,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC195426-Crested Tit Lophophanes cristatus scoticus.mp3,Lophophanes_cristatus,Bubo_bubo,0.22311940789222717,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Lophophanes_cristatus/XC600119-20.11.3.WS.012450.01.mp3,Lophophanes_cristatus,Bubo_bubo,0.6930468678474426,Lophophanes_cristatus,0.9470662474632263,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC176553-haubenmeise.mp3,Lophophanes_cristatus,Certhia_familiaris,0.3289516270160675,Lophophanes_cristatus,0.9975442290306091,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC831995-230924_115836_10---1.mp3,Lophophanes_cristatus,Periparus_ater,0.498445063829422,Lophophanes_cristatus,0.397081583738327,False,True,birdnet_only_correct
+>>>>>>> ed74597 (no bird benchmark)
+../bird_sound_dataset/Lophophanes_cristatus/HaubenmeisePull-ViernhHeide-29-04-2010-15Uhr40.mp3,Lophophanes_cristatus,Periparus_ater,0.47287821769714355,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC776851-Mésange-huppée-cris-façon-Godlewski-claquants-+.mp3,Lophophanes_cristatus,Periparus_ater,0.2819499671459198,Poecile_montanus,0.1300080120563507,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC419687-Lophophanes cristatus_song_2016.12.11.mp3,Lophophanes_cristatus,Poecile_montanus,0.3979851007461548,Lophophanes_cristatus,0.9838889837265015,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC562563-2020.05.26_08.19_01.mp3,Lophophanes_cristatus,Certhia_familiaris,0.292654424905777,Lophophanes_cristatus,0.9997791647911072,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC361167-5340-04_120-04tut mp3.mp3,Lophophanes_cristatus,Certhia_familiaris,0.4122984707355499,Lophophanes_cristatus,0.9840083122253418,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC212524-Cincia_mora_Cincia dal ciuffo_call.mp3,Lophophanes_cristatus,Periparus_ater,0.6261552572250366,Periparus_ater,0.3491477370262146,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC447542-Tofsmes.mp3,Lophophanes_cristatus,Periparus_ater,0.6187591552734375,Lophophanes_cristatus,0.6594597697257996,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC535929-2018-10-16 Cap Ferret Mesange huppee cri type PGS - compil.mp3,Lophophanes_cristatus,Periparus_ater,0.3168012797832489,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC678263-TM210727.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.4260633587837219,no_birds,0.0,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC776849-Mésange-huppée-cris-de-vol-dont-purs-façon-farlouse-++.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.32525622844696045,Poecile_montanus,0.16389881074428558,True,False,student_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/Parus_cristatus_calls_1988_07_03_2A_372-377_Poland_Bialowiza_primary_forest.mp3,Lophophanes_cristatus,Periparus_ater,0.5918388366699219,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC584114-31741-ö-14high.mp3,Lophophanes_cristatus,Bubo_bubo,0.481036514043808,Lophophanes_cristatus,0.5194650888442993,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC584121-31741-ö-19high.mp3,Lophophanes_cristatus,Bubo_bubo,0.5704024434089661,Lophophanes_cristatus,0.6785257458686829,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC326951-PARCRI08h59m46s12jul2016 (2).mp3,Lophophanes_cristatus,Emberiza_cia,0.23060426115989685,Lophophanes_cristatus,0.12894228100776672,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC692734-XC 2021-12-22 Bludesch Jordan 11.00h (010 - 0.04) Hm (Haubenmeise nah futtersuchend in mixed flock oben Km) 20x hp 1500-6db.mp3,Lophophanes_cristatus,Certhia_familiaris,0.6219825148582458,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC378856-Haubenmeise.mp3,Lophophanes_cristatus,Poecile_montanus,0.3353216350078583,Periparus_ater,0.29513615369796753,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC536230-czubatka call 3   19.03.2020 Gostynka 7.10.mp3,Lophophanes_cristatus,Periparus_ater,0.23417595028877258,Lophophanes_cristatus,0.2131349891424179,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC538200-MESANGE HUPPE juv quémande &TB DourdanButtesBlanches 010510 MD122DVDEF.mp3,Lophophanes_cristatus,Bubo_bubo,0.2282382845878601,no_birds,0.0,False,False,both_incorrect
-../bird_sound_dataset/Lophophanes_cristatus/XC678846-TOFSM211005.mp3,Lophophanes_cristatus,Certhia_familiaris,0.48825281858444214,Lophophanes_cristatus,0.1848253607749939,False,True,birdnet_only_correct
-../bird_sound_dataset/Lophophanes_cristatus/XC535931-2018-10-16 Cap Ferret Mesange huppee cri type PGS 2.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.5715897083282471,no_birds,0.0,True,False,student_only_correct
 ../bird_sound_dataset/Lophophanes_cristatus/XC518936-AB-023 raniuszek czubatki (2).mp3,Lophophanes_cristatus,Certhia_familiaris,0.23057839274406433,Lophophanes_cristatus,0.9968072175979614,False,True,birdnet_only_correct
+<<<<<<< HEAD
 ../bird_sound_dataset/Lophophanes_cristatus/XC669393-czubatka l Pilsko 20.08.2021    11.20.mp3,Lophophanes_cristatus,Periparus_ater,0.7130246758460999,Periparus_ater,0.6799200177192688,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC536234-czubatka call 4 Gostynka 19.03 2020  7.20.mp3,Lophophanes_cristatus,Periparus_ater,0.35966241359710693,no_birds,0.0,False,False,both_incorrect
 ../bird_sound_dataset/Lophophanes_cristatus/XC535906-2018-10-17 Cap Ferret Mesange huppee cris types PGS.mp3,Lophophanes_cristatus,Lophophanes_cristatus,0.6410045623779297,no_birds,0.0,True,False,student_only_correct
@@ -2803,138 +2788,153 @@ audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,b
 ../augmented_dataset/no_birds/empty_0464.wav,no_birds,Certhia_familiaris,0.4621065855026245,no_birds,0.0,False,True,birdnet_only_correct
 ../augmented_dataset/no_birds/empty_0316.wav,no_birds,no_birds,0.6919718980789185,Bubo_bubo,0.593210756778717,True,False,student_only_correct
 ../augmented_dataset/no_birds/empty_0499.wav,no_birds,no_birds,0.6709944605827332,Bubo_bubo,0.39728298783302307,True,False,student_only_correct
+=======
+"../bird_sound_dataset/Lophophanes_cristatus/XC168247-Mésange huppée pour XC Somport 25 fév 2014, 16h.mp3",Lophophanes_cristatus,Periparus_ater,0.18166160583496094,Lophophanes_cristatus,0.9329797029495239,False,True,birdnet_only_correct
+../bird_sound_dataset/Lophophanes_cristatus/XC534641-REC001-Ü--02Wav--18.mp3,Lophophanes_cristatus,Periparus_ater,0.21656279265880585,Lophophanes_cristatus,0.5575993061065674,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC472896-LS102305 Coal Tit calls A.mp3,Periparus_ater,Periparus_ater,0.5580655336380005,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC576107-20200713_0831-CoalTit_Song-Magpie_Calls.mp3,Periparus_ater,Bubo_bubo,0.2880118191242218,Periparus_ater,0.40862026810646057,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/CoalTitBelgrads.mp3,Periparus_ater,Periparus_ater,0.6756214499473572,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC679838-sp cri type PGS + 2.mp3,Periparus_ater,Certhia_brachydactyla,0.7096158862113953,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC556953-7 may. 16.04 carbonero garrapinos call song-gorrion-mirlo.mp3,Periparus_ater,Periparus_ater,0.5412108898162842,Certhia_brachydactyla,0.12493884563446045,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC236917-svartmeis-call-0420_182550.mp3,Periparus_ater,Periparus_ater,0.6651236414909363,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC494830-MIXPRE-513.mp3,Periparus_ater,Poecile_montanus,0.33756861090660095,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC515401-MIXPRE-423.mp3,Periparus_ater,Lophophanes_cristatus,0.5541090965270996,Lophophanes_cristatus,0.21245966851711273,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC438637-B15h25m27s15may2018_plus_00m05s_CoalTit_song_VolUpHighPass.mp3,Periparus_ater,Poecile_montanus,0.5406422019004822,Periparus_ater,0.49834200739860535,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC189747-Tannenm01081243.mp3,Periparus_ater,Periparus_ater,0.44457587599754333,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC246490-T41.mp3,Periparus_ater,Poecile_montanus,0.40431758761405945,Periparus_ater,0.8168665170669556,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/CoalTit250106m.mp3,Periparus_ater,Periparus_ater,0.5650254487991333,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC513176-191123_0043.mp3,Periparus_ater,Periparus_ater,0.4043804109096527,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC793813-Parate-Cpourel.mp3,Periparus_ater,Periparus_ater,0.7503886222839355,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC954478-Fri-Dec-06-2024-14-08-22-Coal-Tit.wav,Periparus_ater,Periparus_ater,0.7113611102104187,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC705271-ZOstrollgäiN!!OM0028_03mp3 (6).mp3,Periparus_ater,no_birds,0.34571459889411926,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC338097-5246_246-01hiequen mp3.mp3,Periparus_ater,Certhia_brachydactyla,0.3325381875038147,Periparus_ater,0.8626794815063477,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC265575-30873_131-03ü mp3.mp3,Periparus_ater,Certhia_familiaris,0.8050403594970703,Lophophanes_cristatus,0.43483126163482666,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC520638-Periparus ater_2020.01.15_15.45_01.mp3,Periparus_ater,Periparus_ater,0.34842199087142944,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC403435-170520TannenmeiseRufFH 1220.mp3,Periparus_ater,Poecile_montanus,0.43699291348457336,Periparus_ater,0.16823448240756989,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC617920-201225_004d.mp3,Periparus_ater,Periparus_ater,0.5229041576385498,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC149720-Mésange noire Croisement Pierre 2 oct 13.mp3,Periparus_ater,Periparus_ater,0.5291516780853271,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC865918-240126_20.Periparus-ater-subsong-or-lekking-18.mp3,Periparus_ater,Periparus_ater,0.4454917907714844,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC499871-MIXPRE-1076.mp3,Periparus_ater,Poecile_montanus,0.4564518332481384,Periparus_ater,0.12180255353450775,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC570471-CoalTitWarren20.6.20.mp3,Periparus_ater,Certhia_brachydactyla,0.5641058087348938,Periparus_ater,0.833632230758667,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC497040-Svartmes lockläte (online-audio-converter.com).mp3,Periparus_ater,Certhia_familiaris,0.42736533284187317,Periparus_ater,0.10997212678194046,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC745936-AnyConv.com__220830_1033.mp3,Periparus_ater,Periparus_ater,0.2604159414768219,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC621625-200614_06 Coal Tit D 0940.mp3,Periparus_ater,Certhia_brachydactyla,0.5191066861152649,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC784527-Cincia-mora-juv-cecit.mp3,Periparus_ater,Certhia_familiaris,0.5413547158241272,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC715353-Forest.mp3,Periparus_ater,Certhia_brachydactyla,0.54063481092453,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC147627-4371HNR mp3.mp3,Periparus_ater,Periparus_ater,0.5808446407318115,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC534530-Coal Tits at Killarney NP IR on 6.6.19 at 18.45 for .43.mp3,Periparus_ater,Poecile_montanus,0.2949971556663513,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC747083-220808_001_090601_ZwarteMees.mp3,Periparus_ater,Bubo_bubo,0.5673719644546509,Periparus_ater,0.13207608461380005,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC112526-2756va mp3.mp3,Periparus_ater,Periparus_ater,0.477753609418869,Lophophanes_cristatus,0.20342376828193665,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC412824-mesange noire rattle call.mp3,Periparus_ater,Bubo_bubo,0.35319143533706665,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC732509-Mesangenoire_20102021_carollesvauban_9h30 cris vol.mp3,Periparus_ater,Periparus_ater,0.3203880786895752,no_birds,0.0,True,False,student_only_correct
+"../bird_sound_dataset/Periparus_ater/XC901174-Periparus-ater-michalowskii-240420_002,B-song.mp3",Periparus_ater,Periparus_ater,0.39769721031188965,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC435002-BIF0097-1_PFR04440_2-10_101026_BIO_cotit-ater-C-C_d_th_eisfeld_REF-S.mp3,Periparus_ater,Periparus_ater,0.7095381021499634,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC586119-sosnówka Żwaków 2.09.2020   17.38.mp3,Periparus_ater,Periparus_ater,0.615923285484314,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC244267-Peripater-C_Poland_PSZ_2015_05_19_5504.mp3,Periparus_ater,Poecile_montanus,0.34373190999031067,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC762541-XC-2022-11-23-(012---16.00)-12.15h-Bürserberg-Ausserberg-MSF-mit-cf-Tm-Ruf-Teil-2-norm--10db-hp-1000-6db-(mit-Ez-ua).wav,Periparus_ater,Poecile_montanus,0.6760290265083313,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC693974-Periparus ater_2021.12.25_14.24_01.mp3,Periparus_ater,Certhia_brachydactyla,0.5582279562950134,Certhia_brachydactyla,0.9467438459396362,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC895001-Periparus-ater_240410_101229_030.mp3,Periparus_ater,Periparus_ater,0.752212405204773,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC745334-22 18.mp3,Periparus_ater,Certhia_brachydactyla,0.6333335638046265,Periparus_ater,0.2091074436903,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC181922-Zwarte Mees_atlas_20140314_25_roep.mp3,Periparus_ater,Periparus_ater,0.5597934722900391,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC307421-5104_120-08hiaudequ mp3.mp3,Periparus_ater,Certhia_familiaris,0.4867953956127167,Certhia_familiaris,0.11210225522518158,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC697287-XC 2022-01-15 (026) 11.10h Nüziders Muttersberg hinten unten Tm u Hm Teil 1 hp 200-24db.mp3,Periparus_ater,Lophophanes_cristatus,0.5206925868988037,Lophophanes_cristatus,0.5207054018974304,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC603481-201102_0016mp3-01ö (16).mp3,Periparus_ater,Bubo_bubo,0.5508528351783752,Periparus_ater,0.5739551782608032,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC298656-periparus ater 2 refugio de la serpiente 21-12-2015.mp3,Periparus_ater,Periparus_ater,0.7294139266014099,Certhia_familiaris,0.24183711409568787,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC298219-5052_000-02hiequ mp3.mp3,Periparus_ater,no_birds,0.6106480360031128,Certhia_brachydactyla,0.10841558128595352,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC697297-XC 2022-01-15 (036) 12.12h Nüziders Muttersberg hinten oben bei Haus Tm Teil 1 10x Ausschnitt hp 200-24db.mp3,Periparus_ater,Certhia_brachydactyla,0.5610955357551575,Periparus_ater,0.8312768936157227,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC155265-131121_0225HEqNR mp3.mp3,Periparus_ater,Periparus_ater,0.3720991015434265,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC291965-151113_75.mp3,Periparus_ater,Poecile_montanus,0.3721502125263214,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC299903-periparus ater 2 sierra de las nieves 13-01-2016.mp3,Periparus_ater,Periparus_ater,0.5284011960029602,Lophophanes_cristatus,0.26983287930488586,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC352428-Perater-c1_poland-psz_11.00_170122-0592.mp3,Periparus_ater,Periparus_ater,0.7550881505012512,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC890812-Coal-Tit煤山雀call-雅典-Lycabettus-Hill2401280748_0298---A.mp3,Periparus_ater,Periparus_ater,0.6477005481719971,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC456100-B12h12m26s23may2018_plus_00m00s_CoalTit_song_VolUpHighPass.mp3,Periparus_ater,Periparus_ater,0.5504102110862732,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC523172-191028_06 Coal Tit D 1135 XCu.mp3,Periparus_ater,Periparus_ater,0.5153031945228577,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC330909-Coal Tit_Cyprus_20160728_193600_prepared.mp3,Periparus_ater,Certhia_brachydactyla,0.7004878520965576,Certhia_brachydactyla,0.9021837115287781,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC240210-PaAte.mp3,Periparus_ater,Periparus_ater,0.7492598295211792,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC403432-170520TannenmeiseGesangFH 1123.mp3,Periparus_ater,Certhia_brachydactyla,0.3460373878479004,Periparus_ater,0.1652146428823471,False,True,birdnet_only_correct
+../bird_sound_dataset/Periparus_ater/XC434853-Mésange noire.mp3,Periparus_ater,Periparus_ater,0.41821983456611633,Certhia_brachydactyla,0.10360545665025711,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC921665-COAL-TIT-Coniston-Cumbria-UK-7.05am-06302024.wav,Periparus_ater,Bubo_bubo,0.29696446657180786,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC191408-140813_STE-070_CoalTit_Glenveagh_OC.mp3,Periparus_ater,Periparus_ater,0.721904456615448,no_birds,0.0,True,False,student_only_correct
+"../bird_sound_dataset/Periparus_ater/XC240324- синигер (Periparus ater), 2015-03-02, 13.24.mp3",Periparus_ater,Periparus_ater,0.7844921350479126,no_birds,0.0,True,False,student_only_correct
+"../bird_sound_dataset/Periparus_ater/XC393412-Tit, Coal (pekinensis Beijing)(A23300).mp3",Periparus_ater,Periparus_ater,0.5597782731056213,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC302118-5076_119-07hiequ mp3.mp3,Periparus_ater,Periparus_ater,0.5062299966812134,Certhia_brachydactyla,0.5584357976913452,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC884796-COAL-TIT-11.22am-03162024-Northaw-Herts.wav,Periparus_ater,Poecile_montanus,0.5307543277740479,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC317012-PARATE AARDLA 16.5.16alarm.mp3,Periparus_ater,Periparus_ater,0.6576651930809021,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC522457-180418_01.mp3,Periparus_ater,Periparus_ater,0.7519844770431519,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC681297-Mesange noire migration dans le ciel cris facon PGS.mp3,Periparus_ater,Periparus_ater,0.37004193663597107,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC788318-Per.ate.2_Lagoa-da-Estacada.wav,Periparus_ater,Bubo_bubo,0.5193931460380554,Lophophanes_cristatus,0.14299598336219788,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC575867-coal tit 12 5.mp3,Periparus_ater,Periparus_ater,0.42090731859207153,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC397319-170713_0041.mp3,Periparus_ater,Periparus_ater,0.6022287607192993,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC503906-XC 191023-Mésange N-Vernon.mp3.mp3,Periparus_ater,Lophophanes_cristatus,0.7330198884010315,Lophophanes_cristatus,0.9791374206542969,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC505860-SME.mp3,Periparus_ater,Periparus_ater,0.26677918434143066,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC147628-4370-1HNR mp3.mp3,Periparus_ater,Periparus_ater,0.5087094902992249,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC297261-PARATE12h24m53s30oct2015).mp3,Periparus_ater,Periparus_ater,0.5073555111885071,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC171566-2013-08-30-Coal_Tit-AtalantiTrail-Troodos-Zypern-T1332.mp3,Periparus_ater,Certhia_brachydactyla,0.7364304065704346,Certhia_brachydactyla,0.9587693810462952,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC411490-odd Blue Tit-like Coal Tit song Power Head 19th April 2018_HH_1.mp3,Periparus_ater,Periparus_ater,0.6701646447181702,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC411051-180416_0560_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_2.mp3,Periparus_ater,Periparus_ater,0.3825094401836395,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC203023-T07.mp3,Periparus_ater,Periparus_ater,0.6585460901260376,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC454653-Coal Tit Brooke.mp3,Periparus_ater,no_birds,0.4136926829814911,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Periparus_ater/XC731209-LS_50049_hm6_ 11h55f.mp3,Periparus_ater,Periparus_ater,0.7377699613571167,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC457935-B15h27m48s26may2018_plus_00m00s_CoalTit_song_VolUpHighPass.mp3,Periparus_ater,Periparus_ater,0.17330846190452576,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC538749-11 mar. 16.51 herrerilo urba.mp3,Periparus_ater,Periparus_ater,0.7187356948852539,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC456079-B07h39m46s18may2018_plus_00m10s_CoalTit_song_VolUpHighPass.mp3,Periparus_ater,Periparus_ater,0.6363911628723145,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Periparus_ater/XC864159-PARATE130730.wav,Periparus_ater,Periparus_ater,0.6739383339881897,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC379724-matkop_ovp1.mp3,Poecile_montanus,Poecile_montanus,0.7456977367401123,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC831209-Willow-TitXC.mp3,Poecile_montanus,Bubo_bubo,0.3535383939743042,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC712690-220312_004_Tr1_2.mp3,Poecile_montanus,Certhia_familiaris,0.49797913432121277,Poecile_montanus,0.18156148493289948,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC148816-WillowTitContactCalls29june2013AltaiMountainsRussia.mp3,Poecile_montanus,Poecile_montanus,0.318835973739624,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC171255-Poecmont-C_Poland_PSZ_2014_03_24_2658.mp3,Poecile_montanus,Poecile_montanus,0.3158336579799652,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC525896-200208_0110.mp3,Poecile_montanus,Periparus_ater,0.619269073009491,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC837373-T373.mp3,Poecile_montanus,Periparus_ater,0.4412803053855896,Poecile_montanus,0.3194928467273712,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC402076-180131_1273 1015 Mandichosee_willowtTit.mp3,Poecile_montanus,Emberiza_cia,0.5665081143379211,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC345457-call1.mp3,Poecile_montanus,no_birds,0.5362154245376587,Poecile_montanus,0.9656611084938049,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC512872-Matkop Schulen.mp3,Poecile_montanus,Poecile_montanus,0.3202619254589081,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/Parus_montanus_Pomiechowek_Poland_Jarek_Matusiak_f_20100307.mp3,Poecile_montanus,Lophophanes_cristatus,0.7058426141738892,Certhia_brachydactyla,0.5431049466133118,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC854592-2023-10-22_15h42Matkop_RolyBelgium_NHPFN.mp3,Poecile_montanus,Poecile_montanus,0.5068952441215515,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC435402-BIF2666-1_PFR14235_2-11_180106_BIO_witit-salicarius-3-FC_d_profen_REF-S_C-B.mp3,Poecile_montanus,Certhia_familiaris,0.5504083633422852,Poecile_montanus,0.3416137397289276,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC217256-courtshipsong.mp3,Poecile_montanus,no_birds,0.6703407168388367,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC618365-SNItestospar-024-GRANMEIS-SUBSANG-2701-2021-01_25.mp3,Poecile_montanus,Lophophanes_cristatus,0.4717613756656647,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC422523-Mesange boreale juvs 2.mp3,Poecile_montanus,Periparus_ater,0.5883626937866211,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC393921-Matk_SaunjaEst_170313_1530.mp3,Poecile_montanus,Periparus_ater,0.45021793246269226,Poecile_montanus,0.9506600499153137,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC714258-czarnogłówka 220409_Psary.mp3,Poecile_montanus,Poecile_montanus,0.6825445890426636,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC954463-241211-084701-3-mono-tati.mp3,Poecile_montanus,Certhia_familiaris,0.7390509843826294,no_birds,0.0,False,False,both_incorrect
+"../bird_sound_dataset/Poecile_montanus/XC909599-Ph.-collybita-caucasica-240421_005,-21.04.2024.-Янтарное,утро,B.mp3",Poecile_montanus,Bubo_bubo,0.3471955358982086,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC162668-PFR09367_2-10_130605_witit-baicalensis-MAT-WS-TOC.mp3,Poecile_montanus,Periparus_ater,0.7462323307991028,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC198262-WillowTit-Långmyren-20140830.mp3,Poecile_montanus,Certhia_familiaris,0.40143245458602905,Poecile_montanus,0.8092681169509888,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC463009-Mesange boreale cris de vol +.mp3,Poecile_montanus,Certhia_familiaris,0.4494732916355133,Poecile_montanus,0.8386755585670471,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC171720-weidenm.mp3,Poecile_montanus,Poecile_montanus,0.7437067627906799,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC831073-DM672283-(mp3cut.net).mp3,Poecile_montanus,no_birds,0.20136797428131104,Poecile_montanus,0.9334074854850769,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC465503-20190407-080641GRANMEIS-CALL-STRBKT.mp3,Poecile_montanus,Lophophanes_cristatus,0.27786245942115784,Poecile_montanus,0.529592752456665,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC354063-Poecmont-c-poland_PSZ_12.15_170128-0788.mp3,Poecile_montanus,Periparus_ater,0.6193941235542297,Poecile_montanus,0.947288453578949,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC962865-褐头山雀subsong（效鸣某鹀？）-海拉尔西山.mp3,Poecile_montanus,Periparus_ater,0.4555937945842743,Lophophanes_cristatus,0.12667813897132874,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC197904-Talltita-(2014-05-05 18.30)-LS114517.mp3,Poecile_montanus,Lophophanes_cristatus,0.580000102519989,Lophophanes_cristatus,0.6736127138137817,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC152481-131019_Granmeis_rarsang-0002.mp3,Poecile_montanus,Lophophanes_cristatus,0.4359852373600006,Poecile_montanus,0.3718434274196625,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC592593-mes bor2.mp3,Poecile_montanus,Bubo_bubo,0.46900564432144165,Poecile_montanus,0.4961313009262085,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC404523-Willow Tit Call Bagmere Reserve Cheshire UK 15 Feb 2018.mp3,Poecile_montanus,no_birds,0.6611824631690979,Poecile_montanus,0.32214435935020447,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC206901-30647_205-1yyµ mp3.mp3,Poecile_montanus,Periparus_ater,0.412929892539978,no_birds,0.0,False,False,both_incorrect
+"../bird_sound_dataset/Poecile_montanus/XC918903-Weidenmeise,-ssp.-montanus,-Gesang,-Engstelnalp-BE,-240618-016.wav",Poecile_montanus,Bubo_bubo,0.661149263381958,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC411595-Sikora_czarnogłowa_Poecile_montanus_Poland_Jarek_Matusiak_1100.mp3,Poecile_montanus,Certhia_brachydactyla,0.496494323015213,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC791993-czarnoglowka-2.mp3,Poecile_montanus,Apus_apus,0.5203811526298523,Poecile_montanus,0.8542571663856506,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC308680-20110611 marta Mésange boréale (Poecile montanus).mp3,Poecile_montanus,Poecile_montanus,0.5823497176170349,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/XC818162-Talltita_45.mp3,Poecile_montanus,Periparus_ater,0.2778092920780182,no_birds,0.0,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC710077-XC 2022-03-20 (015) 9.35h ZOOM H4n u NTG1 Nenzing Triegel Wm Teil 1 10x.mp3,Poecile_montanus,Poecile_montanus,0.6027942895889282,no_birds,0.0,True,False,student_only_correct
+../bird_sound_dataset/Poecile_montanus/Parmon_Vesancy_20090801_edited.mp3,Poecile_montanus,Periparus_ater,0.7811294794082642,Poecile_montanus,0.8914406299591064,False,True,birdnet_only_correct
+>>>>>>> ed74597 (no bird benchmark)
 ../augmented_dataset/no_birds/esc50_0082.wav,no_birds,Periparus_ater,0.41672465205192566,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/esc50_0257.wav,no_birds,Periparus_ater,0.32662513852119446,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0089.wav,no_birds,no_birds,0.6093054413795471,Bubo_bubo,0.12223004549741745,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0062.wav,no_birds,no_birds,0.7135602831840515,Bubo_bubo,0.1213829442858696,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0261.wav,no_birds,no_birds,0.6631187200546265,Certhia_familiaris,0.11337097734212875,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0077.wav,no_birds,Certhia_familiaris,0.3074921667575836,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0088.wav,no_birds,Poecile_montanus,0.3186741769313812,Poecile_montanus,0.8998465538024902,False,False,both_incorrect
-../augmented_dataset/no_birds/esc50_0256.wav,no_birds,Certhia_familiaris,0.23976941406726837,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/esc50_0281.wav,no_birds,Periparus_ater,0.2697110176086426,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0473.wav,no_birds,Certhia_familiaris,0.3045858144760132,Bubo_bubo,0.13369011878967285,False,False,both_incorrect
-../augmented_dataset/no_birds/esc50_0097.wav,no_birds,Periparus_ater,0.2727174162864685,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0305.wav,no_birds,no_birds,0.7026984691619873,Bubo_bubo,0.516966700553894,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0477.wav,no_birds,no_birds,0.3920792043209076,Lophophanes_cristatus,0.6152271628379822,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0339.wav,no_birds,no_birds,0.6853159070014954,Bubo_bubo,0.8592879772186279,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0098.wav,no_birds,Certhia_familiaris,0.2852417826652527,Bubo_bubo,0.8434156775474548,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0073.wav,no_birds,no_birds,0.680604100227356,Bubo_bubo,0.7914454340934753,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0326.wav,no_birds,Certhia_familiaris,0.39424076676368713,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/esc50_0130.wav,no_birds,Poecile_montanus,0.21550500392913818,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0271.wav,no_birds,Certhia_familiaris,0.6989872455596924,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0265.wav,no_birds,Periparus_ater,0.18067321181297302,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0259.wav,no_birds,Certhia_familiaris,0.36685091257095337,Bubo_bubo,0.1085614487528801,False,False,both_incorrect
-../augmented_dataset/no_birds/esc50_0119.wav,no_birds,Certhia_familiaris,0.24060747027397156,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0258.wav,no_birds,Periparus_ater,0.18067321181297302,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0270.wav,no_birds,no_birds,0.20012196898460388,Bubo_bubo,0.9929433465003967,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0333.wav,no_birds,Certhia_familiaris,0.1952838897705078,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0072.wav,no_birds,Periparus_ater,0.26960575580596924,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0112.wav,no_birds,Periparus_ater,0.3257159888744354,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0338.wav,no_birds,no_birds,0.6288490295410156,Bubo_bubo,0.9727234840393066,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0310.wav,no_birds,no_birds,0.38465362787246704,Bubo_bubo,0.15435732901096344,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0304.wav,no_birds,no_birds,0.689484715461731,Bubo_bubo,0.1725107729434967,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0462.wav,no_birds,no_birds,0.694287896156311,Bubo_bubo,0.7614920735359192,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0474.wav,no_birds,Certhia_familiaris,0.2648561894893646,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0448.wav,no_birds,Certhia_familiaris,0.32702699303627014,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/esc50_0245.wav,no_birds,Certhia_familiaris,0.20980028808116913,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0104.wav,no_birds,Periparus_ater,0.25405287742614746,Certhia_familiaris,0.31535595655441284,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0138.wav,no_birds,Certhia_familiaris,0.32019513845443726,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0266.wav,no_birds,no_birds,0.5582973957061768,Bubo_bubo,0.9065093994140625,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0126.wav,no_birds,Periparus_ater,0.3313919007778168,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/esc50_0318.wav,no_birds,Poecile_montanus,0.2405320107936859,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0071.wav,no_birds,Certhia_familiaris,0.2353706955909729,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0065.wav,no_birds,Certhia_familiaris,0.2544274628162384,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0105.wav,no_birds,Certhia_familiaris,0.22699151933193207,Certhia_familiaris,0.12201591581106186,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0449.wav,no_birds,no_birds,0.5593368411064148,Bubo_bubo,0.7447139620780945,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0307.wav,no_birds,Periparus_ater,0.2417004406452179,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0313.wav,no_birds,no_birds,0.6128116250038147,Bubo_bubo,0.7708294987678528,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0478.wav,no_birds,Periparus_ater,0.47144630551338196,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0336.wav,no_birds,Certhia_familiaris,0.25932809710502625,Certhia_familiaris,0.11610379815101624,False,False,both_incorrect
-../augmented_dataset/no_birds/esc50_0275.wav,no_birds,Certhia_familiaris,0.21999596059322357,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0120.wav,no_birds,no_birds,0.6365410089492798,Poecile_montanus,0.1312503218650818,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0097.wav,no_birds,Periparus_ater,0.18067321181297302,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0068.wav,no_birds,no_birds,0.6725279092788696,Bubo_bubo,0.7435084581375122,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0242.wav,no_birds,Certhia_familiaris,0.3538956046104431,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0257.wav,no_birds,no_birds,0.690314531326294,Bubo_bubo,0.88297039270401,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0300.wav,no_birds,Periparus_ater,0.19758747518062592,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0492.wav,no_birds,no_birds,0.6343517303466797,Bubo_bubo,0.9896572232246399,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0289.wav,no_birds,Bubo_bubo,0.5367987751960754,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0080.wav,no_birds,no_birds,0.6064180731773376,Bubo_bubo,0.13151948153972626,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0043.wav,no_birds,no_birds,0.6590767502784729,Bubo_bubo,0.29744940996170044,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0255.wav,no_birds,no_birds,0.6574322581291199,Poecile_montanus,0.1684531569480896,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0254.wav,no_birds,Periparus_ater,0.41197776794433594,Poecile_montanus,0.1661127805709839,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0056.wav,no_birds,no_birds,0.6980015635490417,Bubo_bubo,0.10453600436449051,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0136.wav,no_birds,Certhia_familiaris,0.2665719985961914,Bubo_bubo,0.4744012653827667,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0320.wav,no_birds,no_birds,0.5486494302749634,Bubo_bubo,0.2729358375072479,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0059.wav,no_birds,Certhia_familiaris,0.22070695459842682,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0126.wav,no_birds,no_birds,0.4495912194252014,Poecile_montanus,0.14078640937805176,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0132.wav,no_birds,no_birds,0.5030865669250488,Bubo_bubo,0.8405454158782959,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0091.wav,no_birds,Certhia_familiaris,0.28940489888191223,Bubo_bubo,0.9893660545349121,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0278.wav,no_birds,no_birds,0.6201401948928833,Bubo_bubo,0.8474313020706177,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0245.wav,no_birds,no_birds,0.6546343564987183,Bubo_bubo,0.4693061411380768,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0053.wav,no_birds,no_birds,0.22119878232479095,Bubo_bubo,0.33907023072242737,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0084.wav,no_birds,no_birds,0.6802268624305725,Bubo_bubo,0.9617307782173157,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0133.wav,no_birds,no_birds,0.4554760456085205,Bubo_bubo,0.5859561562538147,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0299.wav,no_birds,Certhia_familiaris,0.18831314146518707,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0443.wav,no_birds,Certhia_familiaris,0.35588347911834717,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0494.wav,no_birds,Certhia_familiaris,0.505783200263977,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0333.wav,no_birds,no_birds,0.5608791708946228,Lophophanes_cristatus,0.11408045887947083,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0264.wav,no_birds,Periparus_ater,0.18067321181297302,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0125.wav,no_birds,Periparus_ater,0.2674957811832428,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0086.wav,no_birds,no_birds,0.621310830116272,Bubo_bubo,0.9580802917480469,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0079.wav,no_birds,no_birds,0.6345377564430237,Bubo_bubo,0.9492000937461853,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0284.wav,no_birds,no_birds,0.6563245058059692,Bubo_bubo,0.9456013441085815,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0290.wav,no_birds,no_birds,0.3996705710887909,Bubo_bubo,0.8931761980056763,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0291.wav,no_birds,Certhia_familiaris,0.235317662358284,Poecile_montanus,0.1984960287809372,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0078.wav,no_birds,no_birds,0.5701243877410889,Bubo_bubo,0.5133771300315857,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0050.wav,no_birds,no_birds,0.6826000213623047,Bubo_bubo,0.10990724712610245,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0044.wav,no_birds,no_birds,0.6822648048400879,Bubo_bubo,0.333040326833725,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0468.wav,no_birds,Certhia_familiaris,0.2771734595298767,Poecile_montanus,0.2990793287754059,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0497.wav,no_birds,Certhia_brachydactyla,0.47602149844169617,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0355.wav,no_birds,Certhia_familiaris,0.32918646931648254,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/esc50_0000.wav,no_birds,Certhia_familiaris,0.2353363186120987,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0209.wav,no_birds,no_birds,0.6553326845169067,Bubo_bubo,0.9220245480537415,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0235.wav,no_birds,no_birds,0.4610741436481476,Bubo_bubo,0.8609363436698914,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0234.wav,no_birds,Certhia_familiaris,0.21186862885951996,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0036.wav,no_birds,no_birds,0.31872788071632385,Bubo_bubo,0.9839980602264404,True,False,student_only_correct
 ../augmented_dataset/no_birds/esc50_0015.wav,no_birds,Certhia_familiaris,0.2467741072177887,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0354.wav,no_birds,Certhia_familiaris,0.2892008423805237,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0397.wav,no_birds,no_birds,0.7160374522209167,Bubo_bubo,0.991446852684021,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0418.wav,no_birds,Certhia_familiaris,0.23511114716529846,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0356.wav,no_birds,no_birds,0.5451400876045227,Bubo_bubo,0.9424724578857422,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0017.wav,no_birds,Periparus_ater,0.23146174848079681,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0008.wav,no_birds,no_birds,0.5992878079414368,Bubo_bubo,0.8612643480300903,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0222.wav,no_birds,no_birds,0.4582686126232147,Poecile_montanus,0.130264550447464,True,False,student_only_correct
 ../augmented_dataset/no_birds/empty_0196.wav,no_birds,no_birds,0.6888903379440308,Bubo_bubo,0.8848778009414673,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0419.wav,no_birds,no_birds,0.41348955035209656,Bubo_bubo,0.23263677954673767,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0390.wav,no_birds,Certhia_familiaris,0.2658810615539551,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0353.wav,no_birds,no_birds,0.6301497220993042,Bubo_bubo,0.10335353016853333,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0409.wav,no_birds,Periparus_ater,0.35896986722946167,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0186.wav,no_birds,no_birds,0.4467795789241791,Periparus_ater,0.3339131474494934,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0145.wav,no_birds,no_birds,0.6664507985115051,Bubo_bubo,0.2816947400569916,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0151.wav,no_birds,Certhia_familiaris,0.2873076796531677,Bubo_bubo,0.8294151425361633,False,False,both_incorrect
+../augmented_dataset/no_birds/empty_0254.wav,no_birds,Periparus_ater,0.41197776794433594,Poecile_montanus,0.1661127805709839,False,False,both_incorrect
+../augmented_dataset/no_birds/esc50_0126.wav,no_birds,Periparus_ater,0.3313919007778168,no_birds,0.0,False,True,birdnet_only_correct
 ../augmented_dataset/no_birds/empty_0179.wav,no_birds,no_birds,0.6643213033676147,Bubo_bubo,0.9359856843948364,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0172.wav,no_birds,Certhia_familiaris,0.3246287405490875,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0018.wav,no_birds,Certhia_familiaris,0.2786053717136383,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0178.wav,no_birds,Certhia_familiaris,0.2494824230670929,Bubo_bubo,0.525421142578125,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0144.wav,no_birds,Certhia_familiaris,0.21701551973819733,Bubo_bubo,0.14746877551078796,False,False,both_incorrect
-../augmented_dataset/no_birds/empty_0408.wav,no_birds,no_birds,0.462759792804718,Bubo_bubo,0.7278992533683777,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0352.wav,no_birds,no_birds,0.6894934177398682,Bubo_bubo,0.5024498701095581,True,False,student_only_correct
+../augmented_dataset/no_birds/empty_0077.wav,no_birds,Certhia_familiaris,0.3074921667575836,no_birds,0.0,False,True,birdnet_only_correct
+../augmented_dataset/no_birds/empty_0039.wav,no_birds,no_birds,0.24504414200782776,Bubo_bubo,0.4526221752166748,True,False,student_only_correct
+../augmented_dataset/no_birds/empty_0038.wav,no_birds,no_birds,0.6832759976387024,Bubo_bubo,0.1710549145936966,True,False,student_only_correct
+../augmented_dataset/no_birds/empty_0258.wav,no_birds,Periparus_ater,0.18067321181297302,no_birds,0.0,False,True,birdnet_only_correct
 ../augmented_dataset/no_birds/empty_0420.wav,no_birds,no_birds,0.25774499773979187,Certhia_familiaris,0.15086424350738525,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0387.wav,no_birds,no_birds,0.7016493082046509,Poecile_montanus,0.9737408757209778,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0422.wav,no_birds,Certhia_familiaris,0.29175373911857605,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0191.wav,no_birds,no_birds,0.6471993923187256,Bubo_bubo,0.9819446802139282,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0152.wav,no_birds,no_birds,0.6662455797195435,Bubo_bubo,0.1990509331226349,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0207.wav,no_birds,Certhia_familiaris,0.17569905519485474,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0026.wav,no_birds,no_birds,0.7005048394203186,Bubo_bubo,0.8449082374572754,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0171.wav,no_birds,no_birds,0.662401020526886,Apus_apus,0.250360369682312,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0218.wav,no_birds,Certhia_familiaris,0.2500758469104767,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0033.wav,no_birds,Certhia_familiaris,0.21817822754383087,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0184.wav,no_birds,no_birds,0.5205603837966919,Bubo_bubo,0.9308125376701355,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0190.wav,no_birds,no_birds,0.6962683200836182,Bubo_bubo,0.2491733431816101,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0379.wav,no_birds,no_birds,0.6188395023345947,Bubo_bubo,0.42780372500419617,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0345.wav,no_birds,no_birds,0.2929088771343231,Bubo_bubo,0.8549635410308838,True,False,student_only_correct
-../augmented_dataset/no_birds/esc50_0004.wav,no_birds,Poecile_montanus,0.28731903433799744,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0423.wav,no_birds,no_birds,0.6814436912536621,Bubo_bubo,0.9088564515113831,True,False,student_only_correct
-../augmented_dataset/no_birds/empty_0437.wav,no_birds,Certhia_familiaris,0.32316118478775024,no_birds,0.0,False,True,birdnet_only_correct
-../augmented_dataset/no_birds/empty_0351.wav,no_birds,Certhia_familiaris,0.2665804922580719,Bubo_bubo,0.8851385116577148,False,False,both_incorrect
+../augmented_dataset/no_birds/empty_0044.wav,no_birds,no_birds,0.6822648048400879,Bubo_bubo,0.333040326833725,True,False,student_only_correct
+../augmented_dataset/no_birds/esc50_0281.wav,no_birds,Periparus_ater,0.2697110176086426,no_birds,0.0,False,True,birdnet_only_correct
+../augmented_dataset/no_birds/empty_0408.wav,no_birds,no_birds,0.462759792804718,Bubo_bubo,0.7278992533683777,True,False,student_only_correct
+../augmented_dataset/no_birds/empty_0144.wav,no_birds,Certhia_familiaris,0.21701551973819733,Bubo_bubo,0.14746877551078796,False,False,both_incorrect
+../augmented_dataset/no_birds/empty_0088.wav,no_birds,Poecile_montanus,0.3186741769313812,Poecile_montanus,0.8998465538024902,False,False,both_incorrect
+../augmented_dataset/no_birds/empty_0177.wav,no_birds,Certhia_familiaris,0.27105775475502014,Bubo_bubo,0.11425741761922836,False,False,both_incorrect
+../augmented_dataset/no_birds/empty_0098.wav,no_birds,Certhia_familiaris,0.2852417826652527,Bubo_bubo,0.8434156775474548,False,False,both_incorrect

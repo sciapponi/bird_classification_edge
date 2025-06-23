@@ -1,0 +1,9 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Apus_apus/XC921725-Apus-apus_2024-07-18-0740h_A-Salgueira_Vigo_Parábola.wav,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC921725-Apus-apus_2024-07-18-0740h_A-Salgueira_Vigo_Parábola.wav
+../bird_sound_dataset/Bubo_bubo/XC952821-bubo.wav,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC952821-bubo.wav
+../bird_sound_dataset/Bubo_bubo/XC349071-uhu_W_mariastein_20170102_2347.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC349071-uhu_W_mariastein_20170102_2347.mp3
+../bird_sound_dataset/Certhia_familiaris/XC946739-Mon-Nov-04-2024-15-51-24-Treecreeper.wav,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC946739-Mon-Nov-04-2024-15-51-24-Treecreeper.wav
+../bird_sound_dataset/Certhia_familiaris/XC638144-210327_005b.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC638144-210327_005b.mp3
+../bird_sound_dataset/Certhia_familiaris/XC499275-Trädkrypare_08.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC499275-Trädkrypare_08.mp3
+../bird_sound_dataset/Poecile_montanus/XC198962-Parus montanus_Falo_140904_01.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC198962-Parus montanus_Falo_140904_01.mp3
+../bird_sound_dataset/Poecile_montanus/XC323606-WillowTit2LS110132.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC323606-WillowTit2LS110132.mp3

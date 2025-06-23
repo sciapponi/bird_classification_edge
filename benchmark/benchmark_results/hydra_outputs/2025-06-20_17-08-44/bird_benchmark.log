@@ -1,0 +1,29 @@
+[2025-06-20 17:08:48,539][__main__][INFO] - ============================================================
+[2025-06-20 17:08:48,541][__main__][INFO] - 🔬 STATISTICAL ANALYSIS MODE
+[2025-06-20 17:08:48,541][__main__][INFO] - ============================================================
+[2025-06-20 17:08:48,541][__main__][INFO] - 🔬 RUNNING STATISTICAL ANALYSIS...
+[2025-06-20 17:08:51,546][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-20 17:08:52,555][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-20 17:08:52,557][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-20 17:08:52,758][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-20 17:08:52,759][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-20 17:08:52,886][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-20 17:08:52,892][__main__][INFO] - Processing species: Apus_apus
+[2025-06-20 17:08:52,963][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-20 17:08:52,964][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-20 17:08:53,019][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-20 17:08:53,021][__main__][INFO] - Scanning no_birds dataset: /workspace/augmented_dataset/no_birds
+[2025-06-20 17:08:53,079][__main__][INFO] - Found 836 no_birds files
+[2025-06-20 17:08:53,110][__main__][INFO] - Total audio files discovered: 5076
+[2025-06-20 17:08:53,130][__main__][INFO] - Class distribution:
+[2025-06-20 17:08:53,131][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-20 17:08:53,132][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-20 17:08:53,132][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-20 17:08:53,133][__main__][INFO] -   no_birds: 836 files
+[2025-06-20 17:08:53,133][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-20 17:08:53,139][__main__][INFO] - 📊 Statistical Analysis Results:
+[2025-06-20 17:08:53,139][__main__][INFO] -   Current dataset: 5076 samples
+[2025-06-20 17:08:53,140][__main__][INFO] -   Recommended: 1591 samples
+[2025-06-20 17:08:53,141][__main__][INFO] -   Status: ADEQUATE
+[2025-06-20 17:08:53,142][__main__][INFO] -   Can detect 5.0% improvement: True
+[2025-06-20 17:08:53,145][__main__][INFO] - ✅ Statistical analysis completed successfully!

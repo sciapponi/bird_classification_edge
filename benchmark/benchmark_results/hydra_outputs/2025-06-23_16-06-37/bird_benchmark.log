@@ -1,0 +1,34 @@
+[2025-06-23 16:06:38,491][__main__][INFO] - 📁 Timestamped benchmark directory: 2025-06-23_16-06-38
+[2025-06-23 16:06:38,491][__main__][INFO] -    Predictions: /workspace/benchmark/benchmark_results/2025-06-23_16-06-38/predictions
+[2025-06-23 16:06:38,492][__main__][INFO] -    Comparison: /workspace/benchmark/benchmark_results/2025-06-23_16-06-38/comparison
+[2025-06-23 16:06:38,492][__main__][INFO] - ============================================================
+[2025-06-23 16:06:38,492][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-23 16:06:38,492][__main__][INFO] - ============================================================
+[2025-06-23 16:06:38,492][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-23 16:06:38,493][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-23 16:06:38,493][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-23 16:06:38,493][__main__][INFO] -    • Both models see identical audio data
+[2025-06-23 16:06:38,493][__main__][INFO] - 🔧 SINGLE THRESHOLD: 0.2 (simplified approach)
+[2025-06-23 16:06:38,493][__main__][INFO] - ============================================================
+[2025-06-23 16:06:38,493][__main__][INFO] - Working directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-23_16-06-37
+[2025-06-23 16:06:38,494][__main__][INFO] - Hydra output directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-23_16-06-37
+[2025-06-23 16:06:38,494][__main__][INFO] - 
+========================================
+[2025-06-23 16:06:38,494][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-23 16:06:38,494][__main__][INFO] - ========================================
+[2025-06-23 16:06:38,495][__main__][WARNING] - Bird dataset directory not found: /workspace/benchmark/bird_sound_dataset
+[2025-06-23 16:06:38,495][__main__][WARNING] - No_birds directory not found: /workspace/benchmark/augmented_dataset/no_birds
+[2025-06-23 16:06:38,497][__main__][ERROR] - No audio files found!
+[2025-06-23 16:06:38,498][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/benchmark_results/2025-06-23_16-06-38/predictions/ground_truth.csv
+[2025-06-23 16:06:38,498][__main__][INFO] - 
+========================================
+[2025-06-23 16:06:38,498][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-23 16:06:38,498][__main__][INFO] - ========================================
+[2025-06-23 16:06:38,499][__main__][INFO] - Starting student model predictions
+[2025-06-23 16:06:39,035][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-23 16:06:39,244][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-23 16:06:39,244][benchmark.predict_student][INFO] - PyTorch CUDA available: False
+[2025-06-23 16:06:39,244][benchmark.predict_student][INFO] - Using device: cpu
+[2025-06-23 16:06:39,255][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/config/bird_classification.yaml
+[2025-06-23 16:06:39,270][benchmark.predict_student][ERROR] - Failed to load model: [Errno 2] No such file or directory: '/workspace/benchmark/best_distillation_model.pt'
+[2025-06-23 16:06:39,270][__main__][ERROR] - Student model prediction failed: [Errno 2] No such file or directory: '/workspace/benchmark/best_distillation_model.pt'

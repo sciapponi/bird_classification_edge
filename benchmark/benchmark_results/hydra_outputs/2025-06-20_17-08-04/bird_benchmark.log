@@ -1,0 +1,43 @@
+[2025-06-20 17:08:11,613][__main__][INFO] - 📁 Timestamped benchmark directory: 2025-06-20_17-08-11
+[2025-06-20 17:08:11,613][__main__][INFO] -    Predictions: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/benchmark_results/2025-06-20_17-08-11/predictions
+[2025-06-20 17:08:11,614][__main__][INFO] -    Comparison: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/benchmark_results/2025-06-20_17-08-11/comparison
+[2025-06-20 17:08:11,614][__main__][INFO] - ============================================================
+[2025-06-20 17:08:11,614][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-20 17:08:11,614][__main__][INFO] - ============================================================
+[2025-06-20 17:08:11,614][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-20 17:08:11,614][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-20 17:08:11,614][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-20 17:08:11,615][__main__][INFO] -    • Both models see identical audio data
+[2025-06-20 17:08:11,616][__main__][INFO] - 🔧 ADAPTIVE THRESHOLDS: no_birds threshold = 0.4
+[2025-06-20 17:08:11,616][__main__][INFO] - ============================================================
+[2025-06-20 17:08:11,616][__main__][INFO] - Working directory: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/benchmark_results/hydra_outputs/2025-06-20_17-08-04
+[2025-06-20 17:08:11,616][__main__][INFO] - Hydra output directory: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/benchmark_results/hydra_outputs/2025-06-20_17-08-04
+[2025-06-20 17:08:11,616][__main__][INFO] - 
+========================================
+[2025-06-20 17:08:11,616][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-20 17:08:11,616][__main__][INFO] - ========================================
+[2025-06-20 17:08:11,617][__main__][INFO] - Scanning bird dataset: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/../bird_sound_dataset
+[2025-06-20 17:08:11,617][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-20 17:08:11,763][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-20 17:08:11,764][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-20 17:08:11,842][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-20 17:08:11,842][__main__][INFO] - Processing species: Apus_apus
+[2025-06-20 17:08:11,879][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-20 17:08:11,879][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-20 17:08:11,922][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-20 17:08:11,922][__main__][INFO] - Scanning no_birds dataset: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/../augmented_dataset/no_birds
+[2025-06-20 17:08:11,968][__main__][INFO] - Found 836 no_birds files
+[2025-06-20 17:08:11,974][__main__][INFO] - Total audio files discovered: 5076
+[2025-06-20 17:08:11,981][__main__][INFO] - Class distribution:
+[2025-06-20 17:08:11,981][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-20 17:08:11,981][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-20 17:08:11,981][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-20 17:08:11,982][__main__][INFO] -   no_birds: 836 files
+[2025-06-20 17:08:11,982][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-20 17:08:12,052][__main__][INFO] - ✅ Ground truth saved to: /Users/leonardomannini/Documenti/FBK/repos/bird_classification_edge/benchmark/benchmark_results/2025-06-20_17-08-11/predictions/ground_truth.csv
+[2025-06-20 17:08:12,053][__main__][INFO] - 
+========================================
+[2025-06-20 17:08:12,053][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-20 17:08:12,053][__main__][INFO] - ========================================
+[2025-06-20 17:08:12,053][__main__][INFO] - Starting student model predictions
+[2025-06-20 17:08:13,897][__main__][ERROR] - Student model prediction failed: cannot import name '_is_pandas_dataframe' from 'matplotlib.cbook' (/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/matplotlib/cbook/__init__.py)

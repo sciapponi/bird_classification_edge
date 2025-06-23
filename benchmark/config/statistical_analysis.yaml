@@ -1,0 +1,31 @@
+# Statistical Analysis Configuration
+# This configuration enables statistical analysis mode for benchmark validation
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Enable statistical analysis mode
+statistical_analysis_mode: true
+
+# Statistical analysis parameters
+statistical_analysis:
+  target_improvement: 0.05  # Minimum improvement to detect reliably (5%)
+  confidence_level: 0.95    # 95% confidence level
+  statistical_power: 0.8    # 80% power
+  effect_size_threshold: 0.02  # Practical significance threshold (2%)
+
+# Use reasonable sample size for analysis
+debug:
+  files_limit: null  # Use all available files for statistical analysis
+  max_files_per_class: null
+
+# Output for statistical analysis
+benchmark:
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+    output_dir: "benchmark_results"
+    predictions_dir: null  # Will be set at runtime (statistical analysis mode)
+    comparison_dir: null  # Will be set at runtime (statistical analysis mode) 

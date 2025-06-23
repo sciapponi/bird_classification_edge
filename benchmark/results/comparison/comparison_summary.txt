@@ -3,19 +3,20 @@ BIRD CLASSIFICATION MODEL COMPARISON REPORT
 
 SUMMARY
 --------------------
-Total samples: 10822
+Total samples: 996
 Number of classes: 9
 Classes: Apus_apus, Bubo_bubo, Certhia_brachydactyla, Certhia_familiaris, Emberiza_cia, Lophophanes_cristatus, Periparus_ater, Poecile_montanus, no_birds
 
 OVERALL METRICS
 --------------------
 Student Model:
-  Accuracy: 0.8373
-  Precision: 0.8534
-  Recall: 0.8276
-  F1-Score: 0.8367
+  Accuracy: 0.8424
+  Precision: 0.8542
+  Recall: 0.8355
+  F1-Score: 0.8411
 
 BirdNET:
+<<<<<<< HEAD
   Accuracy: 0.8013
   Precision: 0.8758
   Recall: 0.8181
@@ -83,4 +84,73 @@ no_birds (support: 836):
   BirdNET accuracy: 0.8517
   Student predictions: 901
   BirdNET predictions: 2464
+=======
+  Accuracy: 0.8112
+  Precision: 0.8782
+  Recall: 0.8288
+  F1-Score: 0.8340
+
+AGREEMENT ANALYSIS
+--------------------
+Both correct: 738 (74.1%)
+Student only correct: 101 (10.1%)
+BirdNET only correct: 70 (7.0%)
+Both incorrect: 87 (8.7%)
+
+PER-CLASS ANALYSIS
+--------------------
+Apus_apus (support: 74):
+  Student accuracy: 0.9189
+  BirdNET accuracy: 0.8784
+  Student predictions: 72
+  BirdNET predictions: 65
+
+Bubo_bubo (support: 79):
+  Student accuracy: 0.9367
+  BirdNET accuracy: 0.8481
+  Student predictions: 94
+  BirdNET predictions: 76
+
+Certhia_brachydactyla (support: 128):
+  Student accuracy: 0.8438
+  BirdNET accuracy: 0.8828
+  Student predictions: 124
+  BirdNET predictions: 123
+
+Certhia_familiaris (support: 122):
+  Student accuracy: 0.9016
+  BirdNET accuracy: 0.8689
+  Student predictions: 143
+  BirdNET predictions: 111
+
+Emberiza_cia (support: 37):
+  Student accuracy: 0.7297
+  BirdNET accuracy: 0.8108
+  Student predictions: 29
+  BirdNET predictions: 30
+
+Lophophanes_cristatus (support: 96):
+  Student accuracy: 0.7396
+  BirdNET accuracy: 0.8229
+  Student predictions: 80
+  BirdNET predictions: 88
+
+Periparus_ater (support: 268):
+  Student accuracy: 0.8619
+  BirdNET accuracy: 0.7201
+  Student predictions: 272
+  BirdNET predictions: 195
+
+Poecile_montanus (support: 115):
+  Student accuracy: 0.7304
+  BirdNET accuracy: 0.7826
+  Student predictions: 102
+  BirdNET predictions: 94
+
+no_birds (support: 77):
+  Student accuracy: 0.8571
+  BirdNET accuracy: 0.8442
+  Student predictions: 80
+  BirdNET predictions: 214
+>>>>>>> ed74597 (no bird benchmark)
 

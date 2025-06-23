@@ -1,0 +1,6 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species,birdnet_preprocessing
+../bird_sound_dataset/Apus_apus/XC743927-20220411_203623_Apus apus_Llucmajor.mp3,Apus_apus,Apus_apus,0.877324104309082,1,{'Apus_apus': 0.877324104309082},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC839784-B19h52m47s21oct2023c_04h55.mp3,Bubo_bubo,Bubo_bubo,0.68598473072052,1,{'Bubo_bubo': 0.68598473072052},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC701017-cerfam ok1.mp3,Certhia_familiaris,Certhia_familiaris,0.9998506307601929,1,{'Certhia_familiaris': 0.9998506307601929},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC354066-Poecmont-qC2_poland_psz_10.30_170128-0761.mp3,Poecile_montanus,Poecile_montanus,0.9356088638305664,2,"{'Poecile_montanus': 0.9356088638305664, 'Lophophanes_cristatus': 0.323395311832428}",extract_calls
+../augmented_dataset/no_birds/empty_0010.wav,no_birds,no_birds,0.0,0,{},extract_calls
