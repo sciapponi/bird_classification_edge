@@ -1,0 +1,5 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Apus_apus/XC451146-Common swift_Tashkent_DLY.mp3,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC451146-Common swift_Tashkent_DLY.mp3
+../bird_sound_dataset/Bubo_bubo/XC345653-bubo bubo 8 ubicación secreta 13-11-2016.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC345653-bubo bubo 8 ubicación secreta 13-11-2016.mp3
+../bird_sound_dataset/Certhia_familiaris/XC447799-Certhiafam-c-poland_psz_9.37_81117-6450.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC447799-Certhiafam-c-poland_psz_9.37_81117-6450.mp3
+../bird_sound_dataset/Poecile_montanus/XC664739-boreale-turet-21juillet21.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC664739-boreale-turet-21juillet21.mp3

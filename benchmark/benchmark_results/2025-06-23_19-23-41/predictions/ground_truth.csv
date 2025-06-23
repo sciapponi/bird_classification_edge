@@ -1,0 +1,5 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Apus_apus/XC564571-falciot 2 6 1.mp3,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC564571-falciot 2 6 1.mp3
+../bird_sound_dataset/Bubo_bubo/XC839762-B21h54m20s18oct2023_04h40.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC839762-B21h54m20s18oct2023_04h40.mp3
+../bird_sound_dataset/Certhia_familiaris/XC704174-XC 2022-02-24 (007) 7.30h ZOOM H4n u NTG1 Düns Flana Wbl Teil 1 Gesang 10x hp 1200-6db.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC704174-XC 2022-02-24 (007) 7.30h ZOOM H4n u NTG1 Düns Flana Wbl Teil 1 Gesang 10x hp 1200-6db.mp3
+../bird_sound_dataset/Poecile_montanus/XC409238-Willow Tit Alarm Calls Bagmere Nature Reserve 18 March 2018 at 0826am.mp3,Poecile_montanus,bird,Poecile_montanus,/workspace/bird_sound_dataset/Poecile_montanus/XC409238-Willow Tit Alarm Calls Bagmere Nature Reserve 18 March 2018 at 0826am.mp3

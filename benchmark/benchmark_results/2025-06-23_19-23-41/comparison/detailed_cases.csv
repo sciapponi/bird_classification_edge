@@ -1,0 +1,2 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Poecile_montanus/XC409238-Willow Tit Alarm Calls Bagmere Nature Reserve 18 March 2018 at 0826am.mp3,Poecile_montanus,Bubo_bubo,0.11090920865535736,Poecile_montanus,0.2007257044315338,False,True,birdnet_only_correct

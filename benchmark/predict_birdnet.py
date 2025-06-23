@@ -296,9 +296,11 @@ class BirdNETPredictor:
                 fallback_class = "no_birds"
                 fallback_confidence = 0.0
                 if self.force_bird_prediction and self.target_species:
-                    fallback_class = self.target_species[0]
+                    # Use a random species instead of always the first one to reduce bias
+                    import random
+                    fallback_class = random.choice(self.target_species)
                     fallback_confidence = 0.01
-                    logger.debug(f"Force bird prediction (preprocessing failed): {fallback_class}")
+                    logger.debug(f"Force bird prediction (preprocessing failed): {fallback_class} (random)")
                 
                 return {
                     'audio_path': str(audio_path),
@@ -363,12 +365,42 @@ class BirdNETPredictor:
                 )
                     
             else:
-                # No detections
+                # No detections above threshold
                 if self.force_bird_prediction:
-                    # Force bird prediction: choose first target species with minimal confidence
-                    predicted_class = self.target_species[0] if self.target_species else "no_birds"
-                    final_confidence = 0.01  # Minimal confidence to indicate forced prediction
-                    logger.debug(f"Force bird prediction (no detections): {predicted_class} with minimal confidence")
+                    # Try to get ALL detections (even below threshold) to find best species
+                    recording_all = Recording(
+                        self.analyzer,
+                        temp_file,
+                        min_conf=0.001  # Very low threshold to get all possible detections
+                    )
+                    recording_all.lat = None
+                    recording_all.lon = None
+                    recording_all.date = None
+                    recording_all.week = -1
+                    recording_all.analyze()
+                    
+                    # Find best detection even if below main threshold
+                    all_species_confidences = {}
+                    for detection in recording_all.detections:
+                        scientific_name = detection['scientific_name']
+                        confidence = detection['confidence']
+                        project_species = scientific_name.replace(' ', '_')
+                        
+                        # Only consider target species
+                        if project_species in self.target_species:
+                            if project_species not in all_species_confidences or confidence > all_species_confidences[project_species]:
+                                all_species_confidences[project_species] = confidence
+                    
+                    if all_species_confidences:
+                        # Choose species with highest confidence, even if very low
+                        predicted_class = max(all_species_confidences.keys(), key=lambda x: all_species_confidences[x])
+                        final_confidence = all_species_confidences[predicted_class]
+                        logger.debug(f"Force bird prediction (below threshold): {predicted_class} with confidence {final_confidence:.4f}")
+                    else:
+                        # Absolute fallback: use first target species with minimal confidence
+                        predicted_class = self.target_species[0] if self.target_species else "no_birds"
+                        final_confidence = 0.01
+                        logger.debug(f"Force bird prediction (absolute fallback): {predicted_class} with minimal confidence")
                 else:
                     # Standard behavior: classify as no_birds
                     predicted_class = "no_birds"
@@ -390,9 +422,11 @@ class BirdNETPredictor:
             fallback_class = "no_birds"
             fallback_confidence = 0.0
             if self.force_bird_prediction and self.target_species:
-                fallback_class = self.target_species[0]
+                # Use a random species instead of always the first one to reduce bias
+                import random
+                fallback_class = random.choice(self.target_species)
                 fallback_confidence = 0.01
-                logger.debug(f"Force bird prediction (exception): {fallback_class}")
+                logger.debug(f"Force bird prediction (exception): {fallback_class} (random)")
             
             return {
                 'audio_path': str(audio_path),
@@ -476,12 +510,42 @@ class BirdNETPredictor:
                 )
                     
             else:
-                # No detections
+                # No detections above threshold
                 if self.force_bird_prediction:
-                    # Force bird prediction: choose first target species with minimal confidence
-                    predicted_class = self.target_species[0] if self.target_species else "no_birds"
-                    final_confidence = 0.01  # Minimal confidence to indicate forced prediction
-                    logger.debug(f"Force bird prediction (no detections): {predicted_class} with minimal confidence")
+                    # Try to get ALL detections (even below threshold) to find best species
+                    recording_all = Recording(
+                        self.analyzer,
+                        str(audio_path),
+                        min_conf=0.001  # Very low threshold to get all possible detections
+                    )
+                    recording_all.lat = None
+                    recording_all.lon = None
+                    recording_all.date = None
+                    recording_all.week = -1
+                    recording_all.analyze()
+                    
+                    # Find best detection even if below main threshold
+                    all_species_confidences = {}
+                    for detection in recording_all.detections:
+                        scientific_name = detection['scientific_name']
+                        confidence = detection['confidence']
+                        project_species = scientific_name.replace(' ', '_')
+                        
+                        # Only consider target species
+                        if project_species in self.target_species:
+                            if project_species not in all_species_confidences or confidence > all_species_confidences[project_species]:
+                                all_species_confidences[project_species] = confidence
+                    
+                    if all_species_confidences:
+                        # Choose species with highest confidence, even if very low
+                        predicted_class = max(all_species_confidences.keys(), key=lambda x: all_species_confidences[x])
+                        final_confidence = all_species_confidences[predicted_class]
+                        logger.debug(f"Force bird prediction (below threshold): {predicted_class} with confidence {final_confidence:.4f}")
+                    else:
+                        # Absolute fallback: use first target species with minimal confidence
+                        predicted_class = self.target_species[0] if self.target_species else "no_birds"
+                        final_confidence = 0.01
+                        logger.debug(f"Force bird prediction (absolute fallback): {predicted_class} with minimal confidence")
                 else:
                     # Standard behavior: classify as no_birds
                     predicted_class = "no_birds"
@@ -502,9 +566,11 @@ class BirdNETPredictor:
             fallback_class = "no_birds"
             fallback_confidence = 0.0
             if self.force_bird_prediction and self.target_species:
-                fallback_class = self.target_species[0]
+                # Use a random species instead of always the first one to reduce bias
+                import random
+                fallback_class = random.choice(self.target_species)
                 fallback_confidence = 0.01
-                logger.debug(f"Force bird prediction (exception): {fallback_class}")
+                logger.debug(f"Force bird prediction (exception): {fallback_class} (random)")
             
             return {
                 'audio_path': str(audio_path),

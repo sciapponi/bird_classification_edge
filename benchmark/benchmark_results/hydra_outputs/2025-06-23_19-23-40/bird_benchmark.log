@@ -1,0 +1,118 @@
+[2025-06-23 19:23:41,937][__main__][INFO] - 📁 Timestamped benchmark directory: 2025-06-23_19-23-41
+[2025-06-23 19:23:41,938][__main__][INFO] -    Predictions: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/predictions
+[2025-06-23 19:23:41,938][__main__][INFO] -    Comparison: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison
+[2025-06-23 19:23:41,940][__main__][INFO] - ============================================================
+[2025-06-23 19:23:41,940][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-23 19:23:41,940][__main__][INFO] - ============================================================
+[2025-06-23 19:23:41,941][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-23 19:23:41,941][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-23 19:23:41,941][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-23 19:23:41,942][__main__][INFO] -    • Both models see identical audio data
+[2025-06-23 19:23:41,942][__main__][INFO] - 🎯 BIRDS-ONLY MODE: Excluding no_birds class from evaluation
+[2025-06-23 19:23:41,942][__main__][INFO] - 🔄 FORCE BIRD PREDICTION: Both models will never predict no_birds
+[2025-06-23 19:23:41,943][__main__][INFO] - 🔧 SINGLE THRESHOLD: 0.5 (simplified approach)
+[2025-06-23 19:23:41,943][__main__][INFO] - ============================================================
+[2025-06-23 19:23:41,943][__main__][INFO] - Working directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-23_19-23-40
+[2025-06-23 19:23:41,943][__main__][INFO] - Hydra output directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-23_19-23-40
+[2025-06-23 19:23:41,944][__main__][INFO] - 
+========================================
+[2025-06-23 19:23:41,944][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-23 19:23:41,944][__main__][INFO] - ========================================
+[2025-06-23 19:23:41,948][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-23 19:23:41,951][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-23 19:23:42,010][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-23 19:23:42,011][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-23 19:23:42,049][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-23 19:23:42,050][__main__][INFO] - Processing species: Apus_apus
+[2025-06-23 19:23:42,071][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-23 19:23:42,072][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-23 19:23:42,093][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-23 19:23:42,093][__main__][INFO] - 🎯 BIRDS-ONLY MODE: Excluding no_birds samples from ground truth
+[2025-06-23 19:23:42,109][__main__][INFO] - 🔍 LIMITED TO 5 files for testing
+[2025-06-23 19:23:42,110][__main__][INFO] - Total audio files discovered: 4
+[2025-06-23 19:23:42,110][__main__][INFO] - Class distribution:
+[2025-06-23 19:23:42,110][__main__][INFO] -   Apus_apus: 1 files
+[2025-06-23 19:23:42,111][__main__][INFO] -   Bubo_bubo: 1 files
+[2025-06-23 19:23:42,111][__main__][INFO] -   Certhia_familiaris: 1 files
+[2025-06-23 19:23:42,111][__main__][INFO] -   Poecile_montanus: 1 files
+[2025-06-23 19:23:42,113][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/predictions/ground_truth.csv
+[2025-06-23 19:23:42,114][__main__][INFO] - 
+========================================
+[2025-06-23 19:23:42,114][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-23 19:23:42,114][__main__][INFO] - ========================================
+[2025-06-23 19:23:42,114][__main__][INFO] - Starting student model predictions
+[2025-06-23 19:23:43,135][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-23 19:23:43,548][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-23 19:23:43,548][benchmark.predict_student][INFO] - PyTorch CUDA available: False
+[2025-06-23 19:23:43,549][benchmark.predict_student][INFO] - Using device: cpu
+[2025-06-23 19:23:43,561][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/config/bird_classification.yaml
+[2025-06-23 19:23:43,656][benchmark.predict_student][INFO] - Loaded model from: /workspace/best_distillation_model.pt
+[2025-06-23 19:23:43,659][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-23 19:23:43,659][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-23 19:23:43,660][benchmark.predict_student][INFO] - Confidence threshold: 0.05
+[2025-06-23 19:24:02,691][__main__][INFO] - Student predictions saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/predictions/student_predictions.csv
+[2025-06-23 19:24:02,704][__main__][INFO] - ✅ Student prediction completed
+[2025-06-23 19:24:02,704][__main__][INFO] -   Total predictions: 4
+[2025-06-23 19:24:02,706][__main__][INFO] -   Average confidence: 0.522
+[2025-06-23 19:24:02,706][__main__][INFO] -   Top prediction: Bubo_bubo (2 files)
+[2025-06-23 19:24:02,728][__main__][INFO] - 
+========================================
+[2025-06-23 19:24:02,733][__main__][INFO] - 🦅 STEP 3: BirdNET Aligned Predictions
+[2025-06-23 19:24:02,733][__main__][INFO] - ========================================
+[2025-06-23 19:24:02,733][__main__][INFO] - Starting BirdNET predictions with ALIGNED preprocessing and ADAPTIVE THRESHOLDS
+[2025-06-23 19:24:02,734][__main__][INFO] - 🎯 Using identical preprocessing pipeline as student model:
+[2025-06-23 19:24:02,734][__main__][INFO] -    - Segment duration: 3.0s
+[2025-06-23 19:24:02,734][__main__][INFO] -    - Sample rate: 32000 Hz
+[2025-06-23 19:24:02,734][__main__][INFO] -    - Bandpass filter: 150.0-15000.0 Hz
+[2025-06-23 19:24:02,735][__main__][INFO] -    - Extract calls: True
+[2025-06-23 19:24:02,735][__main__][INFO] - 🔧 Threshold configuration:
+[2025-06-23 19:24:02,735][__main__][INFO] -    - Confidence threshold: 0.5 (single threshold approach)
+[2025-06-23 19:24:02,735][__main__][INFO] -    - Adaptive threshold enabled: False
+[2025-06-23 19:24:02,898][benchmark.predict_birdnet][INFO] - BirdNET initialized with 8 target species
+[2025-06-23 19:24:02,899][benchmark.predict_birdnet][INFO] - Target species: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus']
+[2025-06-23 19:24:02,899][benchmark.predict_birdnet][INFO] - Confidence threshold: 0.5
+[2025-06-23 19:24:02,899][benchmark.predict_birdnet][INFO] - Segmented mode: True, Duration: 3.0s
+[2025-06-23 19:24:02,899][benchmark.predict_birdnet][INFO] - Using BirdNET prediction method: aligned (3s segments)
+[2025-06-23 19:24:10,623][__main__][INFO] - BirdNET predictions saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/predictions/birdnet_predictions.csv
+[2025-06-23 19:24:10,625][__main__][INFO] - ✅ BirdNET ALIGNED prediction completed
+[2025-06-23 19:24:10,625][__main__][INFO] -   Total predictions: 4
+[2025-06-23 19:24:10,626][__main__][INFO] -   Average confidence: 0.750
+[2025-06-23 19:24:10,626][__main__][INFO] -   Top prediction: Apus_apus (1 files)
+[2025-06-23 19:24:10,626][__main__][INFO] -   Preprocessing methods used:
+[2025-06-23 19:24:10,627][__main__][INFO] -     extract_calls: 4 files
+[2025-06-23 19:24:10,629][benchmark.predict_birdnet][INFO] - Cleaned up temporary species list file
+[2025-06-23 19:24:10,638][__main__][INFO] - 
+========================================
+[2025-06-23 19:24:10,638][__main__][INFO] - 📊 STEP 4: Metrics and Comparison
+[2025-06-23 19:24:10,639][__main__][INFO] - ========================================
+[2025-06-23 19:24:10,639][__main__][INFO] - Starting model comparison
+[2025-06-23 19:24:10,651][benchmark.compare_predictions][INFO] - ModelComparator initialized with exclude_classes: ['no_birds']
+[2025-06-23 19:24:10,652][benchmark.compare_predictions][INFO] - Birds-only mode: False
+[2025-06-23 19:24:10,689][__main__][INFO] - Comparing 4 predictions
+[2025-06-23 19:24:10,689][benchmark.compare_predictions][INFO] - Comparing model predictions
+[2025-06-23 19:24:10,690][benchmark.compare_predictions][INFO] - Applying class filtering - exclude_classes: ['no_birds'], birds_only: False
+[2025-06-23 19:24:10,690][benchmark.compare_predictions][INFO] - Filtering out classes: {'no_birds'}
+[2025-06-23 19:24:10,690][benchmark.compare_predictions][INFO] - Samples before filtering: 4
+[2025-06-23 19:24:10,690][benchmark.compare_predictions][INFO] - Samples after filtering: 4
+[2025-06-23 19:24:10,690][benchmark.compare_predictions][INFO] - After filtering: 4 samples remaining
+[2025-06-23 19:24:10,690][benchmark.compare_predictions][INFO] - Classes in analysis: ['Apus_apus', 'Bubo_bubo', 'Certhia_familiaris', 'Poecile_montanus']
+[2025-06-23 19:24:10,768][benchmark.compare_predictions][INFO] - JSON report saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/comparison_report.json
+[2025-06-23 19:24:10,770][benchmark.compare_predictions][INFO] - Text summary saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/comparison_summary.txt
+[2025-06-23 19:24:10,786][benchmark.compare_predictions][INFO] - Detailed cases saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/detailed_cases.csv
+[2025-06-23 19:24:10,789][benchmark.compare_predictions][INFO] - Metrics comparison table saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/metrics_comparison_table.csv
+[2025-06-23 19:24:10,793][benchmark.compare_predictions][INFO] - Per-class metrics table saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/per_class_metrics_table.csv
+[2025-06-23 19:24:11,780][benchmark.compare_predictions][INFO] - Confusion matrices saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/confusion_matrices.png
+[2025-06-23 19:24:12,143][benchmark.compare_predictions][INFO] - Agreement analysis saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/agreement_analysis.png
+[2025-06-23 19:24:12,388][benchmark.compare_predictions][INFO] - Per-class comparison saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/per_class_accuracy.png
+[2025-06-23 19:24:13,390][benchmark.compare_predictions][INFO] - Comprehensive metrics comparison saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison/comprehensive_metrics_comparison.png
+[2025-06-23 19:24:13,391][__main__][INFO] - Comparison results saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-23-41/comparison
+[2025-06-23 19:24:13,395][__main__][INFO] - 
+============================================================
+[2025-06-23 19:24:13,396][__main__][INFO] - 🎉 ALIGNED BENCHMARK COMPLETED SUCCESSFULLY!
+[2025-06-23 19:24:13,396][__main__][INFO] - ============================================================
+[2025-06-23 19:24:13,396][__main__][INFO] - ✅ Fair comparison achieved:
+[2025-06-23 19:24:13,397][__main__][INFO] -    • Both models used identical preprocessing
+[2025-06-23 19:24:13,397][__main__][INFO] -    • Both models analyzed same 3-second segments
+[2025-06-23 19:24:13,397][__main__][INFO] -    • Performance gap should be <5% (realistic)
+[2025-06-23 19:24:13,397][__main__][INFO] - 📊 Check results/comparison/ for detailed analysis
+[2025-06-23 19:24:13,397][__main__][INFO] - ============================================================

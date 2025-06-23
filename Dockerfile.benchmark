@@ -44,11 +44,14 @@ WORKDIR /workspace
 COPY requirements.txt /workspace/
 COPY benchmark/requirements.txt /workspace/benchmark_requirements.txt
 
-# Install Python packages
-RUN pip install -r requirements.txt
+# Install large packages separately with extended timeout
+RUN pip install --timeout 600 --retries 5 birdnetlib
 
-# Install benchmark-specific requirements
-RUN pip install -r benchmark_requirements.txt
+# Install Python packages with increased timeout and retries
+RUN pip install --timeout 300 --retries 3 --cache-dir /tmp/pip-cache -r requirements.txt
+
+# Install benchmark-specific requirements with increased timeout and retries
+RUN pip install --timeout 300 --retries 3 --cache-dir /tmp/pip-cache -r benchmark_requirements.txt
 
 # Install additional packages for benchmark (including statistical analysis)
 RUN pip install numba resampy psutil
