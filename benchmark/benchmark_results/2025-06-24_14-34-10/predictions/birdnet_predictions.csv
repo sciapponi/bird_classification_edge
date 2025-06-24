@@ -1,0 +1,49 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species,birdnet_preprocessing
+../bird_sound_dataset/Apus_apus/XC829866-apus-apus-1-trabajo-08-04-2022.mp3,Apus_apus,Apus_apus,0.9843422770500183,1,{'Apus_apus': 0.9843422770500183},extract_calls
+"../bird_sound_dataset/Apus_apus/XC725750-220513_57Cirrio bo 21.30 Castelo de Monterrei, Verín.mp3",Apus_apus,Apus_apus,0.9949401617050171,1,{'Apus_apus': 0.9949401617050171},extract_calls
+../bird_sound_dataset/Apus_apus/XC328123-160723_02 - trimmed.mp3,Apus_apus,Apus_apus,0.9954311847686768,1,{'Apus_apus': 0.9954311847686768},extract_calls
+../bird_sound_dataset/Apus_apus/XC810161-APUAPU_230617_3557_Paimpont35_SBP.mp3,Apus_apus,Apus_apus,0.9977489113807678,1,{'Apus_apus': 0.9977489113807678},extract_calls
+../bird_sound_dataset/Apus_apus/XC372845-gierzwaluw_zwow1.mp3,Apus_apus,Apus_apus,0.9974678754806519,1,{'Apus_apus': 0.9974678754806519},extract_calls
+../bird_sound_dataset/Apus_apus/XC668982-TS210804.mp3,Apus_apus,Apus_apus,0.12855128943920135,0,{},extract_calls
+../bird_sound_dataset/Apus_apus/XC809365-230616_8972-Gierzwaluw.mp3,Apus_apus,Apus_apus,0.9813151955604553,1,{'Apus_apus': 0.9813151955604553},extract_calls
+../bird_sound_dataset/Apus_apus/XC913495-Common-Swift.mp3,Apus_apus,Apus_apus,0.10778271406888962,0,{},extract_calls
+../bird_sound_dataset/Apus_apus/XC736524-220708_6480 Gierzwaluw.mp3,Apus_apus,Apus_apus,0.9995645880699158,1,{'Apus_apus': 0.9995645880699158},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC864395-MixPre-166-20042023_elhorcajo-EM272_HUBRO-DEVILS-CACKLE-GOD1-sørnattergal16bit.wav,Bubo_bubo,Bubo_bubo,0.01871863193809986,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC382620-Cloqueo buho real 2.mp3,Bubo_bubo,Certhia_brachydactyla,0.001,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC524179-GR-MONED-BAR_20190214_064702_Gufo reale_richiamo_f (forte)_serie.mp3,Bubo_bubo,Bubo_bubo,0.8229633569717407,1,{'Bubo_bubo': 0.8229633569717407},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC768000-Grand-duc-d-Europe.mp3,Bubo_bubo,Bubo_bubo,0.8248382806777954,1,{'Bubo_bubo': 0.8248382806777954},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC125367-Eurasian Eagle Owl_20130303_192622.mp3,Bubo_bubo,Certhia_familiaris,0.001,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC337467-MVI_4364.mp3,Bubo_bubo,Bubo_bubo,0.7817997336387634,1,{'Bubo_bubo': 0.7817997336387634},extract_calls
+"../bird_sound_dataset/Bubo_bubo/23 Bubo bubo, Voreppe (France) 2006.mp3",Bubo_bubo,Bubo_bubo,0.5502825975418091,1,{'Bubo_bubo': 0.5502825975418091},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC788604-Berguv-2023-02-26_red.mp3,Bubo_bubo,Emberiza_cia,0.001,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC366025-call2.mp3,Bubo_bubo,Bubo_bubo,0.8968163728713989,1,{'Bubo_bubo': 0.8968163728713989},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC403827-Uhu Wellen mit Damwild 112.mp3,Bubo_bubo,Bubo_bubo,0.7745512127876282,1,{'Bubo_bubo': 0.7745512127876282},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC883845-MVI_7581.mp3,Certhia_familiaris,Certhia_familiaris,0.9804370999336243,1,{'Certhia_familiaris': 0.9804370999336243},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC194178-Certhia_familiaris_2014_09_04_01.mp3,Certhia_familiaris,Lophophanes_cristatus,0.001,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC113935-26-1-4varklo mp3.mp3,Certhia_familiaris,Certhia_familiaris,0.9918930530548096,1,{'Certhia_familiaris': 0.9918930530548096},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC781205-230217_2411-mp3-noise-red.mp3,Certhia_familiaris,Lophophanes_cristatus,0.04953611269593239,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC890852-旋木雀call-辽河公园.mp3,Certhia_familiaris,Poecile_montanus,0.001,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC749183-MIXPRE-532.mp3,Certhia_familiaris,Certhia_familiaris,0.8255725502967834,1,{'Certhia_familiaris': 0.8255725502967834},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC308693-160325WaldbaumläuferGesangFH1 49.028.mp3,Certhia_familiaris,Certhia_familiaris,0.9996993541717529,1,{'Certhia_familiaris': 0.9996993541717529},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC408121-Pełzacz leśny Certhia_familiaris_Poland_Jarek_Matusiak_611.mp3,Certhia_familiaris,Certhia_familiaris,0.9998476505279541,1,{'Certhia_familiaris': 0.9998476505279541},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC462599-Grimpereau des bois alarmes aggressive puis chant ++.mp3,Certhia_familiaris,Certhia_familiaris,0.9998513460159302,1,{'Certhia_familiaris': 0.9998513460159302},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC639599-210328_005b.mp3,Certhia_familiaris,Certhia_familiaris,0.9761225581169128,1,{'Certhia_familiaris': 0.9761225581169128},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC749181-MIXPRE-530.mp3,Certhia_familiaris,Certhia_familiaris,0.44713085889816284,0,{},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC676182-TRÄK210920.mp3,Certhia_familiaris,Certhia_familiaris,0.6666001677513123,1,{'Certhia_familiaris': 0.6666001677513123},extract_calls
+../bird_sound_dataset/Certhia_familiaris/Rampichino alpestre Marmora 12 feb 2011.mp3,Certhia_familiaris,Certhia_familiaris,0.9948762059211731,1,{'Certhia_familiaris': 0.9948762059211731},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC883469-XC-2024-03-20-(795)-TASCAM-Dünserberg-Wbl-1-Strophe-norm--3db-hp-200-24db.wav,Certhia_familiaris,Certhia_familiaris,0.9999009370803833,1,{'Certhia_familiaris': 0.9999009370803833},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC940662-CERFAM_cri_2_240315_Cordon.mp3,Certhia_familiaris,Certhia_familiaris,0.013759243302047253,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC371752-Poecile montanus songarus Ili-Alatau NP Kazakhstan 17 May 2017 06.07 hr.mp3,Poecile_montanus,Periparus_ater,0.001,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC153757-PAR07h26m02s03aug2013.mp3,Poecile_montanus,Poecile_montanus,0.9869158267974854,1,{'Poecile_montanus': 0.9869158267974854},extract_calls
+"../bird_sound_dataset/Poecile_montanus/XC803094-P.-montanus-21.05.2023,-оз.-Яранкуб,-ночь-утро,B.mp3",Poecile_montanus,Emberiza_cia,0.001,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC676233-Talltita_19.mp3,Poecile_montanus,Poecile_montanus,0.05992550402879715,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC355729-Poecmont-sc_poland_psz_8.48_170213-1041.mp3,Poecile_montanus,Poecile_montanus,0.9959053993225098,1,{'Poecile_montanus': 0.9959053993225098},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC925707-TALLT2408040653.wav,Poecile_montanus,Bubo_bubo,0.001,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC462496-rdbpara_2019-01-03_08h15_WillowTit_song.mp3,Poecile_montanus,Poecile_montanus,0.9934324026107788,1,{'Poecile_montanus': 0.9934324026107788},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC168312-Granmeis XC Jessnes 140225_145520_AERY1227.mp3,Poecile_montanus,Poecile_montanus,0.8640356063842773,1,{'Poecile_montanus': 0.8640356063842773},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC462506-rdbpara_2019-03-19_09h07b_WillowTit_Song.mp3,Poecile_montanus,Poecile_montanus,0.9980960488319397,1,{'Poecile_montanus': 0.9980960488319397},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC623389-LS_56998 Matkop Q song A.mp3,Poecile_montanus,Poecile_montanus,0.9993568062782288,1,{'Poecile_montanus': 0.9993568062782288},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC487160-MEsange boreale chant long sous la pluie.mp3,Poecile_montanus,Poecile_montanus,0.9595395922660828,1,{'Poecile_montanus': 0.9595395922660828},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC281669-417 7 Matkop 7 Roep.mp3,Poecile_montanus,Poecile_montanus,0.29449722170829773,0,{},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC153756-PAR07h25m34s05aug2013.mp3,Poecile_montanus,Poecile_montanus,0.9235692620277405,1,{'Poecile_montanus': 0.9235692620277405},extract_calls
+../bird_sound_dataset/Poecile_montanus/XC305538-x5090_059-04hiequ mp3.mp3,Poecile_montanus,Poecile_montanus,0.8545807003974915,1,{'Poecile_montanus': 0.8545807003974915},extract_calls

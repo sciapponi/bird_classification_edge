@@ -1,0 +1,56 @@
+BIRD CLASSIFICATION MODEL COMPARISON REPORT
+==================================================
+
+SUMMARY
+--------------------
+Total samples: 48
+Number of classes: 8
+Classes: Apus_apus, Bubo_bubo, Certhia_brachydactyla, Certhia_familiaris, Emberiza_cia, Lophophanes_cristatus, Periparus_ater, Poecile_montanus
+
+OVERALL METRICS
+--------------------
+Student Model:
+  Accuracy: 0.7917
+  Precision: 0.6210
+  Recall: 0.5442
+  F1-Score: 0.5764
+
+BirdNET:
+  Accuracy: 0.8125
+  Precision: 0.4643
+  Recall: 0.4107
+  F1-Score: 0.4351
+
+AGREEMENT ANALYSIS
+--------------------
+Both correct: 35 (72.9%)
+Student only correct: 3 (6.2%)
+BirdNET only correct: 4 (8.3%)
+Both incorrect: 6 (12.5%)
+
+PER-CLASS ANALYSIS
+--------------------
+Apus_apus (support: 9):
+  Student accuracy: 0.8889
+  BirdNET accuracy: 1.0000
+  Student predictions: 8
+  BirdNET predictions: 9
+
+Bubo_bubo (support: 10):
+  Student accuracy: 1.0000
+  BirdNET accuracy: 0.7000
+  Student predictions: 11
+  BirdNET predictions: 8
+
+Certhia_familiaris (support: 15):
+  Student accuracy: 0.7333
+  BirdNET accuracy: 0.8000
+  Student predictions: 12
+  BirdNET predictions: 13
+
+Poecile_montanus (support: 14):
+  Student accuracy: 0.6429
+  BirdNET accuracy: 0.7857
+  Student predictions: 10
+  BirdNET predictions: 12
+

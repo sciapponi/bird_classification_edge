@@ -114,7 +114,7 @@ def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict]
     else:
         logger.warning(f"Bird dataset directory not found: {bird_dataset_path}")
     
-    # Process no_birds dataset (only if not in birds-only mode)
+    # Process no_birds category if not excluded
     exclude_no_birds = cfg.benchmark.mode.get('exclude_no_birds_from_ground_truth', False)
     
     if not exclude_no_birds:

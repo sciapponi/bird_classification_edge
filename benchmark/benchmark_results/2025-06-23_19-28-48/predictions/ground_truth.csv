@@ -1,0 +1,6 @@
+audio_path,label,category,species,full_path
+../bird_sound_dataset/Apus_apus/XC547704-Swift2019-6-24-1.mp3,Apus_apus,bird,Apus_apus,/workspace/bird_sound_dataset/Apus_apus/XC547704-Swift2019-6-24-1.mp3
+../bird_sound_dataset/Bubo_bubo/XC343143-485_bubbub_naarassoidin2_Suomi_Hankasalmi_2011-03-13.mp3,Bubo_bubo,bird,Bubo_bubo,/workspace/bird_sound_dataset/Bubo_bubo/XC343143-485_bubbub_naarassoidin2_Suomi_Hankasalmi_2011-03-13.mp3
+../bird_sound_dataset/Certhia_brachydactyla/XC418021-Certhia brachydactyla.mp3,Certhia_brachydactyla,bird,Certhia_brachydactyla,/workspace/bird_sound_dataset/Certhia_brachydactyla/XC418021-Certhia brachydactyla.mp3
+../bird_sound_dataset/Certhia_familiaris/XC287661-T06.mp3,Certhia_familiaris,bird,Certhia_familiaris,/workspace/bird_sound_dataset/Certhia_familiaris/XC287661-T06.mp3
+../bird_sound_dataset/Emberiza_cia/XC814606-526096131.wav,Emberiza_cia,bird,Emberiza_cia,/workspace/bird_sound_dataset/Emberiza_cia/XC814606-526096131.wav

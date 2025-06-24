@@ -104,7 +104,7 @@ student_model:
 
 # BirdNET prediction configuration
 birdnet:
-  # Analysis parameters  
+  # Analysis parameters
   confidence_threshold: 0.2  # Single threshold for all classifications (simplified system)
   sensitivity: 1.25  # BirdNET sensitivity parameter
   

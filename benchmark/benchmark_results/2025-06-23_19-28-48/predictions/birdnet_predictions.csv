@@ -1,0 +1,6 @@
+audio_path,ground_truth,birdnet_prediction,birdnet_confidence,birdnet_detections,birdnet_all_species,birdnet_preprocessing
+../bird_sound_dataset/Apus_apus/XC547704-Swift2019-6-24-1.mp3,Apus_apus,Apus_apus,0.026985038071870804,0,{},extract_calls
+../bird_sound_dataset/Bubo_bubo/XC343143-485_bubbub_naarassoidin2_Suomi_Hankasalmi_2011-03-13.mp3,Bubo_bubo,Bubo_bubo,0.8003069162368774,1,{'Bubo_bubo': 0.8003069162368774},extract_calls
+../bird_sound_dataset/Certhia_brachydactyla/XC418021-Certhia brachydactyla.mp3,Certhia_brachydactyla,Certhia_brachydactyla,0.9273501038551331,1,{'Certhia_brachydactyla': 0.9273501038551331},extract_calls
+../bird_sound_dataset/Certhia_familiaris/XC287661-T06.mp3,Certhia_familiaris,Certhia_familiaris,0.8244854807853699,1,{'Certhia_familiaris': 0.8244854807853699},extract_calls
+../bird_sound_dataset/Emberiza_cia/XC814606-526096131.wav,Emberiza_cia,Emberiza_cia,0.052315495908260345,0,{},extract_calls

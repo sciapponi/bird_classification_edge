@@ -51,6 +51,63 @@ Il sistema rileva automaticamente la presenza di GPU e usa CPU come fallback su 
 
 ## 📋 Configurazioni Benchmark Disponibili
 
+Il sistema offre **9 configurazioni specializzate** per diversi tipi di analisi e testing. Ecco la panoramica completa:
+
+### 📊 **Tabella Comparativa Configurazioni**
+
+| Configurazione | Soglia BirdNET | Soglia Student | File Limit | Force Bird | Adaptive | Multiple Runs | Scopo Principale |
+|----------------|----------------|----------------|------------|------------|----------|---------------|------------------|
+| **`benchmark`** | 0.2 | 0.1 | Tutti | ❌ | ❌ | ❌ | Standard completo |
+| **`mini_benchmark`** | 0.25 | 0.1 | 15 | ❌ | ❌ | ❌ | Pipeline completa veloce |
+| **`test_benchmark`** | 0.25 | 0.1 | 30 | ❌ | ❌ | ❌ | Validazione sviluppo |
+| **`quick_start`** | 0.1 | 0.1 | 3 | ❌ | ❌ | ❌ | Primo utilizzo |
+| **`birds_only_benchmark`** | 0.50 | 0.05 | Tutti | ✅ | ❌ | ❌ | Solo specie (no no_birds) |
+| **`optimized_benchmark`** | 0.18 | 0.05 | Tutti | ❌ | ❌ | ❌ | Massima precisione |
+| **`adaptive_threshold_benchmark`** | 0.25+0.4 | 0.05 | Tutti | ❌ | ✅ | ❌ | Ridurre falsi positivi |
+| **`multiple_runs_benchmark`** | 0.25+0.4 | 0.1 | 200 | ❌ | ✅ | ✅ (5x) | Validazione statistica |
+| **`statistical_analysis`** | N/A | N/A | Tutti | ❌ | ❌ | ❌ | Solo analisi dataset |
+
+### 🚀 **Comandi di Avvio Rapido**
+
+```bash
+# Test velocissimo (3 file)
+./run_docker_benchmark.sh quick 0 quick_start
+
+# Test completo veloce (15 file) 
+./run_docker_benchmark.sh mini 0 mini_benchmark
+
+# Standard completo
+./run_docker_benchmark.sh standard 0 benchmark
+
+# Solo uccelli (mai no_birds) 🔥 NOVITÀ
+./run_docker_benchmark.sh birds_only 0 birds_only_benchmark
+
+# Soglie ottimizzate
+./run_docker_benchmark.sh optimized 0 optimized_benchmark
+
+# Validazione statistica
+./run_docker_benchmark.sh multi_runs 0 multiple_runs_benchmark
+```
+
+### 🎯 **Scegli la Configurazione Giusta**
+
+**🚀 Per iniziare velocemente:**
+- `quick_start` - Primo test (3 file, 30 secondi)
+- `mini_benchmark` - Pipeline completa veloce (15 file, 2 minuti)
+
+**🔬 Per test e sviluppo:**
+- `test_benchmark` - Validazione funzionalità (30 file)
+- `benchmark` - Standard di riferimento
+
+**🎯 Per analisi specializzate:**
+- `birds_only_benchmark` - **Confronto equo solo uccelli** (esclude no_birds)
+- `optimized_benchmark` - Configurazione ottimizzata per massima accuratezza
+- `adaptive_threshold_benchmark` - Riduce falsi positivi no_birds
+
+**📊 Per validazione scientifica:**
+- `multiple_runs_benchmark` - 5 run con confidence intervals
+- `statistical_analysis` - Sample size e power analysis
+
 ### 🔧 1. `benchmark.yaml` - Configurazione Base
 
 **Cosa fa:**
@@ -417,17 +474,31 @@ Il benchmark esegue automaticamente questi passi:
 
 ## 🆕 New Features & Improvements
 
-### 🎯 Birds-Only Mode
-Escludi la classe "no_birds" per confronto più equo sulle specie di uccelli:
+### 🎯 Birds-Only Mode + Force Bird Prediction
+Modalità completamente rinnovata che **forza entrambi i modelli a scegliere sempre una specie**:
 ```bash
-python run_benchmark.py --config-name=birds_only_benchmark
+./run_docker_benchmark.sh birds_only 0 birds_only_benchmark
+# 🔄 FORCE BIRD PREDICTION: Both models will never predict no_birds
 ```
+**Novità implementate:**
+- ✅ **Force bird prediction**: Mai più predizioni "no_birds" 
+- ✅ **Fair comparison**: Confronto equo solo su 8 specie
+- ✅ **Intelligent fallback**: Gestione errori senza no_birds
+- ✅ **Single threshold**: Sistema semplificato (0.50 BirdNET)
 
-### 🔧 Adaptive Thresholds
-Soglie separate per ridurre falsi positivi "no_birds":
+### 🔧 Simplified Threshold System
+**BREAKING CHANGE**: Rimosso il complesso sistema dual-threshold in favore di un approccio più semplice e affidabile:
 ```bash
-python run_benchmark.py --config-name=adaptive_threshold_benchmark
+# Prima (complesso): confidence_threshold + no_birds_threshold
+# Dopo (semplice): single confidence_threshold
+
+./run_docker_benchmark.sh standard 0 benchmark  # Single threshold 0.2
 ```
+**Miglioramenti:**
+- ✅ **Single threshold**: Un solo parametro da configurare
+- ✅ **Più prevedibile**: Comportamento deterministico
+- ✅ **Facile debug**: Meno complessità, più affidabilità
+- ✅ **Configurazioni aggiornate**: Tutti i YAML sistemati
 
 ### ⚡ Test Mode
 Validazione rapida delle funzionalità con files limitati:
@@ -436,6 +507,29 @@ python run_benchmark.py --config-name=test_benchmark
 # o con override:
 python run_benchmark.py test_mode=true debug.files_limit=20
 ```
+
+### 🔥 Force Bird Prediction (NOVITÀ)
+Modalità che **forza entrambi i modelli a non predire mai "no_birds"**. Invece di no_birds, scelgono sempre la specie con confidence più alta.
+
+**Quando è attivo:**
+- ✅ **Birds-only mode**: `birds_only_benchmark` automaticamente attiva force bird prediction
+- ✅ **Confronto equo**: Entrambi i modelli devono scegliere tra le 8 specie
+- ✅ **Mai no_birds**: Nessun modello può "scappare" verso no_birds
+- ✅ **Fallback intelligente**: In caso di errori, sceglie la prima specie target
+
+**Esempio pratico:**
+```bash
+# Prima: BirdNET poteva predire "no_birds" per uccelli difficili
+# Dopo: BirdNET DEVE scegliere la migliore tra le 8 specie
+
+./run_docker_benchmark.sh birds_only 0 birds_only_benchmark
+# Log: "🔄 FORCE BIRD PREDICTION: Both models will never predict no_birds"
+```
+
+**Implementazione tecnica:**
+- `force_bird_prediction=True` nei costruttori dei predittori
+- Logica modificata: `if confidence >= threshold: return best_species` 
+- Gestione errori: Fallback a prima specie invece di no_birds
 
 ### 🔄 Fair Preprocessing
 Entrambi i modelli (student e BirdNET) usano ora preprocessing identico:
@@ -707,9 +801,28 @@ comparison:
 
 ### Performance Tips
 
-- Usa `files_limit: 100` in fase di test
-- BirdNET è più lento, considera subset per test rapidi
+**🚀 Parametri di Debug Supportati:**
+```bash
+# Limitare numero di file totali
+./run_docker_benchmark.sh test 0 benchmark debug.files_limit=20
+
+# Limitare file per classe
+./run_docker_benchmark.sh test 0 benchmark debug.max_files_per_class=5
+
+# Combinare entrambi
+./run_docker_benchmark.sh test 0 benchmark debug.files_limit=50 debug.max_files_per_class=10
+```
+
+**🔧 Ottimizzazione Velocità:**
+- **Quick test**: `debug.files_limit=5` per test rapidissimi (30 secondi)
+- **Development**: `debug.files_limit=20` per sviluppo (2-3 minuti)
+- **Pre-production**: `debug.files_limit=100` per test approfonditi
+- **Production**: Nessun limite per benchmark completi
+
+**⚡ Caching e Prestazioni:**
 - I risultati vengono cachati per evitare ricalcoli
+- BirdNET è più lento: considera subset per iterazioni veloci
+- GPU accelera solo lo student model (BirdNET è CPU-bound)
 
 ## 📝 Log e Debug
 

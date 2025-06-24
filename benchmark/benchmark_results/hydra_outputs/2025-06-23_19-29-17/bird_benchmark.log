@@ -1,0 +1,170 @@
+[2025-06-23 19:29:19,201][__main__][INFO] - 📁 Timestamped benchmark directory: 2025-06-23_19-29-19
+[2025-06-23 19:29:19,202][__main__][INFO] -    Predictions: /workspace/benchmark/benchmark_results/2025-06-23_19-29-19/predictions
+[2025-06-23 19:29:19,202][__main__][INFO] -    Comparison: /workspace/benchmark/benchmark_results/2025-06-23_19-29-19/comparison
+[2025-06-23 19:29:19,202][__main__][INFO] - ============================================================
+[2025-06-23 19:29:19,202][__main__][INFO] - 🎯 ALIGNED BIRD CLASSIFICATION BENCHMARK
+[2025-06-23 19:29:19,202][__main__][INFO] - ============================================================
+[2025-06-23 19:29:19,202][__main__][INFO] - 🔧 FAIR COMPARISON MODE:
+[2025-06-23 19:29:19,202][__main__][INFO] -    • BirdNET: Uses 3s segments with student model preprocessing
+[2025-06-23 19:29:19,202][__main__][INFO] -    • Student: Uses same 3s segments and preprocessing
+[2025-06-23 19:29:19,202][__main__][INFO] -    • Both models see identical audio data
+[2025-06-23 19:29:19,202][__main__][INFO] - 🎯 BIRDS-ONLY MODE: Excluding no_birds class from evaluation
+[2025-06-23 19:29:19,202][__main__][INFO] - 🔄 FORCE BIRD PREDICTION: Both models will never predict no_birds
+[2025-06-23 19:29:19,202][__main__][INFO] - 🔧 SINGLE THRESHOLD: 0.5 (simplified approach)
+[2025-06-23 19:29:19,202][__main__][INFO] - ============================================================
+[2025-06-23 19:29:19,202][__main__][INFO] - Working directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-23_19-29-17
+[2025-06-23 19:29:19,202][__main__][INFO] - Hydra output directory: /workspace/benchmark/benchmark_results/hydra_outputs/2025-06-23_19-29-17
+[2025-06-23 19:29:19,202][__main__][INFO] - 
+========================================
+[2025-06-23 19:29:19,202][__main__][INFO] - 📁 STEP 1: Audio Discovery
+[2025-06-23 19:29:19,202][__main__][INFO] - ========================================
+[2025-06-23 19:29:19,202][__main__][INFO] - Scanning bird dataset: /workspace/bird_sound_dataset
+[2025-06-23 19:29:19,202][__main__][INFO] - Processing species: Poecile_montanus
+[2025-06-23 19:29:19,225][__main__][INFO] - Found 1248 files for Poecile_montanus
+[2025-06-23 19:29:19,225][__main__][INFO] - Processing species: Certhia_familiaris
+[2025-06-23 19:29:19,249][__main__][INFO] - Found 1325 files for Certhia_familiaris
+[2025-06-23 19:29:19,249][__main__][INFO] - Processing species: Apus_apus
+[2025-06-23 19:29:19,263][__main__][INFO] - Found 807 files for Apus_apus
+[2025-06-23 19:29:19,263][__main__][INFO] - Processing species: Bubo_bubo
+[2025-06-23 19:29:19,278][__main__][INFO] - Found 860 files for Bubo_bubo
+[2025-06-23 19:29:19,278][__main__][INFO] - Processing species: Periparus_ater
+[2025-06-23 19:29:19,325][__main__][INFO] - Found 2902 files for Periparus_ater
+[2025-06-23 19:29:19,325][__main__][INFO] - Processing species: Emberiza_cia
+[2025-06-23 19:29:19,332][__main__][INFO] - Found 403 files for Emberiza_cia
+[2025-06-23 19:29:19,332][__main__][INFO] - Processing species: Lophophanes_cristatus
+[2025-06-23 19:29:19,349][__main__][INFO] - Found 1045 files for Lophophanes_cristatus
+[2025-06-23 19:29:19,349][__main__][INFO] - Processing species: Certhia_brachydactyla
+[2025-06-23 19:29:19,372][__main__][INFO] - Found 1396 files for Certhia_brachydactyla
+[2025-06-23 19:29:19,372][__main__][INFO] - 🎯 BIRDS-ONLY MODE: Excluding no_birds samples from ground truth
+[2025-06-23 19:29:19,380][__main__][INFO] - Total audio files discovered: 9986
+[2025-06-23 19:29:19,381][__main__][INFO] - Class distribution:
+[2025-06-23 19:29:19,381][__main__][INFO] -   Periparus_ater: 2902 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Certhia_brachydactyla: 1396 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Certhia_familiaris: 1325 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Poecile_montanus: 1248 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Lophophanes_cristatus: 1045 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Bubo_bubo: 860 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Apus_apus: 807 files
+[2025-06-23 19:29:19,381][__main__][INFO] -   Emberiza_cia: 403 files
+[2025-06-23 19:29:19,417][__main__][INFO] - ✅ Ground truth saved to: /workspace/benchmark/benchmark_results/2025-06-23_19-29-19/predictions/ground_truth.csv
+[2025-06-23 19:29:19,417][__main__][INFO] - 
+========================================
+[2025-06-23 19:29:19,417][__main__][INFO] - 🤖 STEP 2: Student Model Predictions
+[2025-06-23 19:29:19,417][__main__][INFO] - ========================================
+[2025-06-23 19:29:19,417][__main__][INFO] - Starting student model predictions
+[2025-06-23 19:29:20,091][matplotlib.font_manager][INFO] - generated new fontManager
+[2025-06-23 19:29:20,470][benchmark.predict_student][INFO] - Environment CUDA_VISIBLE_DEVICES: ''
+[2025-06-23 19:29:20,471][benchmark.predict_student][INFO] - PyTorch CUDA available: True
+[2025-06-23 19:29:20,471][benchmark.predict_student][INFO] - PyTorch CUDA device count: 0
+[2025-06-23 19:29:20,471][benchmark.predict_student][INFO] - Using device: cuda
+[2025-06-23 19:29:20,489][benchmark.predict_student][INFO] - Loaded configuration from: /workspace/config/bird_classification.yaml
+[2025-06-23 19:29:20,640][benchmark.predict_student][INFO] - Loaded model from: /workspace/best_distillation_model.pt
+[2025-06-23 19:29:20,641][benchmark.predict_student][INFO] - Student model initialized with 9 classes
+[2025-06-23 19:29:20,641][benchmark.predict_student][INFO] - Classes: ['Bubo_bubo', 'Certhia_familiaris', 'Apus_apus', 'Certhia_brachydactyla', 'Emberiza_cia', 'Lophophanes_cristatus', 'Periparus_ater', 'Poecile_montanus', 'no_birds']
+[2025-06-23 19:29:20,642][benchmark.predict_student][INFO] - Confidence threshold: 0.05
+[2025-06-23 19:29:41,192][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC759943-Fyrremejse,-Kasted-mose,-17-8-2022.wav, using fallback preprocessing
+[2025-06-23 19:29:44,985][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC864150-PARMON130824.wav, using fallback preprocessing
+[2025-06-23 19:29:49,282][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/1761.mp3, using fallback preprocessing
+[2025-06-23 19:29:59,877][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406068-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1220pm.mp3, using fallback preprocessing
+[2025-06-23 19:30:04,095][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540988-WillowTitCall Bagmere 1327pm 11022019.mp3, using fallback preprocessing
+[2025-06-23 19:30:07,805][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406069-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1400pm.mp3, using fallback preprocessing
+[2025-06-23 19:30:08,754][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409237-Willow Tit Calls Bagmere Nature Reserve 18 March 2018 at 0826am.mp3, using fallback preprocessing
+[2025-06-23 19:30:14,916][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC709923-220306_0218 Weidenmeise Beerbusch.mp3, using fallback preprocessing
+[2025-06-23 19:30:18,410][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC529772-Willow Tit call very good 2020 02 11 Combe Wood_1822_short.mp3, using fallback preprocessing
+[2025-06-23 19:30:24,290][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC677476-20210928 1455 mees onbekend kleine wielen.mp3, using fallback preprocessing
+[2025-06-23 19:30:30,611][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC709922-220305_0216 Weidenmeise Beerbusch.mp3, using fallback preprocessing
+[2025-06-23 19:30:39,535][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC826687-Mésange-Boréale-Hameau-du-Villaron-Bessans.mp3, using fallback preprocessing
+[2025-06-23 19:30:45,952][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC858258-MVI_7260.mp3, using fallback preprocessing
+[2025-06-23 19:30:46,020][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC456181-B17h05m33s19may2018_plus_37m59s_Presumed_OBP_call_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-23 19:30:50,559][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540990-WillowTitCall Bagmere 1338pm 11022019.mp3, using fallback preprocessing
+[2025-06-23 19:30:51,971][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC551311-7.mp3, using fallback preprocessing
+[2025-06-23 19:30:53,754][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC820983-DM672185-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-23 19:31:04,607][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405837-Willow Tit Call Bagmere Nature Reserve 27 February 2018 at 1146am.mp3, using fallback preprocessing
+[2025-06-23 19:31:05,148][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC126801-8002 8.03.2013, Заволжье, 10-00, Poecile montanus в.mp3, using fallback preprocessing
+[2025-06-23 19:31:06,971][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC404523-Willow Tit Call Bagmere Reserve Cheshire UK 15 Feb 2018.mp3, using fallback preprocessing
+[2025-06-23 19:31:09,712][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC406067-Willow Tit Call Bagmere Nature Reserve 28 February 2018 at 1221pm.mp3, using fallback preprocessing
+[2025-06-23 19:31:12,656][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540987-WillowTitCall Bagmere 1326pm 11022019.mp3, using fallback preprocessing
+[2025-06-23 19:31:12,915][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC327315-1359_319-02hipan mp3.mp3, using fallback preprocessing
+[2025-06-23 19:31:17,629][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC305538-x5090_059-04hiequ mp3.mp3, using fallback preprocessing
+[2025-06-23 19:31:51,463][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405835-Willow Tit Call Bagmere Nature Reserve 26 February 2018 at 0854am.mp3, using fallback preprocessing
+[2025-06-23 19:32:12,038][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC487533-xc-wa006478-000053-Parus-montanus.mp3, using fallback preprocessing
+[2025-06-23 19:32:15,031][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409119-Willow Tit Contact Call Bagmere Nature Reserve 16 March 2018 at 1008am.mp3, using fallback preprocessing
+[2025-06-23 19:32:20,972][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC313250-5124_053-04audj mp3.mp3, using fallback preprocessing
+[2025-06-23 19:32:27,166][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405649-Willow Tit Call Bagmere Reserve Cheshire UK 22 Feb 2018 at 1342pm.mp3, using fallback preprocessing
+[2025-06-23 19:32:40,790][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC719730-Poecile_montanus.mp3, using fallback preprocessing
+[2025-06-23 19:32:43,264][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC540995-WillowTitCall Bagmere 1348pm 11022019.mp3, using fallback preprocessing
+[2025-06-23 19:32:43,299][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC409236-Willow Tit Calls Bagmere Nature Reserve 18 March 2018 at 0825am.mp3, using fallback preprocessing
+[2025-06-23 19:33:01,531][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC438295-B10h09m21s15may2018_plus_37m51s_WillowTit_song_VolUpHighPass.mp3, using fallback preprocessing
+[2025-06-23 19:33:14,771][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Poecile_montanus/XC405762-Willow Tit Call Bagmere Reserve Cheshire UK 24 Feb 2018 at 1358pm.mp3, using fallback preprocessing
+[2025-06-23 19:33:28,016][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC893592-Gdesbois_19052023.wav, using fallback preprocessing
+[2025-06-23 19:33:30,207][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC788091-24-03-23-(grimpereau-des-bois,-chant,-Wanne).wav, using fallback preprocessing
+[2025-06-23 19:33:35,151][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC906149-raspinell-pirinenc-cant-(19.32)-xeno-cant.wav, using fallback preprocessing
+[2025-06-23 19:33:56,492][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC747092-220809_001_090803_Taigaboomkruiper.mp3, using fallback preprocessing
+[2025-06-23 19:33:57,960][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC786266-DM671512-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-23 19:34:08,968][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC129288-8031_11.04.2013, Н. Азяпово, 9-25, королёк С.mp3, using fallback preprocessing
+[2025-06-23 19:34:14,522][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC628993-Treecreeper 14 March 2021 1143 Lea Cottage.mp3, using fallback preprocessing
+[2025-06-23 19:34:15,686][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC828620-DM672234-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-23 19:34:33,511][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/Rampichino alpestre S.Anna 6 gen 2012.mp3, using fallback preprocessing
+[2025-06-23 19:34:36,227][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC703964-20220212_0918_bois.mp3, using fallback preprocessing
+[2025-06-23 19:34:39,999][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC901109-Certhia-familiaris-caucasica-240420_004,-A-call.mp3, using fallback preprocessing
+[2025-06-23 19:34:54,575][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC773189-180071.mp3, using fallback preprocessing
+[2025-06-23 19:35:25,084][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC405755-Eurasian Treecreeper Calls Bagmere Nature Reserve 24 Feb 2018 at 1154am.mp3, using fallback preprocessing
+[2025-06-23 19:35:40,392][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/1454.mp3, using fallback preprocessing
+[2025-06-23 19:35:44,342][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/3121.mp3, using fallback preprocessing
+[2025-06-23 19:35:53,558][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC420325-Certhia familiaris_song_2018.05.11_15.50_01.mp3, using fallback preprocessing
+[2025-06-23 19:35:56,819][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC745314-luch 2 2.mp3, using fallback preprocessing
+[2025-06-23 19:35:58,499][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC598433-XC-biOsmid3C001-04equII (8).mp3, using fallback preprocessing
+[2025-06-23 19:35:59,658][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC901108-Certhia-familiaris-caucasica-240420_002,C1call.mp3, using fallback preprocessing
+[2025-06-23 19:36:23,716][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC536596-Ag. euroasi.mp3, using fallback preprocessing
+[2025-06-23 19:36:24,088][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC373620-3436-01_000-05ku mp3.mp3, using fallback preprocessing
+[2025-06-23 19:36:25,242][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/1797.mp3, using fallback preprocessing
+[2025-06-23 19:36:26,149][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC575844-m 12 5.mp3, using fallback preprocessing
+[2025-06-23 19:36:37,809][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC311607-LS11CerthiaFamiliaris.mp3, using fallback preprocessing
+[2025-06-23 19:36:43,943][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC937640-Certhia-familiaris-240918_001,-Кашхатау,-опушка,-5-часов-утра,росы-нет,1call.mp3, using fallback preprocessing
+[2025-06-23 19:36:48,223][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC683148-XC) 2021-10-20 Gävner Höhe (MONO-141) 11.30h indet hoch 40x hp 1000-6db.mp3, using fallback preprocessing
+[2025-06-23 19:37:09,345][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Certhia_familiaris/XC405760-Eurasian Treecreeper Unusual Calls Bagmere Nature Reserve 24 Feb 2018 at 1446pm.mp3, using fallback preprocessing
+[2025-06-23 19:37:17,637][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC942752-2024-06-28_11_10[1].wav, using fallback preprocessing
+[2025-06-23 19:37:18,004][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC792385-swift.wav, using fallback preprocessing
+[2025-06-23 19:37:20,114][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC925446-TORNS2407302135.wav, using fallback preprocessing
+[2025-06-23 19:37:20,138][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC863320-13-07-23-(martinet-noir,-mas-d-Agon).wav, using fallback preprocessing
+[2025-06-23 19:37:24,610][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC845752-13-07-23-(martinet-noir,-mas-d-Agon-2).wav, using fallback preprocessing
+[2025-06-23 19:37:26,903][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC410765-DM670691_Ms_juv_aus-ornitho.mp3, using fallback preprocessing
+[2025-06-23 19:37:39,449][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC740585-Default_20220730-212303-0.mp3, using fallback preprocessing
+[2025-06-23 19:37:40,000][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC774661-common-swift-(2).mp3, using fallback preprocessing
+[2025-06-23 19:37:40,408][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC647122-vencejos (online-audio-converter.com).mp3, using fallback preprocessing
+[2025-06-23 19:37:40,994][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC730139-220607-0608_Tornseglare.mp3, using fallback preprocessing
+[2025-06-23 19:37:44,018][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC723217-220423_001_240619_Gierzwaluw.mp3, using fallback preprocessing
+[2025-06-23 19:37:45,760][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573649-apus 5 3.mp3, using fallback preprocessing
+[2025-06-23 19:37:53,987][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC580072-swift 30-07-20.mp3, using fallback preprocessing
+[2025-06-23 19:37:54,148][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC579677-Swift and Goldcrest.mp3, using fallback preprocessing
+[2025-06-23 19:38:04,129][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC572782-falciot 29 1.mp3, using fallback preprocessing
+[2025-06-23 19:38:14,450][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC553096-20200502Gierzwaluwbijnacht2Versterkt.mp3, using fallback preprocessing
+[2025-06-23 19:38:15,108][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC820733-DM672157-(mp3cut.net).mp3, using fallback preprocessing
+[2025-06-23 19:38:30,910][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573645-apus 5 1.mp3, using fallback preprocessing
+[2025-06-23 19:38:31,445][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC647394-20210511_0425 NoId XC.mp3, using fallback preprocessing
+[2025-06-23 19:38:31,478][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC414319-Vier-Abwehr-Duette.mp3, using fallback preprocessing
+[2025-06-23 19:38:37,252][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC649741-210513_001_130925_Gierzwaluw.mp3, using fallback preprocessing
+[2025-06-23 19:38:40,645][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC579356-24th July Swift.mp3, using fallback preprocessing
+[2025-06-23 19:38:41,125][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC582111-swift 11-08-20.mp3, using fallback preprocessing
+[2025-06-23 19:38:46,154][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC652985-2021-05-29 Common Swift 2123.mp3, using fallback preprocessing
+[2025-06-23 19:38:46,339][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573508-20200705_0415 jerzyk ok.mp3, using fallback preprocessing
+[2025-06-23 19:38:48,700][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC550691-20200426_0415_unid.mp3, using fallback preprocessing
+[2025-06-23 19:38:48,774][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC573646-apus 5 2.mp3, using fallback preprocessing
+[2025-06-23 19:39:10,450][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC383114-170816_02_Common Swift nestling_Norwich_15 August 2017.mp3, using fallback preprocessing
+[2025-06-23 19:39:11,149][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC649748-210513_001_131528_Gierzwaluw.mp3, using fallback preprocessing
+[2025-06-23 19:39:13,785][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC290017-CommonSwift_GwassiHills_29Oct2015_1300.mp3, using fallback preprocessing
+[2025-06-23 19:39:13,865][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC528511-Common Swift Driel 180504 0140u.mp3, using fallback preprocessing
+[2025-06-23 19:39:22,411][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC647305-aa.mp3, using fallback preprocessing
+[2025-06-23 19:39:24,544][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC576490-apus_apus_bialystok_podlaskie_2020.07.17_0630.mp3, using fallback preprocessing
+[2025-06-23 19:39:24,844][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC910923-Swift-06-06-24.mp3, using fallback preprocessing
+[2025-06-23 19:39:41,444][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC447351-Swift good 2014 07 13 Grays_0062_stereo.mp3, using fallback preprocessing
+[2025-06-23 19:39:44,501][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC559198-falciot 17 2.mp3, using fallback preprocessing
+[2025-06-23 19:39:44,701][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC567634-falciot 12 2.mp3, using fallback preprocessing
+[2025-06-23 19:39:47,489][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Apus_apus/XC663393-jerzyki Zakole.mp3, using fallback preprocessing
+[2025-06-23 19:39:55,260][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC931418-Uhu_2024-03-19_04-47_Backnang-Steinbach_2_Audiomoth.wav, using fallback preprocessing
+[2025-06-23 19:39:56,814][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC958942-Uhu_2023-10-29_03-55_Aichtal_Audiomoth.wav, using fallback preprocessing
+[2025-06-23 19:40:00,432][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC943047-202408122322-Hou-ho.wav, using fallback preprocessing
+[2025-06-23 19:40:00,944][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC902432-berguv.wav, using fallback preprocessing
+[2025-06-23 19:40:24,634][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC653490-BU210601.mp3, using fallback preprocessing
+[2025-06-23 19:40:39,797][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC381210-.mp3, using fallback preprocessing
+[2025-06-23 19:40:50,577][benchmark.predict_student][WARNING] - No calls detected in /workspace/benchmark/../bird_sound_dataset/Bubo_bubo/XC531659-Fragment equalitzat i amplificat 200301_0678 Duc, reclam (Freixenet de Segarra).mp3, using fallback preprocessing

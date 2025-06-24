@@ -1,0 +1,2 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Emberiza_cia/XC814606-526096131.wav,Emberiza_cia,Certhia_familiaris,0.3299697935581207,Emberiza_cia,0.052315495908260345,False,True,birdnet_only_correct

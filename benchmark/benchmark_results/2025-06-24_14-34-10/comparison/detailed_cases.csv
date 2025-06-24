@@ -1,0 +1,14 @@
+audio_path,true_label,student_prediction,student_confidence,birdnet_prediction,birdnet_confidence,student_correct,birdnet_correct,category
+../bird_sound_dataset/Apus_apus/XC372845-gierzwaluw_zwow1.mp3,Apus_apus,Certhia_brachydactyla,0.5514433979988098,Apus_apus,0.9974678754806519,False,True,birdnet_only_correct
+../bird_sound_dataset/Bubo_bubo/XC382620-Cloqueo buho real 2.mp3,Bubo_bubo,Bubo_bubo,0.4564484655857086,Certhia_brachydactyla,0.001,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC125367-Eurasian Eagle Owl_20130303_192622.mp3,Bubo_bubo,Bubo_bubo,0.3197203576564789,Certhia_familiaris,0.001,True,False,student_only_correct
+../bird_sound_dataset/Bubo_bubo/XC788604-Berguv-2023-02-26_red.mp3,Bubo_bubo,Bubo_bubo,0.6695474982261658,Emberiza_cia,0.001,True,False,student_only_correct
+../bird_sound_dataset/Certhia_familiaris/XC194178-Certhia_familiaris_2014_09_04_01.mp3,Certhia_familiaris,Periparus_ater,0.22758449614048004,Lophophanes_cristatus,0.001,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC781205-230217_2411-mp3-noise-red.mp3,Certhia_familiaris,Poecile_montanus,0.7037818431854248,Lophophanes_cristatus,0.04953611269593239,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/XC890852-旋木雀call-辽河公园.mp3,Certhia_familiaris,Bubo_bubo,0.6411404013633728,Poecile_montanus,0.001,False,False,both_incorrect
+../bird_sound_dataset/Certhia_familiaris/Rampichino alpestre Marmora 12 feb 2011.mp3,Certhia_familiaris,Certhia_brachydactyla,0.25972920656204224,Certhia_familiaris,0.9948762059211731,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC371752-Poecile montanus songarus Ili-Alatau NP Kazakhstan 17 May 2017 06.07 hr.mp3,Poecile_montanus,Certhia_familiaris,0.7757843136787415,Periparus_ater,0.001,False,False,both_incorrect
+"../bird_sound_dataset/Poecile_montanus/XC803094-P.-montanus-21.05.2023,-оз.-Яранкуб,-ночь-утро,B.mp3",Poecile_montanus,Periparus_ater,0.5776389837265015,Emberiza_cia,0.001,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC676233-Talltita_19.mp3,Poecile_montanus,Periparus_ater,0.31974872946739197,Poecile_montanus,0.05992550402879715,False,True,birdnet_only_correct
+../bird_sound_dataset/Poecile_montanus/XC925707-TALLT2408040653.wav,Poecile_montanus,Periparus_ater,0.5721033811569214,Bubo_bubo,0.001,False,False,both_incorrect
+../bird_sound_dataset/Poecile_montanus/XC281669-417 7 Matkop 7 Roep.mp3,Poecile_montanus,Periparus_ater,0.21944564580917358,Poecile_montanus,0.29449722170829773,False,True,birdnet_only_correct
