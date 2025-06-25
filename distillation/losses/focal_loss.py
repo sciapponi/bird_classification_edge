@@ -180,6 +180,16 @@ class AdaptiveFocalDistillationLoss(FocalDistillationLoss):
             max_class = hard_labels.max().item() + 1
             self.class_counts = torch.zeros(max_class, device=hard_labels.device)
         
+        # Check if we need to expand class_counts for new classes
+        max_label = hard_labels.max().item()
+        if max_label >= self.class_counts.size(0):
+            # Expand the tensor to accommodate new classes
+            old_size = self.class_counts.size(0)
+            new_size = max_label + 1
+            expanded_counts = torch.zeros(new_size, device=hard_labels.device)
+            expanded_counts[:old_size] = self.class_counts
+            self.class_counts = expanded_counts
+        
         # Update counts
         for label in hard_labels:
             if label >= 0:  # Ignore negative labels

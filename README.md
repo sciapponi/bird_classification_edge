@@ -742,7 +742,7 @@ docker build -f Dockerfile.benchmark -t bird_classification_benchmark .
 ### 3. Docker Workflow Examples
 
 #### Complete Knowledge Distillation Pipeline
-    ```bash
+```
 # Step 1: Extract soft labels from BirdNET
 ./run_docker_soft_labels.sh extraction_gpu0 GPU_ID=0
 # Results saved to soft_labels_complete/

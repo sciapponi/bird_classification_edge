@@ -13,6 +13,11 @@ loss:
   gamma: 2.0                    # Starting gamma (will be adapted)
   class_weights: "auto"         # Automatically compute and adapt
   alpha_scaling: 2.0            # Higher scaling for very imbalanced data
+  
+  # FORCE FULL DATASET CALCULATION FOR PRODUCTION
+  use_fast_sampling: false      # Use ALL samples for accurate weights
+  weight_calculation_samples: null  # Use all available samples
+  cache_max_age_hours: 24       # Cache for 1 day
 
 # Adaptive distillation parameters
 distillation:
