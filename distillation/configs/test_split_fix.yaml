@@ -1,6 +1,13 @@
 # Test configuration for verifying no_birds split fix
 experiment_name: "test_no_birds_split_fix"
 
+# Loss function configuration - testing with focal loss to handle imbalance
+loss:
+  type: "focal_distillation"    # Use focal loss to handle no_birds class imbalance
+  gamma: 2.0                    # Standard gamma for focal loss
+  class_weights: "auto"         # Automatically compute weights from data
+  alpha_scaling: 1.0            # Standard scaling
+
 distillation:
   alpha: 0.4
   temperature: 3.0

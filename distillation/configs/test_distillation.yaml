@@ -7,6 +7,13 @@ defaults:
 # Override experiment name
 experiment_name: "distillation_test"
 
+# Loss function configuration - testing standard distillation
+loss:
+  type: "distillation"          # Test with standard distillation
+  gamma: 2.0                    # Not used for distillation type
+  class_weights: null           # Equal weights for testing
+  alpha_scaling: 1.0
+
 # Test with ALL 5 CLASSES (4 birds + non-bird)
 dataset:
   allowed_bird_classes: null    # Use all available classes

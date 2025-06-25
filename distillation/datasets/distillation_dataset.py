@@ -258,14 +258,14 @@ def create_distillation_dataloader(config, soft_labels_path, split='train'):
         num_no_bird_samples=config.get('num_no_bird_samples', 100)
     )
 
-    # Create DataLoader with more workers to speed up data loading
+    # Create DataLoader - use single thread to avoid segfaults with corrupted audio files
     dataloader = DataLoader(
         dataset, 
-        batch_size=config.get('batch_size', 16), # Get batch_size from dataset config section
+        batch_size=config.get('batch_size', 16) if hasattr(config, 'batch_size') else config.get('training', {}).get('batch_size', 16),
         shuffle=(split == 'train'),
-        num_workers=8,  # Increased from 4 to 8 for better I/O parallelism
-        pin_memory=True, # Essential for fast CPU-to-GPU transfer
-        persistent_workers=True  # Keep workers alive between epochs
+        num_workers=0,  # Disable multiprocessing to prevent segfaults
+        pin_memory=False, # Disable for single worker
+        persistent_workers=False  # Not needed for single worker
     )
     
     return dataloader, dataset

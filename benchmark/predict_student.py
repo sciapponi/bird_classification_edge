@@ -324,7 +324,7 @@ class StudentModelPredictor:
                         predicted_class = self.class_names[predicted_idx]
                 elif confidence >= self.confidence_threshold:
                     # Standard threshold logic
-                    predicted_class = self.class_names[predicted_idx]
+                predicted_class = self.class_names[predicted_idx]
                 else:
                     # Below threshold - classify as no_birds
                     predicted_class = "no_birds"

@@ -23,6 +23,10 @@ import json
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from distillation.losses.distillation_loss import DistillationLoss, AdaptiveDistillationLoss
+from distillation.losses.focal_loss import (
+    FocalLoss, FocalDistillationLoss, AdaptiveFocalDistillationLoss,
+    create_focal_loss_with_class_weights
+)
 from distillation.datasets.distillation_dataset import create_distillation_dataloader
 from models import Improved_Phi_GRU_ATT
 # from utils.metrics import calculate_metrics, save_confusion_matrix
@@ -217,14 +221,29 @@ class DistillationTrainer:
             logger.info(f"Scheduler: {type(self.scheduler).__name__}")
     
     def setup_criterion(self):
-        """Setup distillation loss function"""
-        logger.info("Setting up distillation loss...")
+        """Setup loss function based on configuration"""
+        logger.info("Setting up loss function...")
         
-        # Get distillation parameters from config
+        # Get loss configuration
+        loss_config = self.config.get('loss', {})
+        loss_type = loss_config.get('type', 'distillation')  # Default to distillation
+        
+        # Common parameters
         alpha = self.config.distillation.get('alpha', 0.5)
         temperature = self.config.distillation.get('temperature', 4.0)
         adaptive = self.config.distillation.get('adaptive', False)
         
+        # Loss-specific parameters
+        gamma = loss_config.get('gamma', 2.0)  # For focal loss
+        class_weights = loss_config.get('class_weights', None)  # Per-class weights
+        
+        logger.info(f"Loss type: {loss_type}")
+        logger.info(f"Alpha (soft weight): {alpha}")
+        logger.info(f"Temperature: {temperature}")
+        logger.info(f"Adaptive: {adaptive}")
+        
+        if loss_type == 'distillation':
+            # Standard knowledge distillation
         if adaptive:
             self.criterion = AdaptiveDistillationLoss(
                 alpha=alpha,
@@ -236,9 +255,155 @@ class DistillationTrainer:
                 alpha=alpha,
                 temperature=temperature
             )
+            logger.info("Using standard DistillationLoss")
+            
+        elif loss_type == 'focal':
+            # Pure focal loss (no distillation)
+            logger.info(f"Gamma (focal): {gamma}")
+            
+            if class_weights == 'auto':
+                # Automatically compute class weights from training data
+                logger.info("Computing automatic class weights...")
+                # We'll compute these after data loading
+                self.criterion = None  # Will be set after data statistics
+                self._setup_focal_with_auto_weights = True
+            else:
+                self.criterion = FocalLoss(
+                    alpha=class_weights if class_weights is not None else 1.0,
+                    gamma=gamma
+                )
+                self._setup_focal_with_auto_weights = False
+            logger.info("Using FocalLoss")
+            
+        elif loss_type == 'focal_distillation':
+            # Focal loss + knowledge distillation
+            logger.info(f"Gamma (focal): {gamma}")
+            
+            if class_weights == 'auto':
+                # Automatically compute class weights from training data
+                logger.info("Computing automatic class weights for focal_distillation...")
+                # We'll compute these after data loading
+                self.criterion = None  # Will be set after data statistics
+                self._setup_focal_distillation_with_auto_weights = True
+                self._focal_distillation_params = {
+                    'alpha': alpha,
+                    'gamma': gamma, 
+                    'temperature': temperature,
+                    'adaptive': adaptive,
+                    'adaptation_rate': loss_config.get('adaptation_rate', 0.1)
+                }
+            else:
+                if adaptive:
+                    self.criterion = AdaptiveFocalDistillationLoss(
+                        alpha=alpha,
+                        gamma=gamma,
+                        temperature=temperature,
+                        class_weights=class_weights,
+                        adaptation_rate=loss_config.get('adaptation_rate', 0.1)
+                    )
+                    logger.info("Using AdaptiveFocalDistillationLoss")
+                else:
+                    self.criterion = FocalDistillationLoss(
+                        alpha=alpha,
+                        gamma=gamma,
+                        temperature=temperature,
+                        class_weights=class_weights
+                    )
+                    logger.info("Using FocalDistillationLoss")
+                self._setup_focal_distillation_with_auto_weights = False
+                
+        else:
+            raise ValueError(f"Unknown loss type: {loss_type}. "
+                           f"Supported: 'distillation', 'focal', 'focal_distillation'")
         
-        logger.info(f"Using {'Adaptive' if adaptive else 'Standard'} DistillationLoss")
-        logger.info(f"Alpha: {alpha}, Temperature: {temperature}")
+        # Store loss type for later reference
+        self.loss_type = loss_type
+    
+    def _compute_automatic_class_weights(self, train_dataset):
+        """Compute class weights automatically from training dataset"""
+        logger.info("Computing automatic class weights from training data...")
+        
+        # Get class distribution from dataset with progress bar
+        class_counts = {}
+        dataset_size = len(train_dataset)
+        
+        logger.info(f"Scanning {dataset_size} samples to compute class distribution...")
+        pbar = tqdm(range(dataset_size), desc="Computing class weights", unit="samples")
+        
+        for i in pbar:
+            try:
+                _, hard_label, _ = train_dataset[i]
+                if isinstance(hard_label, torch.Tensor):
+                    label = hard_label.item()
+                else:
+                    label = hard_label
+                
+                class_counts[label] = class_counts.get(label, 0) + 1
+                
+                # Update progress bar every 100 samples
+                if i % 100 == 0:
+                    pbar.set_postfix(classes_found=len(class_counts), current_sample=i+1)
+            except Exception as e:
+                # Handle corrupted files gracefully
+                continue
+        
+        # Convert to ordered list
+        max_class = max(class_counts.keys())
+        class_counts_list = [class_counts.get(i, 0) for i in range(max_class + 1)]
+        
+        logger.info(f"Class distribution: {class_counts_list}")
+        
+        # Compute class weights using inverse frequency
+        total_samples = sum(class_counts_list)
+        num_classes = len(class_counts_list)
+        
+        # Avoid division by zero
+        class_weights = []
+        for count in class_counts_list:
+            if count > 0:
+                weight = total_samples / (num_classes * count)
+            else:
+                weight = 1.0  # Default weight for missing classes
+            class_weights.append(weight)
+        
+        # Apply scaling
+        loss_config = self.config.get('loss', {})
+        alpha_scaling = loss_config.get('alpha_scaling', 1.0)
+        class_weights = [w * alpha_scaling for w in class_weights]
+        
+        logger.info(f"Computed class weights: {class_weights}")
+        
+        # Create appropriate loss function
+        if hasattr(self, '_setup_focal_with_auto_weights') and self._setup_focal_with_auto_weights:
+            # Pure focal loss
+            gamma = loss_config.get('gamma', 2.0)
+            self.criterion = FocalLoss(
+                alpha=class_weights,
+                gamma=gamma
+            )
+            logger.info("Automatic class weights applied to FocalLoss")
+            
+        elif hasattr(self, '_setup_focal_distillation_with_auto_weights') and self._setup_focal_distillation_with_auto_weights:
+            # Focal distillation loss
+            params = self._focal_distillation_params
+            
+            if params['adaptive']:
+                self.criterion = AdaptiveFocalDistillationLoss(
+                    alpha=params['alpha'],
+                    gamma=params['gamma'],
+                    temperature=params['temperature'],
+                    class_weights=class_weights,
+                    adaptation_rate=params['adaptation_rate']
+                )
+                logger.info("Automatic class weights applied to AdaptiveFocalDistillationLoss")
+            else:
+                self.criterion = FocalDistillationLoss(
+                    alpha=params['alpha'],
+                    gamma=params['gamma'],
+                    temperature=params['temperature'],
+                    class_weights=class_weights
+                )
+                logger.info("Automatic class weights applied to FocalDistillationLoss")
     
     def save_best_model(self):
         """Saves the best model based on validation loss."""
@@ -255,8 +420,12 @@ class DistillationTrainer:
         correct = 0
         total = 0
         
-        pbar = tqdm(self.train_loader, desc=f"Epoch {self.epoch} [Train]", unit="batch")
+        pbar = tqdm(self.train_loader, desc=f"Epoch {self.epoch} [Train]", unit="batch", disable=False)
+        batch_count = 0
+        total_batches = len(self.train_loader)
+        
         for audio, hard_labels, soft_labels in pbar:
+            batch_count += 1
             # Move to device
             audio = audio.to(self.device)
             hard_labels = hard_labels.to(self.device)
@@ -266,7 +435,14 @@ class DistillationTrainer:
             self.optimizer.zero_grad()
             logits = self.model(audio)
             
-            # Compute distillation loss
+            # Compute loss based on loss type
+            if hasattr(self, 'loss_type') and self.loss_type == 'focal':
+                # Pure focal loss (no distillation)
+                loss = self.criterion(logits, hard_labels)
+                hard_loss = loss  # For focal loss, the returned value is the hard loss
+                soft_loss = torch.tensor(0.0, device=self.device)  # No soft loss
+            else:
+                # Distillation-based losses (returns tuple)
             loss, hard_loss, soft_loss = self.criterion(logits, hard_labels, soft_labels)
             
             # Backward pass
@@ -284,12 +460,26 @@ class DistillationTrainer:
             correct += predicted.eq(hard_labels).sum().item()
             
             # Set postfix for tqdm progress bar
-            pbar.set_postfix(
-                loss=loss.item(), 
-                hard_loss=hard_loss.item(), 
-                soft_loss=soft_loss.item(),
-                acc=f"{(100. * correct / total):.2f}%"
+            current_acc = (100. * correct / total)
+            if hasattr(self, 'loss_type') and self.loss_type == 'focal':
+                pbar.set_postfix(
+                    batch=f"{batch_count}/{total_batches}",
+                    loss=f"{loss.item():.4f}", 
+                    focal_loss=f"{hard_loss.item():.4f}",
+                    acc=f"{current_acc:.2f}%"
                 )
+            else:
+            pbar.set_postfix(
+                    batch=f"{batch_count}/{total_batches}",
+                    loss=f"{loss.item():.4f}", 
+                    hard_loss=f"{hard_loss.item():.4f}", 
+                    soft_loss=f"{soft_loss.item():.4f}",
+                    acc=f"{current_acc:.2f}%"
+                )
+            
+            # Log progress every 10 batches
+            if batch_count % 10 == 0:
+                logger.info(f"Epoch {self.epoch} - Batch {batch_count}/{total_batches} - Loss: {loss.item():.4f} - Acc: {current_acc:.2f}%")
         
         avg_loss = total_loss / len(self.train_loader)
         avg_hard_loss = total_hard_loss / len(self.train_loader)
@@ -312,9 +502,13 @@ class DistillationTrainer:
         correct = 0
         total = 0
         
-        pbar = tqdm(self.val_loader, desc=f"Epoch {self.epoch} [Val]", unit="batch")
+        pbar = tqdm(self.val_loader, desc=f"Epoch {self.epoch} [Val]", unit="batch", disable=False)
+        batch_count = 0
+        total_batches = len(self.val_loader)
+        
         with torch.no_grad():
             for audio, hard_labels, soft_labels in pbar:
+                batch_count += 1
                 # Move to device
                 audio = audio.to(self.device)
                 hard_labels = hard_labels.to(self.device)
@@ -323,8 +517,13 @@ class DistillationTrainer:
                 # Forward pass
                 logits = self.model(audio)
                 
-                # Compute distillation loss (only hard loss matters for val accuracy)
-                loss, _, _ = self.criterion(logits, hard_labels, soft_labels)
+                # Compute loss based on loss type
+                if hasattr(self, 'loss_type') and self.loss_type == 'focal':
+                    # Pure focal loss (no distillation)
+                    loss = self.criterion(logits, hard_labels)
+                else:
+                    # Distillation-based losses (returns tuple)
+                    loss, _, _ = self.criterion(logits, hard_labels, soft_labels)
                 
                 # Statistics
                 total_loss += loss.item()
@@ -334,9 +533,11 @@ class DistillationTrainer:
                 total += hard_labels.size(0)
                 correct += predicted.eq(hard_labels).sum().item()
         
+                current_acc = (100. * correct / total)
                 pbar.set_postfix(
-                    loss=loss.item(), 
-                    acc=f"{(100. * correct / total):.2f}%"
+                    batch=f"{batch_count}/{total_batches}",
+                    loss=f"{loss.item():.4f}", 
+                    acc=f"{current_acc:.2f}%"
                 )
         
         # Calculate average loss and accuracy (convert to percentage like train_acc)
@@ -358,6 +559,12 @@ class DistillationTrainer:
         self.setup_optimizer()
         self.setup_criterion()
         
+        # Handle deferred focal loss setup with automatic class weights
+        if hasattr(self, '_setup_focal_with_auto_weights') and self._setup_focal_with_auto_weights:
+            self._compute_automatic_class_weights(train_dataset)
+        elif hasattr(self, '_setup_focal_distillation_with_auto_weights') and self._setup_focal_distillation_with_auto_weights:
+            self._compute_automatic_class_weights(train_dataset)
+        
         # Early stopping
         early_stopper = EarlyStopping(
             patience=self.config.training.get('patience', 10),
@@ -374,6 +581,14 @@ class DistillationTrainer:
             
             # Train and validate
             self.train_epoch()
+            
+            # Optional pause between training and validation to reduce CPU stress
+            validation_pause = self.config.training.get('validation_pause', 0)
+            if validation_pause > 0:
+                logger.info(f"Pausing {validation_pause} seconds between training and validation to reduce CPU load...")
+                import time
+                time.sleep(validation_pause)
+            
             val_loss, val_acc = self.validate_epoch()
             
             # Track filter parameters if using combined_log_linear

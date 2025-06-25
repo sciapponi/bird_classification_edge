@@ -106,10 +106,10 @@ bird_classification_edge/
 │   ├── distillation/
 │   │   ├── scripts/                 # Distillation execution scripts
 │   │   ├── datasets/                # Soft label dataset loaders
-│   │   ├── losses/                  # Distillation loss functions
-│   │   └── configs/                 # Distillation configurations
+│   │   ├── losses/                  # Advanced loss functions (focal, distillation)
+│   │   └── configs/                 # 8 comprehensive training configurations
 │   ├── extract_soft_labels.py       # Extract BirdNET soft labels
-│   └── train_distillation.py        # Train with knowledge distillation
+│   └── train_distillation.py        # Train with knowledge distillation & focal loss
 │
 ├── Benchmarking
 │   ├── benchmark/
@@ -199,6 +199,28 @@ The student model learns from two sources:
 
 This is controlled by: `L_total = (1-α) × L_hard + α × L_soft`
 
+### Advanced Loss Functions for Class Imbalance
+
+The system now supports multiple loss function types to handle class imbalance:
+
+- **Standard Distillation**: Cross-entropy + knowledge distillation
+- **Focal Loss**: Down-weights easy examples, emphasizes hard ones
+- **Focal Distillation**: Combines focal loss with knowledge distillation
+- **Adaptive Focal**: Automatically adjusts gamma based on class distribution
+
+**Configuration Options:**
+```yaml
+loss:
+  type: "focal_distillation"  # Options: "distillation", "focal", "focal_distillation"
+  gamma: 2.0                  # Focusing parameter (higher = more focus on hard examples)
+  class_weights: "auto"       # Options: null, "auto", or manual list
+  alpha_scaling: 1.0          # Weight scaling factor
+
+distillation:
+  alpha: 0.3                  # Balance between hard and soft loss
+  temperature: 4.0            # Distillation temperature
+```
+
 ### Workflow Steps
 
 #### Step 1: Extract Soft Labels from BirdNET
@@ -214,11 +236,20 @@ python extract_soft_labels.py \
 
 #### Step 2: Train with Distillation
 ```bash
-# Use default configuration
-python train_distillation.py
+# Standard knowledge distillation
+python train_distillation.py --config-name=distillation_config
+
+# Focal loss + distillation (for imbalanced data)
+python train_distillation.py --config-name=focal_loss_config
+
+# Pure focal loss (no teacher model needed)
+python train_distillation.py --config-name=pure_focal_config
+
+# Adaptive focal for severe imbalance
+python train_distillation.py --config-name=adaptive_focal_config
 
 # With custom parameters
-python train_distillation.py \
+python train_distillation.py --config-name=focal_loss_config \
   training.alpha=0.7 \
   training.temperature=4.0 \
   training.epochs=50
@@ -253,8 +284,26 @@ To train on a subset of species:
 
 4. **Train:**
    ```bash
-   python train_distillation.py
+   # Standard distillation
+   python train_distillation.py --config-name=distillation_config
+   
+   # Or with focal loss for imbalanced custom species
+   python train_distillation.py --config-name=focal_loss_config
    ```
+
+### Available Configuration Files
+
+The distillation system includes eight comprehensive configuration files:
+
+| Configuration File | Purpose | Use Case |
+|-------------------|---------|----------|
+| `distillation_config.yaml` | Standard knowledge distillation | Balanced datasets with teacher model |
+| `focal_loss_config.yaml` | Focal + distillation | Imbalanced data with teacher model |
+| `pure_focal_config.yaml` | Pure focal loss | Imbalanced data without teacher model |
+| `adaptive_focal_config.yaml` | Adaptive focal | Severe imbalance (1:100+ ratio) |
+| `manual_weights_config.yaml` | Manual class weights | Custom weight specification |
+| `test_distillation.yaml` | Testing configuration | Quick testing and validation |
+| `test_split_fix.yaml` | Test with focal | Development with focal distillation |
 
 ## Model Benchmarking System
 
@@ -632,17 +681,86 @@ comparison:
 
 ### Knowledge Distillation Configuration (`distillation/configs/`)
 
+#### Standard Distillation (`distillation_config.yaml`)
 ```yaml
-# distillation_config.yaml
 training:
   alpha: 0.5        # Balance between hard and soft loss
   temperature: 4.0  # Softmax temperature for distillation
   epochs: 100
+
+loss:
+  type: "distillation"  # Standard cross-entropy + distillation
   
 dataset:
   soft_labels_path: "soft_labels_complete"
   allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris", "Poecile_montanus"]
 ```
+
+#### Focal Loss + Distillation (`focal_loss_config.yaml`)
+```yaml
+training:
+  alpha: 0.3        # Balance for focal distillation
+  temperature: 4.0
+  epochs: 100
+
+loss:
+  type: "focal_distillation"  # Focal loss + knowledge distillation
+  gamma: 2.0                  # Focusing parameter
+  class_weights: "auto"       # Automatic class weight computation
+  alpha_scaling: 1.0          # Weight scaling factor
+
+dataset:
+  soft_labels_path: "soft_labels_complete"
+  allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris", "Poecile_montanus"]
+```
+
+#### Pure Focal Loss (`pure_focal_config.yaml`)
+```yaml
+training:
+  epochs: 100
+
+loss:
+  type: "focal"             # Pure focal loss, no distillation
+  gamma: 2.0
+  class_weights: "auto"
+  alpha_scaling: 1.0
+
+dataset:
+  allowed_bird_classes: ["Bubo_bubo", "Apus_apus", "Certhia_familiaris", "Poecile_montanus"]
+  # No soft_labels_path needed
+```
+
+### Loss Function Selection Guide
+
+Choose the appropriate loss function configuration based on your dataset characteristics:
+
+#### When to Use Each Configuration
+
+| Data Characteristics | Recommended Config | Key Benefits |
+|---------------------|-------------------|--------------|
+| **Balanced classes + teacher model** | `distillation_config.yaml` | Standard knowledge transfer |
+| **Imbalanced classes + teacher model** | `focal_loss_config.yaml` | Handles imbalance + knowledge transfer |
+| **Imbalanced classes, no teacher** | `pure_focal_config.yaml` | Pure focal loss for imbalanced data |
+| **Severe imbalance (1:100+ ratio)** | `adaptive_focal_config.yaml` | Automatically adjusts to extreme imbalance |
+| **Domain expertise available** | `manual_weights_config.yaml` | Manual control over class weights |
+
+#### Parameter Guidelines
+
+**Gamma (Focusing Parameter):**
+- `γ = 0`: Equivalent to cross-entropy (no focusing)
+- `γ = 1`: Mild focusing on hard examples
+- `γ = 2`: Standard focal loss (recommended starting point)
+- `γ = 3+`: Strong focusing (use for severe imbalance)
+
+**Class Weight Options:**
+- `null`: Equal weights for all classes
+- `"auto"`: Automatically computed from data distribution
+- `[1.0, 2.0, ...]`: Manual specification (list of weights per class)
+
+**Alpha Scaling:**
+- `1.0`: Standard inverse frequency weighting
+- `< 1.0`: Reduced weight differences between classes
+- `> 1.0`: Enhanced weight differences between classes
 
 ---
 

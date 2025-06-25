@@ -1,0 +1,109 @@
+# Focal Loss + Knowledge Distillation Configuration
+# Complete standalone configuration for testing focal loss implementation
+
+experiment_name: "focal_loss_test_quick"
+
+# Loss configuration - Using focal distillation
+loss:
+  type: "focal_distillation"  # Options: "distillation", "focal", "focal_distillation"
+  gamma: 2.0                  # Focal loss gamma parameter (higher = more focus on hard examples)
+  class_weights: "auto"       # Options: null, "auto", or list of per-class weights
+  alpha_scaling: 1.0          # Scaling factor for automatic class weights
+
+# Standard distillation parameters
+distillation:
+  alpha: 0.3                  # Weight for soft loss (0.0 = only hard loss, 1.0 = only soft loss)
+  temperature: 4.0            # Temperature for softmax in distillation
+  adaptive: false             # Whether to use adaptive distillation
+  adaptation_rate: 0.1        # Rate for adaptive changes (if adaptive: true)
+  confidence_threshold: 0.05  # Must match extract_soft_labels.py
+
+# Training parameters
+training:
+  epochs: 1  # Quick test
+  batch_size: 2  # Even smaller to reduce CPU load
+  patience: 15
+  min_delta: 0.001
+  seed: 42
+  validation_pause: 30  # Pause between train and validation
+
+# Model parameters
+model:
+  spectrogram_type: "combined_log_linear"
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+
+# Optimizer
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.001
+  weight_decay: 0.01
+
+# Learning rate scheduler
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: 'min'
+  factor: 0.5
+  patience: 5
+  min_lr: 1e-6
+
+# Dataset configuration
+dataset:
+  soft_labels_path: "test_soft_labels"
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+    - "Bubo_bubo"
+    - "Certhia_familiaris"
+    - "Apus_apus"
+    - "Certhia_brachydactyla"
+    - "Emberiza_cia"
+    - "Lophophanes_cristatus"
+    - "Periparus_ater"
+    - "Poecile_montanus"
+  
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  
+  # Data augmentation
+  augmentation:
+    enabled: false  # Disabled to avoid IndexError in time_mask
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: true
+  
+  esc50_dir: "esc-50/ESC-50-master"
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+# Debug options
+debug:
+  files_limit: 10  # No limit - use all available files
+
+# Logging
+hydra:
+  run:
+    dir: ./logs/${experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: ${experiment_name} 

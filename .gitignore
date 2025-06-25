@@ -86,6 +86,6 @@ venv.bak/
 #*.pth
 
 # Logs and temporary files
-#logs/
-#logs_backup/
+logs/
+logs_backup/
 #*.log

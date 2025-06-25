@@ -1,0 +1,121 @@
+# Manual Class Weights Configuration
+# For fine-tuned control when you know the exact class imbalance you want to address
+
+defaults:
+  - distillation_config
+
+# Override experiment name  
+experiment_name: "manual_weights_focal_distillation"
+
+# Loss function configuration - Manual class weights
+loss:
+  type: "focal_distillation"    # Focal loss + knowledge distillation
+  gamma: 1.8                    # Slightly lower gamma with manual weights
+  # Manual weights for each class (order: 8 bird species + no_birds)
+  # Higher weights = more focus on that class
+  class_weights: [
+    2.5,  # Bubo_bubo - medium rare
+    3.0,  # Certhia_familiaris - rare  
+    1.5,  # Apus_apus - common
+    2.8,  # Certhia_brachydactyla - rare
+    3.5,  # Emberiza_cia - very rare
+    4.0,  # Lophophanes_cristatus - very rare
+    2.2,  # Periparus_ater - medium rare
+    2.0,  # Poecile_montanus - medium rare
+    1.0   # no_birds - most common, standard weight
+  ]
+  alpha_scaling: 1.0            # No additional scaling with manual weights
+
+# Balanced distillation parameters
+distillation:
+  alpha: 0.35                   # Balanced approach with manual weights
+  temperature: 4.0              # Standard temperature
+  adaptive: false               # No adaptation needed with manual weights
+  adaptation_rate: 0.1          # Not used
+
+# Standard training parameters
+training:
+  epochs: 60                    # Medium training duration
+  batch_size: 56                # Adjusted for manual weight batching
+  patience: 18                  # Standard patience
+  min_delta: 0.001
+  seed: 42
+
+# Model parameters - standard architecture
+model:
+  spectrogram_type: "combined_log_linear"
+  hidden_dim: 64
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.12
+
+# Standard optimizer
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.001
+  weight_decay: 0.01
+
+# Standard scheduler
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: 'min'
+  factor: 0.5
+  patience: 6
+  min_lr: 1e-6
+
+# Dataset configuration matching the manual weights order
+dataset:
+  soft_labels_path: "test_soft_labels"
+  main_data_dir: bird_sound_dataset
+  # Class order MUST match the manual weights above
+  allowed_bird_classes:
+    - "Bubo_bubo"               # Index 0 -> weight 2.5
+    - "Certhia_familiaris"      # Index 1 -> weight 3.0
+    - "Apus_apus"               # Index 2 -> weight 1.5
+    - "Certhia_brachydactyla"   # Index 3 -> weight 2.8
+    - "Emberiza_cia"            # Index 4 -> weight 3.5
+    - "Lophophanes_cristatus"   # Index 5 -> weight 4.0
+    - "Periparus_ater"          # Index 6 -> weight 2.2
+    - "Poecile_montanus"        # Index 7 -> weight 2.0
+    # no_birds automatically becomes index 8 -> weight 1.0
+  
+  # Include no_birds as the common class
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  
+  # Standard augmentation
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: true
+  
+  esc50_dir: "esc-50/ESC-50-master"
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+# Note: When using manual class weights, make sure:
+# 1. The class_weights list length matches the number of classes
+# 2. The order matches your dataset's class indexing  
+# 3. Higher weights give more importance to that class
+# 4. Weight 1.0 is considered "normal" importance 

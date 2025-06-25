@@ -4,6 +4,13 @@
 # Override experiment name
 experiment_name: "bird_classification_distillation_extract_calls_100_epochs"
 
+# Loss function configuration
+loss:
+  type: "distillation"          # Options: "distillation", "focal", "focal_distillation"
+  gamma: 2.0                    # Focal loss gamma parameter (only used for focal loss types)
+  class_weights: null           # Options: null, "auto", or list of per-class weights
+  alpha_scaling: 1.0            # Scaling factor for automatic class weights
+
 # Distillation-specific parameters
 distillation:
   # Distillation loss parameters

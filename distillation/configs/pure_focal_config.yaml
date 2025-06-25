@@ -1,0 +1,83 @@
+# Pure Focal Loss Configuration (No Distillation)
+# Use when you don't have teacher soft labels but want to handle class imbalance
+
+defaults:
+  - distillation_config
+
+# Override experiment name
+experiment_name: "pure_focal_loss_classification"
+
+# Loss function configuration - Pure focal loss
+loss:
+  type: "focal"                 # Pure focal loss without distillation
+  gamma: 2.5                    # Higher gamma for more focus on hard examples
+  class_weights: "auto"         # Automatically compute from class distribution
+  alpha_scaling: 1.5            # Slightly higher scaling for imbalanced data
+
+# Distillation section is ignored for pure focal loss, but kept for compatibility
+distillation:
+  alpha: 0.0                    # Not used for pure focal loss
+  temperature: 4.0              # Not used for pure focal loss
+  adaptive: false               # Not used for pure focal loss
+
+# Training parameters - might need longer training without distillation
+training:
+  epochs: 100                   # Longer training without teacher guidance
+  batch_size: 64
+  patience: 25                  # More patience needed
+  min_delta: 0.001
+  seed: 42
+
+# Optimizer - potentially different settings for pure classification
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0015                    # Slightly higher LR without distillation
+  weight_decay: 0.02            # Higher weight decay
+
+# Learning rate scheduler - more aggressive for longer training
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: 'min'
+  factor: 0.3                   # More aggressive reduction
+  patience: 8                   # Faster adaptation
+  min_lr: 1e-7
+
+# Dataset - can use without soft labels
+dataset:
+  soft_labels_path: "test_soft_labels"  # Required but not used for pure focal
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+    - "Bubo_bubo"
+    - "Certhia_familiaris"
+    - "Apus_apus"
+    - "Certhia_brachydactyla"
+    - "Emberiza_cia"
+    - "Lophophanes_cristatus"
+    - "Periparus_ater"
+    - "Poecile_montanus"
+  
+  # Include no_birds for imbalanced classification
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  
+  # More aggressive augmentation without teacher constraints
+  augmentation:
+    enabled: true
+    noise_level: 0.02           # Higher noise
+    time_mask_param: 40         # More masking
+    freq_mask_param: 15
+    time_shift_limit: 0.15      # More time shift
+    speed_perturb_rate_min: 0.9
+    speed_perturb_rate_max: 1.1
+  
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: true
+  
+  esc50_dir: "esc-50/ESC-50-master"
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42 
