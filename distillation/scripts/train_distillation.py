@@ -18,15 +18,14 @@ import seaborn as sns
 from tqdm import tqdm
 import pandas as pd
 import json
+import time
+import gc
 
 # Add project root to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from distillation.losses.distillation_loss import DistillationLoss, AdaptiveDistillationLoss
-from distillation.losses.focal_loss import (
-    FocalLoss, FocalDistillationLoss, AdaptiveFocalDistillationLoss,
-    create_focal_loss_with_class_weights
-)
+from distillation.losses.focal_loss import FocalLoss, FocalDistillationLoss, AdaptiveFocalDistillationLoss
 from distillation.datasets.distillation_dataset import create_distillation_dataloader
 from models import Improved_Phi_GRU_ATT
 # from utils.metrics import calculate_metrics, save_confusion_matrix
@@ -244,17 +243,17 @@ class DistillationTrainer:
         
         if loss_type == 'distillation':
             # Standard knowledge distillation
-        if adaptive:
-            self.criterion = AdaptiveDistillationLoss(
-                alpha=alpha,
-                temperature=temperature,
-                adaptation_rate=self.config.distillation.get('adaptation_rate', 0.1)
-            )
-        else:
-            self.criterion = DistillationLoss(
-                alpha=alpha,
-                temperature=temperature
-            )
+            if adaptive:
+                self.criterion = AdaptiveDistillationLoss(
+                    alpha=alpha,
+                    temperature=temperature,
+                    adaptation_rate=self.config.distillation.get('adaptation_rate', 0.1)
+                )
+            else:
+                self.criterion = DistillationLoss(
+                    alpha=alpha,
+                    temperature=temperature
+                )
             logger.info("Using standard DistillationLoss")
             
         elif loss_type == 'focal':
@@ -319,59 +318,148 @@ class DistillationTrainer:
         # Store loss type for later reference
         self.loss_type = loss_type
     
+    def _load_cached_class_weights(self):
+        """Load class weights from cache if available and recent"""
+        weights_cache_path = self.output_dir / "computed_class_weights.json"
+        
+        if not weights_cache_path.exists():
+            return None
+            
+        try:
+            import json
+            with open(weights_cache_path, 'r') as f:
+                cache_data = json.load(f)
+            
+            # Check if cache is recent (less than 24 hours old)
+            cache_age_hours = (time.time() - cache_data.get('timestamp', 0)) / 3600
+            max_cache_age = self.config.get('loss', {}).get('cache_max_age_hours', 24)
+            
+            if cache_age_hours > max_cache_age:
+                logger.info(f"Cache is {cache_age_hours:.1f} hours old (max: {max_cache_age}), will recompute weights")
+                return None
+            
+            class_weights = cache_data.get('class_weights')
+            if class_weights and len(class_weights) == self.num_classes:
+                logger.info(f"Loaded cached class weights: {[f'{w:.3f}' for w in class_weights]}")
+                logger.info(f"Cache info: {cache_data.get('samples_used', 'unknown')} samples from {cache_data.get('total_dataset_size', 'unknown')} total")
+                return class_weights
+            else:
+                logger.warning("Cached weights don't match current number of classes, will recompute")
+                return None
+                
+        except Exception as e:
+            logger.warning(f"Could not load weights cache: {e}")
+            return None
+    
     def _compute_automatic_class_weights(self, train_dataset):
-        """Compute class weights automatically from training dataset"""
+        """Compute class weights automatically from training dataset with fast sampling"""
         logger.info("Computing automatic class weights from training data...")
         
-        # Get class distribution from dataset with progress bar
-        class_counts = {}
-        dataset_size = len(train_dataset)
-        
-        logger.info(f"Scanning {dataset_size} samples to compute class distribution...")
-        pbar = tqdm(range(dataset_size), desc="Computing class weights", unit="samples")
-        
-        for i in pbar:
-            try:
-                _, hard_label, _ = train_dataset[i]
-                if isinstance(hard_label, torch.Tensor):
-                    label = hard_label.item()
-                else:
-                    label = hard_label
-                
-                class_counts[label] = class_counts.get(label, 0) + 1
-                
-                # Update progress bar every 100 samples
-                if i % 100 == 0:
-                    pbar.set_postfix(classes_found=len(class_counts), current_sample=i+1)
-            except Exception as e:
-                # Handle corrupted files gracefully
-                continue
-        
-        # Convert to ordered list
-        max_class = max(class_counts.keys())
-        class_counts_list = [class_counts.get(i, 0) for i in range(max_class + 1)]
-        
-        logger.info(f"Class distribution: {class_counts_list}")
-        
-        # Compute class weights using inverse frequency
-        total_samples = sum(class_counts_list)
-        num_classes = len(class_counts_list)
-        
-        # Avoid division by zero
-        class_weights = []
-        for count in class_counts_list:
-            if count > 0:
-                weight = total_samples / (num_classes * count)
+        # Try to load from cache first
+        cached_weights = self._load_cached_class_weights()
+        if cached_weights is not None:
+            class_weights = cached_weights
+        else:
+            # Get loss configuration for sampling parameters
+            loss_config = self.config.get('loss', {})
+            
+            # Fast sampling parameters
+            max_samples = loss_config.get('weight_calculation_samples', 1000)  # Default: use only 1000 samples
+            use_sampling = loss_config.get('use_fast_sampling', True)  # Enable fast sampling by default
+            
+            dataset_size = len(train_dataset)
+            
+            if not use_sampling or dataset_size <= max_samples:
+                # Use full dataset if sampling disabled or dataset is small
+                samples_to_scan = dataset_size
+                indices = range(dataset_size)
+                logger.info(f"Scanning full dataset ({dataset_size} samples) to compute class distribution...")
             else:
-                weight = 1.0  # Default weight for missing classes
-            class_weights.append(weight)
-        
-        # Apply scaling
-        loss_config = self.config.get('loss', {})
-        alpha_scaling = loss_config.get('alpha_scaling', 1.0)
-        class_weights = [w * alpha_scaling for w in class_weights]
-        
-        logger.info(f"Computed class weights: {class_weights}")
+                # Use statistical sampling for faster computation
+                samples_to_scan = min(max_samples, dataset_size)
+                indices = np.random.choice(dataset_size, size=samples_to_scan, replace=False)
+                logger.info(f"Using fast sampling: scanning {samples_to_scan}/{dataset_size} samples ({samples_to_scan/dataset_size*100:.1f}%)")
+            
+            # Get class distribution from sampled dataset
+            class_counts = {}
+            
+            pbar = tqdm(indices, desc="Computing class weights", unit="samples")
+            successful_samples = 0
+            
+            for i in pbar:
+                try:
+                    _, hard_label, _ = train_dataset[i]
+                    if isinstance(hard_label, torch.Tensor):
+                        label = hard_label.item()
+                    else:
+                        label = hard_label
+                    
+                    class_counts[label] = class_counts.get(label, 0) + 1
+                    successful_samples += 1
+                    
+                    # Update progress bar every 50 samples (faster updates)
+                    if successful_samples % 50 == 0:
+                        pbar.set_postfix(classes_found=len(class_counts), scanned=successful_samples)
+                        
+                except Exception as e:
+                    # Handle corrupted files gracefully and continue
+                    logger.debug(f"Failed to load sample {i}: {e}")
+                    continue
+            
+            if successful_samples == 0:
+                logger.error("No samples could be loaded for class weight computation!")
+                # Return equal weights as fallback
+                num_classes = self.num_classes
+                class_weights = [1.0] * num_classes
+            else:
+                # Scale counts to represent full dataset if we used sampling
+                if use_sampling and samples_to_scan < dataset_size:
+                    scaling_factor = dataset_size / samples_to_scan
+                    for label in class_counts:
+                        class_counts[label] = int(class_counts[label] * scaling_factor)
+                    logger.info(f"Scaled sample counts by {scaling_factor:.2f} to estimate full dataset distribution")
+                
+                # Convert to ordered list
+                max_class = max(class_counts.keys()) if class_counts else 0
+                class_counts_list = [class_counts.get(i, 0) for i in range(max_class + 1)]
+                
+                logger.info(f"Estimated class distribution: {class_counts_list}")
+                
+                # Compute class weights using inverse frequency
+                total_samples = sum(class_counts_list)
+                num_classes = len(class_counts_list)
+                
+                # Avoid division by zero with minimum count threshold
+                min_count_threshold = max(1, total_samples // (num_classes * 100))  # At least 1% of average
+                class_weights = []
+                for count in class_counts_list:
+                    effective_count = max(count, min_count_threshold)  # Avoid zero division
+                    weight = total_samples / (num_classes * effective_count)
+                    class_weights.append(weight)
+            
+            # Apply scaling
+            alpha_scaling = loss_config.get('alpha_scaling', 1.0)
+            class_weights = [w * alpha_scaling for w in class_weights]
+            
+            logger.info(f"Computed class weights: {[f'{w:.3f}' for w in class_weights]}")
+            
+            # Save computed weights to cache for future use
+            weights_cache_path = self.output_dir / "computed_class_weights.json"
+            try:
+                import json
+                cache_data = {
+                    'class_weights': class_weights,
+                    'class_distribution': class_counts_list if 'class_counts_list' in locals() else [],
+                    'samples_used': successful_samples,
+                    'total_dataset_size': dataset_size,
+                    'use_sampling': use_sampling,
+                    'timestamp': time.time()
+                }
+                with open(weights_cache_path, 'w') as f:
+                    json.dump(cache_data, f, indent=2)
+                logger.info(f"Saved computed weights to cache: {weights_cache_path}")
+            except Exception as e:
+                logger.warning(f"Could not save weights cache: {e}")
         
         # Create appropriate loss function
         if hasattr(self, '_setup_focal_with_auto_weights') and self._setup_focal_with_auto_weights:
@@ -443,7 +531,7 @@ class DistillationTrainer:
                 soft_loss = torch.tensor(0.0, device=self.device)  # No soft loss
             else:
                 # Distillation-based losses (returns tuple)
-            loss, hard_loss, soft_loss = self.criterion(logits, hard_labels, soft_labels)
+                loss, hard_loss, soft_loss = self.criterion(logits, hard_labels, soft_labels)
             
             # Backward pass
             loss.backward()
@@ -469,7 +557,7 @@ class DistillationTrainer:
                     acc=f"{current_acc:.2f}%"
                 )
             else:
-            pbar.set_postfix(
+                pbar.set_postfix(
                     batch=f"{batch_count}/{total_batches}",
                     loss=f"{loss.item():.4f}", 
                     hard_loss=f"{hard_loss.item():.4f}", 
@@ -502,47 +590,100 @@ class DistillationTrainer:
         correct = 0
         total = 0
         
+        # Add explicit garbage collection
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
         pbar = tqdm(self.val_loader, desc=f"Epoch {self.epoch} [Val]", unit="batch", disable=False)
         batch_count = 0
         total_batches = len(self.val_loader)
         
-        with torch.no_grad():
-            for audio, hard_labels, soft_labels in pbar:
-                batch_count += 1
-                # Move to device
-                audio = audio.to(self.device)
-                hard_labels = hard_labels.to(self.device)
-                soft_labels = soft_labels.to(self.device)
-                
-                # Forward pass
-                logits = self.model(audio)
-                
-                # Compute loss based on loss type
-                if hasattr(self, 'loss_type') and self.loss_type == 'focal':
-                    # Pure focal loss (no distillation)
-                    loss = self.criterion(logits, hard_labels)
-                else:
-                    # Distillation-based losses (returns tuple)
-                    loss, _, _ = self.criterion(logits, hard_labels, soft_labels)
-                
-                # Statistics
-                total_loss += loss.item()
-                
-                # Accuracy
-                _, predicted = logits.max(1)
-                total += hard_labels.size(0)
-                correct += predicted.eq(hard_labels).sum().item()
+        logger.info(f"Starting validation with {total_batches} batches")
         
-                current_acc = (100. * correct / total)
-                pbar.set_postfix(
-                    batch=f"{batch_count}/{total_batches}",
-                    loss=f"{loss.item():.4f}", 
-                    acc=f"{current_acc:.2f}%"
-                )
+        with torch.no_grad():
+            try:
+                for batch_idx, (audio, hard_labels, soft_labels) in enumerate(pbar):
+                    batch_count += 1
+                    logger.debug(f"Processing validation batch {batch_count}/{total_batches}")
+                    
+                    # Move to device with error handling
+                    try:
+                        audio = audio.to(self.device)
+                        hard_labels = hard_labels.to(self.device)
+                        soft_labels = soft_labels.to(self.device)
+                    except Exception as e:
+                        logger.error(f"Error moving batch {batch_count} to device: {e}")
+                        continue
+                    
+                    # Forward pass with error handling
+                    try:
+                        logits = self.model(audio)
+                    except Exception as e:
+                        logger.error(f"Error in forward pass for batch {batch_count}: {e}")
+                        continue
+                    
+                    # Compute loss based on loss type
+                    try:
+                        if hasattr(self, 'loss_type') and self.loss_type == 'focal':
+                            # Pure focal loss (no distillation)
+                            loss = self.criterion(logits, hard_labels)
+                        else:
+                            # Distillation-based losses (returns tuple)
+                            loss, _, _ = self.criterion(logits, hard_labels, soft_labels)
+                    except Exception as e:
+                        logger.error(f"Error computing loss for batch {batch_count}: {e}")
+                        continue
+                    
+                    # Statistics
+                    total_loss += loss.item()
+                    
+                    # Accuracy
+                    _, predicted = logits.max(1)
+                    total += hard_labels.size(0)
+                    correct += predicted.eq(hard_labels).sum().item()
+            
+                    current_acc = (100. * correct / total)
+                    pbar.set_postfix(
+                        batch=f"{batch_count}/{total_batches}",
+                        loss=f"{loss.item():.4f}", 
+                        acc=f"{current_acc:.2f}%"
+                    )
+                    
+                    # Log progress every 5 batches to identify where it stops
+                    if batch_count % 5 == 0:
+                        logger.info(f"Validation batch {batch_count}/{total_batches} completed - Loss: {loss.item():.4f}, Acc: {current_acc:.2f}%")
+                    
+                    # Force garbage collection every 10 batches to prevent memory issues
+                    if batch_count % 10 == 0:
+                        gc.collect()
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                            
+            except Exception as e:
+                logger.error(f"Critical error during validation at batch {batch_count}: {e}")
+                logger.error(f"Exception type: {type(e).__name__}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                # Return partial results if we have any
+                if total > 0:
+                    avg_loss = total_loss / max(1, batch_count)
+                    accuracy = 100. * correct / total
+                    logger.warning(f"Returning partial validation results: Loss={avg_loss:.4f}, Acc={accuracy:.2f}%")
+                    return avg_loss, accuracy
+                else:
+                    logger.error("No validation data processed, returning default values")
+                    return float('inf'), 0.0
+        
+        logger.info(f"Validation completed successfully with {batch_count} batches")
         
         # Calculate average loss and accuracy (convert to percentage like train_acc)
-        avg_loss = total_loss / len(self.val_loader)
-        accuracy = 100. * correct / total  # Convert to percentage for consistency
+        if batch_count > 0:
+            avg_loss = total_loss / batch_count
+            accuracy = 100. * correct / total if total > 0 else 0.0
+        else:
+            avg_loss = float('inf')
+            accuracy = 0.0
         
         # Store metrics
         self.val_losses.append(avg_loss)
@@ -559,10 +700,8 @@ class DistillationTrainer:
         self.setup_optimizer()
         self.setup_criterion()
         
-        # Handle deferred focal loss setup with automatic class weights
-        if hasattr(self, '_setup_focal_with_auto_weights') and self._setup_focal_with_auto_weights:
-            self._compute_automatic_class_weights(train_dataset)
-        elif hasattr(self, '_setup_focal_distillation_with_auto_weights') and self._setup_focal_distillation_with_auto_weights:
+        # If criterion is None, we need to compute automatic class weights
+        if self.criterion is None:
             self._compute_automatic_class_weights(train_dataset)
         
         # Early stopping
@@ -579,16 +718,14 @@ class DistillationTrainer:
             current_lr = self.optimizer.param_groups[0]['lr']
             self.learning_rates.append(current_lr)
             
-            # Train and validate
-            self.train_epoch()
-            
             # Optional pause between training and validation to reduce CPU stress
             validation_pause = self.config.training.get('validation_pause', 0)
             if validation_pause > 0:
                 logger.info(f"Pausing {validation_pause} seconds between training and validation to reduce CPU load...")
-                import time
                 time.sleep(validation_pause)
             
+            # Train and validate
+            self.train_epoch()
             val_loss, val_acc = self.validate_epoch()
             
             # Track filter parameters if using combined_log_linear
@@ -624,46 +761,59 @@ class DistillationTrainer:
         self.save_training_plots()
     
     def test(self):
-        """Test the model on the test set"""
+        """Test the model and generate metrics"""
         logger.info("Starting testing...")
-        
-        # Load best model for testing
-        model_path = self.output_dir / f"{self.config.experiment_name}_best_model.pth"
-        if model_path.exists():
-            logger.info(f"Loading best model from {model_path} for testing...")
-            self.model.load_state_dict(torch.load(model_path, map_location=self.device))
-        else:
-            logger.warning("No best model found. Testing with the model from the last epoch.")
-        
         self.model.eval()
+        
         all_preds = []
         all_true = []
         
         with torch.no_grad():
-            pbar = tqdm(self.test_loader, desc="Testing", unit="batch")
-            for audio, hard_labels, _ in pbar:
+            for audio, hard_labels, soft_labels in tqdm(self.test_loader, desc="Testing"):
+                # Move to device
                 audio = audio.to(self.device)
                 hard_labels = hard_labels.to(self.device)
                 
-                logits = self.model(audio)
-                _, predicted = logits.max(1)
+                # Forward pass
+                outputs = self.model(audio)
+                _, preds = torch.max(outputs, 1)
                 
-                all_preds.extend(predicted.cpu().numpy())
+                # Collect predictions and labels
+                all_preds.extend(preds.cpu().numpy())
                 all_true.extend(hard_labels.cpu().numpy())
         
         # Calculate metrics
         self.test_acc = sum(1 for i, j in zip(all_true, all_preds) if i == j) / len(all_true)
         logger.info(f"Test Accuracy: {self.test_acc:.4f}")
         
-        # Generate classification report
-        report_str = classification_report(all_true, all_preds, target_names=self.class_names, zero_division=0)
-        report_dict = classification_report(all_true, all_preds, target_names=self.class_names, zero_division=0, output_dict=True)
+        # Get unique classes actually present in test set
+        unique_classes_in_test = sorted(list(set(all_true)))
+        actual_class_names = [self.class_names[i] if i < len(self.class_names) else f"Class_{i}" 
+                             for i in unique_classes_in_test]
+        
+        logger.info(f"Classes present in test set: {unique_classes_in_test}")
+        logger.info(f"Corresponding class names: {actual_class_names}")
+        
+        # Generate classification report with only actual classes
+        report_str = classification_report(
+            all_true, all_preds, 
+            labels=unique_classes_in_test,
+            target_names=actual_class_names, 
+            zero_division=0
+        )
+        report_dict = classification_report(
+            all_true, all_preds, 
+            labels=unique_classes_in_test,
+            target_names=actual_class_names, 
+            zero_division=0, 
+            output_dict=True
+        )
         logger.info(f"Test Report:\n{report_str}")
         
-        # Save confusion matrix
+        # Save confusion matrix using actual classes
         cm_png_path = self.output_dir / "confusion_matrix.png"
         cm_csv_path = self.output_dir / "confusion_matrix.csv"
-        save_confusion_matrix(all_true, all_preds, self.class_names, cm_png_path, cm_csv_path)
+        save_confusion_matrix(all_true, all_preds, actual_class_names, cm_png_path, cm_csv_path)
         
         # Save results and summary
         self.save_results(self.test_acc, report_dict)

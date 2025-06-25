@@ -1,0 +1,99 @@
+# INSTANT TEST Configuration - Manual weights to skip computation
+# This config uses manual class weights to completely skip weight calculation
+
+experiment_name: "focal_manual_instant"
+
+# Loss configuration - Manual weights for instant startup
+loss:
+  type: "focal_distillation"
+  gamma: 2.0
+  # MANUAL WEIGHTS - NO CALCULATION NEEDED!
+  # Format: [class_0, class_1, class_2, ...]
+  # For 3-class setup: [Bubo_bubo, Apus_apus, no_birds]
+  class_weights: [1.5, 1.2, 0.8]  # Slightly favor rare classes
+  alpha_scaling: 1.0
+
+# Standard distillation parameters
+distillation:
+  alpha: 0.3
+  temperature: 4.0
+  adaptive: false
+  confidence_threshold: 0.05
+
+# Training parameters - INSTANT
+training:
+  epochs: 1
+  batch_size: 8
+  patience: 15
+  min_delta: 0.001
+  seed: 42
+  validation_pause: 1
+  num_workers: 0
+
+# Model parameters - FIXED DIMENSIONS MISMATCH
+model:
+  spectrogram_type: "mel"  # Simple mel-spectrogram for speed
+  hidden_dim: 32
+  n_mel_bins: 32  # FIXED: MatchboxNet expects this to match input_features
+  n_fft: 512
+  hop_length: 256
+  matchbox:
+    # input_features will be set automatically to n_mel_bins (32) 
+    base_filters: 32  # FIXED: Should be power of 2 and reasonable size
+    num_layers: 2
+    kernel_size: 3
+    dropout: 0.1
+
+# Optimizer
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.003
+  weight_decay: 0.01
+
+# Learning rate scheduler
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: 'min'
+  factor: 0.5
+  patience: 2
+  min_lr: 1e-6
+
+# Dataset configuration - INSTANT
+dataset:
+  soft_labels_path: "test_soft_labels"
+  main_data_dir: bird_sound_dataset
+  allowed_bird_classes:
+    - "Bubo_bubo"
+    - "Apus_apus"
+  
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 30
+  
+  num_workers: 0
+  pin_memory: false
+  
+  augmentation:
+    enabled: false
+  
+  sample_rate: 22050
+  clip_duration: 2.0
+  lowcut: 150.0
+  highcut: 11025.0
+  extract_calls: false
+  
+  esc50_dir: "esc-50/ESC-50-master"
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+# Debug options - INSTANT
+debug:
+  files_limit: 15
+
+# Logging
+hydra:
+  run:
+    dir: ./logs/${experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: ${experiment_name} 

@@ -258,14 +258,29 @@ def create_distillation_dataloader(config, soft_labels_path, split='train'):
         num_no_bird_samples=config.get('num_no_bird_samples', 100)
     )
 
-    # Create DataLoader - use single thread to avoid segfaults with corrupted audio files
+    # Get DataLoader parameters from config with safe fallbacks
+    # First try config.training, then config.dataset, then defaults
+    training_config = getattr(config, 'training', {})
+    batch_size = training_config.get('batch_size') or config.get('batch_size', 16)
+    num_workers = training_config.get('num_workers') or config.get('num_workers', 0)
+    pin_memory = training_config.get('pin_memory') or config.get('pin_memory', False)
+    
+    # Log the DataLoader configuration for debugging
+    print(f"Creating {split} DataLoader with:")
+    print(f"  batch_size: {batch_size}")
+    print(f"  num_workers: {num_workers}")
+    print(f"  pin_memory: {pin_memory}")
+    print(f"  shuffle: {split == 'train'}")
+
+    # Create DataLoader with configuration parameters
     dataloader = DataLoader(
         dataset, 
-        batch_size=config.get('batch_size', 16) if hasattr(config, 'batch_size') else config.get('training', {}).get('batch_size', 16),
+        batch_size=batch_size,
         shuffle=(split == 'train'),
-        num_workers=0,  # Disable multiprocessing to prevent segfaults
-        pin_memory=False, # Disable for single worker
-        persistent_workers=False  # Not needed for single worker
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=(num_workers > 0),  # Only use if we have workers
+        drop_last=(split == 'train')  # Drop incomplete batches for training
     )
     
     return dataloader, dataset

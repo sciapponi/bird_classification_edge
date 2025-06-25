@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from typing import Union, List
+from omegaconf import ListConfig
 
 class FocalLoss(nn.Module):
     """
@@ -25,6 +27,11 @@ class FocalLoss(nn.Module):
             ignore_index: Index to ignore in loss computation
         """
         super(FocalLoss, self).__init__()
+        
+        # Handle Hydra ListConfig - convert to regular list
+        if isinstance(alpha, ListConfig):
+            alpha = list(alpha)
+        
         self.alpha = alpha
         self.gamma = gamma
         self.reduction = reduction
@@ -101,6 +108,10 @@ class FocalDistillationLoss(nn.Module):
         self.alpha = alpha  # Balance between hard and soft loss
         self.temperature = temperature
         self.reduction = reduction
+        
+        # Handle Hydra ListConfig for class_weights
+        if isinstance(class_weights, ListConfig):
+            class_weights = list(class_weights)
         
         # Loss functions
         self.focal_loss = FocalLoss(
