@@ -1,11 +1,11 @@
-# Adaptive Focal Distillation Configuration
-# Best for highly imbalanced datasets where class distribution changes
+# Adaptive Focal Distillation Configuration with Fully Learnable Filter Bank
+# Identical to adaptive_focal_config.yaml but tests fully learnable filters
 
 defaults:
   - distillation_config
 
 # Override experiment name
-experiment_name: "adaptive_focal_distillation"
+experiment_name: "adaptive_focal_fully_learnable"
 
 # Loss function configuration - Adaptive focal distillation
 loss:
@@ -13,10 +13,11 @@ loss:
   gamma: 2.0                    # Starting gamma (will be adapted)
   class_weights: "auto"         # Automatically compute and adapt
   alpha_scaling: 2.0            # Higher scaling for very imbalanced data
+  num_classes: 3                # EXPLICIT: 2 bird classes + 1 no_birds class
   
   # FORCE FULL DATASET CALCULATION FOR PRODUCTION
-  use_fast_sampling: false      # Use ALL samples for accurate weights
-  weight_calculation_samples: null  # Use all available samples
+  use_fast_sampling: true      # Use ALL samples for accurate weights
+  weight_calculation_samples: 50  # Use all available samples
   cache_max_age_hours: 24       # Cache for 1 day
 
 # Adaptive distillation parameters
@@ -28,21 +29,22 @@ distillation:
 
 # Training parameters optimized for adaptive learning
 training:
-  epochs: 75                    # Medium-length training
+  epochs: 2                   # Medium-length training
   batch_size: 48                # Slightly smaller batches for better gradient estimates
   patience: 20                  # Patience for adaptive methods
   min_delta: 0.0005             # More sensitive to improvements
   seed: 42
 
-# Model parameters - robust architecture for imbalanced data
+# Model parameters - FULLY LEARNABLE FILTER BANK
 model:
-  spectrogram_type: "combined_log_linear"
+  num_classes: 3                # EXPLICIT: 2 bird classes + 1 no_birds class
+  spectrogram_type: "fully_learnable"  # ← MAIN CHANGE: Use fully learnable instead of combined_log_linear
   hidden_dim: 80                # Slightly larger for complex imbalanced patterns
   n_mel_bins: 64
   n_linear_filters: 64
-  trainable_filterbank: true
-  initial_breakpoint: 4000.0
-  initial_transition_width: 100.0
+  trainable_filterbank: true    # Kept for compatibility but not used in fully learnable
+  initial_breakpoint: 4000.0    # Not used in fully learnable, kept for compatibility
+  initial_transition_width: 100.0  # Not used in fully learnable, kept for compatibility
   n_fft: 1024
   hop_length: 320
   matchbox:
@@ -51,7 +53,11 @@ model:
     kernel_size: 3
     dropout: 0.15               # Higher dropout for regularization
 
-# Optimizer with careful learning rate for adaptive methods
+# Fully learnable filter specific parameters
+filter_init_strategy: "triangular_noise"  # Initialize with triangular + noise for fair comparison
+filter_lr_multiplier: 0.1      # Slower learning rate for filter parameters (32k params!)
+
+# Optimizer with careful learning rate for adaptive methods + filter awareness
 optimizer:
   _target_: torch.optim.AdamW
   lr: 0.0008                    # Lower LR for stable adaptive learning
@@ -68,24 +74,19 @@ scheduler:
   min_lr: 5e-7
   cooldown: 3                   # Cooldown period after reduction
 
-# Dataset configuration - full imbalanced dataset
+# Dataset configuration - SMALL TEST DATASET
 dataset:
   soft_labels_path: "test_soft_labels"
   main_data_dir: bird_sound_dataset
   allowed_bird_classes:
     - "Bubo_bubo"
     - "Certhia_familiaris"
-    - "Apus_apus"
-    - "Certhia_brachydactyla"
-    - "Emberiza_cia"
-    - "Lophophanes_cristatus"
-    - "Periparus_ater"
-    - "Poecile_montanus"
+    # Reduced to 2 bird classes for testing
   
-  # Use full no_birds dataset to maximize imbalance
+  # Use minimal no_birds dataset for quick testing
   load_pregenerated_no_birds: true
   pregenerated_no_birds_dir: augmented_dataset/no_birds
-  num_no_bird_samples: 836      # Use all for maximum imbalance challenge
+  num_no_bird_samples: 10       # Just 10 no-bird samples for testing
   
   # Moderate augmentation - let adaptive methods handle the complexity
   augmentation:
@@ -106,4 +107,11 @@ dataset:
   esc50_dir: "esc-50/ESC-50-master"
   val_split: 0.15
   test_split: 0.15
-  seed: 42 
+  seed: 42
+
+# Enhanced monitoring for fully learnable filters
+logging:
+  monitor_filters: true         # Enable detailed filter monitoring
+  filter_visualization_interval: 1   # Save filter plots EVERY epoch for testing
+  log_filter_stats: true        # Log filter statistics each epoch
+  generate_advanced_plots: true # Force generation of advanced analysis plots 

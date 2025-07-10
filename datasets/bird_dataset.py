@@ -407,8 +407,23 @@ class BirdSoundDataset(Dataset):
         Returns:
             torch.Tensor: Time-masked waveform
         """
+        # Convert to spectrogram
+        spec_transform = T.Spectrogram(n_fft=1024, hop_length=320)
+        spec = spec_transform(waveform)
+        
+        # Apply time masking
         transform = T.TimeMasking(time_mask_param=time_mask_param)
-        return transform(waveform)
+        masked_spec = transform(spec)
+        
+        # Convert back to waveform using Griffin-Lim
+        griffin_lim = T.GriffinLim(n_fft=1024, hop_length=320)
+        reconstructed = griffin_lim(masked_spec)
+        
+        # Ensure same shape as input
+        if reconstructed.dim() == 1:
+            reconstructed = reconstructed.unsqueeze(0)
+            
+        return reconstructed
     
     def freq_mask(self, waveform, freq_mask_param=10):
         """
@@ -421,15 +436,23 @@ class BirdSoundDataset(Dataset):
         Returns:
             torch.Tensor: Frequency-masked waveform
         """
-        # Convert to spectrogram
-        spec = torchaudio.transforms.Spectrogram()(waveform)
+        # Convert to spectrogram using same parameters as time_mask
+        spec_transform = T.Spectrogram(n_fft=1024, hop_length=320)
+        spec = spec_transform(waveform)
+        
         # Apply frequency masking
         transform = T.FrequencyMasking(freq_mask_param=freq_mask_param)
         masked_spec = transform(spec)
-        # Convert back to waveform 
-        # This is an approximation, as perfect inversion is not always possible
-        griffin_lim = torchaudio.transforms.GriffinLim()(masked_spec)
-        return griffin_lim.unsqueeze(0)
+        
+        # Convert back to waveform using Griffin-Lim
+        griffin_lim = T.GriffinLim(n_fft=1024, hop_length=320)
+        reconstructed = griffin_lim(masked_spec)
+        
+        # Ensure same shape as input
+        if reconstructed.dim() == 1:
+            reconstructed = reconstructed.unsqueeze(0)
+            
+        return reconstructed
     
     def time_shift(self, waveform, shift_limit=0.2):
         """

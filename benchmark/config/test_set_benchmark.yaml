@@ -1,0 +1,40 @@
+# Test Set Only Benchmark Configuration
+# This configuration uses only the test set files (same split as training)
+
+defaults:
+  - benchmark  # Import base benchmark config
+
+# Override benchmark configuration for test set only
+benchmark:
+  name: "test_set_only_benchmark"
+  description: "Benchmark using only test set files (same split logic as training)"
+  
+  # Test set mode configuration
+  mode:
+    use_test_set_only: true  # NEW: Enable test set filtering
+    birds_only: false  # Include all classes
+    exclude_no_birds_from_ground_truth: false
+    force_fair_preprocessing: true
+  
+  # Docker paths
+  paths:
+    audio_dir: "/workspace/bird_sound_dataset"
+    no_birds_dir: "/workspace/augmented_dataset/no_birds"
+    student_model: "/workspace/best_distillation_model.pt"
+    student_config: "/workspace/config/bird_classification.yaml"
+
+# Dataset splitting parameters (MUST match training exactly)
+dataset_split:
+  validation_split: 0.15  # Same as training
+  test_split: 0.15        # Same as training  
+  split_seed: 42          # Same seed as training
+  subset: "testing"       # Only use test subset
+
+# Standard thresholds for clean comparison
+birdnet:
+  confidence_threshold: 0.25
+  use_adaptive_threshold: false
+  
+student_model:
+  inference:
+    confidence_threshold: 0.1 

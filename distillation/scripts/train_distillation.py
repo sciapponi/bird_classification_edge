@@ -199,14 +199,57 @@ class DistillationTrainer:
         return self.model
     
     def setup_optimizer(self):
-        """Setup optimizer and scheduler"""
+        """Setup optimizer and scheduler, with optional different learning rates for filter parameters"""
         logger.info("Setting up optimizer and scheduler...")
         
-        # Optimizer
-        self.optimizer = hydra.utils.instantiate(
-            self.config.optimizer,
-            params=self.model.parameters()
-        )
+        # Check if we need different learning rates for filter parameters
+        filter_lr_mult = self.config.get('filter_lr_multiplier', 1.0)
+        
+        if filter_lr_mult != 1.0:
+            # Separate filter parameters from other parameters
+            filter_params = []
+            other_params = []
+            
+            for name, param in self.model.named_parameters():
+                if any(filter_name in name for filter_name in ['breakpoint', 'transition_width', 'filter_bank']):
+                    filter_params.append(param)
+                    logger.info(f"Filter parameter: {name}, shape: {param.shape}")
+                else:
+                    other_params.append(param)
+            
+            if filter_params:
+                # Get base learning rate from config
+                base_lr = self.config.optimizer.get('lr', 0.001)
+                filter_lr = base_lr * filter_lr_mult
+                
+                # Create optimizer with parameter groups
+                param_groups = [
+                    {'params': other_params, 'lr': base_lr},
+                    {'params': filter_params, 'lr': filter_lr}
+                ]
+                
+                # Create optimizer with parameter groups instead of using hydra
+                optimizer_class = getattr(torch.optim, self.config.optimizer._target_.split('.')[-1])
+                optimizer_kwargs = {k: v for k, v in self.config.optimizer.items() if k != '_target_'}
+                optimizer_kwargs.pop('lr', None)  # Remove base lr since we're using param groups
+                
+                self.optimizer = optimizer_class(param_groups, **optimizer_kwargs)
+                
+                logger.info(f"Using different learning rates: Base={base_lr}, Filter={filter_lr}")
+            else:
+                # No filter parameters found, use standard setup
+                self.optimizer = hydra.utils.instantiate(
+                    self.config.optimizer,
+                    params=self.model.parameters()
+                )
+                logger.info("No filter parameters found, using standard optimizer setup")
+        else:
+            # Standard optimizer setup
+            self.optimizer = hydra.utils.instantiate(
+                self.config.optimizer,
+                params=self.model.parameters()
+            )
+            logger.info(f"Using single learning rate: {self.config.optimizer.get('lr', 'default')}")
         
         # Scheduler (if specified)
         if 'scheduler' in self.config:
@@ -419,9 +462,14 @@ class DistillationTrainer:
                         class_counts[label] = int(class_counts[label] * scaling_factor)
                     logger.info(f"Scaled sample counts by {scaling_factor:.2f} to estimate full dataset distribution")
                 
-                # Convert to ordered list
-                max_class = max(class_counts.keys()) if class_counts else 0
+                # Convert to ordered list - ENSURE WE HAVE ALL EXPECTED CLASSES
+                expected_num_classes = self.num_classes  # Use the known number of classes from config
+                max_class = max(max(class_counts.keys()) if class_counts else 0, expected_num_classes - 1)
                 class_counts_list = [class_counts.get(i, 0) for i in range(max_class + 1)]
+                
+                # Ensure we have exactly the expected number of classes
+                while len(class_counts_list) < expected_num_classes:
+                    class_counts_list.append(0)  # Add missing classes with 0 count
                 
                 logger.info(f"Estimated class distribution: {class_counts_list}")
                 
@@ -429,11 +477,18 @@ class DistillationTrainer:
                 total_samples = sum(class_counts_list)
                 num_classes = len(class_counts_list)
                 
-                # Avoid division by zero with minimum count threshold
-                min_count_threshold = max(1, total_samples // (num_classes * 100))  # At least 1% of average
+                # Handle missing classes with smart fallback
+                min_count_threshold = max(1, total_samples // (num_classes * 50))  # Conservative minimum
                 class_weights = []
-                for count in class_counts_list:
-                    effective_count = max(count, min_count_threshold)  # Avoid zero division
+                for i, count in enumerate(class_counts_list):
+                    if count == 0:
+                        # For missing classes, use a moderate weight (assume rare but present)
+                        # This gives them importance without dominating training
+                        effective_count = min_count_threshold * 2  # Assume they're rare
+                        logger.warning(f"Class {i} not found in sample - assigning moderate weight")
+                    else:
+                        effective_count = max(count, min_count_threshold)  # Avoid zero division
+                    
                     weight = total_samples / (num_classes * effective_count)
                     class_weights.append(weight)
             
@@ -728,15 +783,18 @@ class DistillationTrainer:
             self.train_epoch()
             val_loss, val_acc = self.validate_epoch()
             
-            # Track filter parameters if using combined_log_linear
-            if (self.config.model.get('spectrogram_type') == 'combined_log_linear' and 
-                hasattr(self.model, 'combined_log_linear_spec') and 
-                self.model.combined_log_linear_spec is not None):
-                current_breakpoint = self.model.combined_log_linear_spec.breakpoint.item()
-                current_transition_width = self.model.combined_log_linear_spec.transition_width.item()
-                self.breakpoint_history.append(current_breakpoint)
-                self.transition_width_history.append(current_transition_width)
-                logger.info(f"Epoch {self.epoch} - Filter params: Breakpoint={current_breakpoint:.2f}Hz, Transition Width={current_transition_width:.2f}")
+            # Track filter parameters
+            self._log_filter_parameters()
+            
+            # Monitor fully learnable filters if enabled
+            if (self.config.get('logging', {}).get('monitor_filters', False) and 
+                self.config.model.get('spectrogram_type') == 'fully_learnable'):
+                self._log_fully_learnable_filter_stats()
+                
+                # Save filter visualization periodically
+                viz_interval = self.config.get('logging', {}).get('filter_visualization_interval', 10)
+                if viz_interval > 0 and self.epoch % viz_interval == 0:
+                    self._save_filter_visualization()
             
             # Update learning rate scheduler
             if self.scheduler:
@@ -759,6 +817,360 @@ class DistillationTrainer:
         
         logger.info("Training loop finished.")
         self.save_training_plots()
+    
+    def _log_filter_parameters(self):
+        """Log filter parameters for both semi-learnable and fully learnable filters."""
+        if (self.config.model.get('spectrogram_type') == 'combined_log_linear' and 
+            hasattr(self.model, 'combined_log_linear_spec') and 
+            self.model.combined_log_linear_spec is not None):
+            # Semi-learnable filter parameters
+            current_breakpoint = self.model.combined_log_linear_spec.breakpoint.item()
+            current_transition_width = self.model.combined_log_linear_spec.transition_width.item()
+            self.breakpoint_history.append(current_breakpoint)
+            self.transition_width_history.append(current_transition_width)
+            logger.info(f"Epoch {self.epoch} - Filter params: Breakpoint={current_breakpoint:.2f}Hz, Transition Width={current_transition_width:.2f}")
+    
+    def _log_fully_learnable_filter_stats(self):
+        """Log statistics for fully learnable filter bank."""
+        if not (hasattr(self.model, 'combined_log_linear_spec') and 
+                hasattr(self.model.combined_log_linear_spec, 'filter_bank')):
+            return
+            
+        filter_matrix = self.model.combined_log_linear_spec.filter_bank  # [64, 513]
+        
+        # Basic statistics
+        stats = {
+            'mean': filter_matrix.mean().item(),
+            'std': filter_matrix.std().item(),
+            'min': filter_matrix.min().item(),
+            'max': filter_matrix.max().item(),
+            'total_params': filter_matrix.numel(),
+            'per_filter_variance': filter_matrix.var(dim=1).mean().item(),
+        }
+        
+        # Cross-filter similarity (detect degeneracy)
+        similarity = self._compute_filter_similarity(filter_matrix)
+        stats['cross_filter_similarity'] = similarity
+        
+        # Gradient analysis if available
+        if filter_matrix.grad is not None:
+            stats['grad_norm'] = filter_matrix.grad.norm().item()
+        else:
+            stats['grad_norm'] = 0.0
+        
+        # Log the statistics
+        log_msg = f"Epoch {self.epoch} - Filter Bank Stats: "
+        log_msg += f"Mean={stats['mean']:.4f}, Std={stats['std']:.4f}, "
+        log_msg += f"Min={stats['min']:.4f}, Max={stats['max']:.4f}, "
+        log_msg += f"Similarity={stats['cross_filter_similarity']:.4f}, "
+        log_msg += f"GradNorm={stats['grad_norm']:.4f}"
+        
+        logger.info(log_msg)
+        
+        # Store in history for plotting (if needed)
+        if not hasattr(self, 'filter_stats_history'):
+            self.filter_stats_history = []
+        self.filter_stats_history.append(stats)
+    
+    def _compute_filter_similarity(self, filter_matrix):
+        """Compute average cosine similarity between filters (detect degeneracy)."""
+        import torch.nn.functional as F
+        
+        # Normalize filters
+        normalized = F.normalize(filter_matrix, p=2, dim=1)
+        
+        # Compute similarity matrix
+        similarity_matrix = torch.mm(normalized, normalized.t())
+        
+        # Get off-diagonal elements (exclude self-similarity)
+        mask = ~torch.eye(filter_matrix.size(0), dtype=torch.bool, device=filter_matrix.device)
+        off_diagonal_similarities = similarity_matrix[mask]
+        
+        return off_diagonal_similarities.mean().item()
+    
+    def _save_filter_visualization(self):
+        """Save comprehensive visualization of learned filters with evolution tracking."""
+        if not (hasattr(self.model, 'combined_log_linear_spec') and 
+                hasattr(self.model.combined_log_linear_spec, 'filter_bank')):
+            return
+        
+        try:
+            import matplotlib.pyplot as plt
+            
+            filter_matrix = self.model.combined_log_linear_spec.filter_bank.detach().cpu().numpy()
+            
+            # Create visualization directory
+            viz_dir = self.output_dir / "filter_visualizations"
+            viz_dir.mkdir(exist_ok=True)
+            
+            # Store filter snapshots for evolution tracking
+            if not hasattr(self, 'filter_snapshots'):
+                self.filter_snapshots = []
+            self.filter_snapshots.append(filter_matrix.copy())
+            
+            # 1. COMPOSITE: Single 8-subplot visualization of current state
+            fig, axes = plt.subplots(2, 4, figsize=(20, 10))
+            fig.suptitle(f'Fully Learnable Filter Bank - Epoch {self.epoch}', fontsize=16)
+            axes = axes.flatten()
+            
+            # Plot first 8 filters with enhanced details
+            for i in range(min(8, filter_matrix.shape[0])):
+                axes[i].plot(filter_matrix[i], linewidth=2, alpha=0.8)
+                axes[i].set_title(f'Filter {i+1}\n(Mean: {filter_matrix[i].mean():.3f}, Std: {filter_matrix[i].std():.3f})')
+                axes[i].set_xlabel('Frequency Bin')
+                axes[i].set_ylabel('Weight')
+                axes[i].grid(True, alpha=0.3)
+                axes[i].set_ylim([filter_matrix.min() * 1.1, filter_matrix.max() * 1.1])
+            
+            # Hide unused subplots
+            for i in range(8, len(axes)):
+                axes[i].set_visible(False)
+            
+            plt.tight_layout()
+            plt.savefig(viz_dir / "current_filters_composite.png", dpi=150, bbox_inches='tight')
+            plt.close()
+            
+            # 2. EVOLUTION: Multi-epoch filter evolution (only if we have multiple snapshots)
+            if len(self.filter_snapshots) > 1:
+                fig, axes = plt.subplots(2, 4, figsize=(20, 12))
+                fig.suptitle(f'Filter Evolution Over Training (Epochs 1-{self.epoch})', fontsize=16)
+                axes = axes.flatten()
+                
+                # Create colormap for epochs
+                import matplotlib.cm as cm
+                colors = cm.viridis(np.linspace(0, 1, len(self.filter_snapshots)))
+                
+                for i in range(min(8, filter_matrix.shape[0])):
+                    for epoch_idx, snapshot in enumerate(self.filter_snapshots):
+                        alpha = 0.3 + 0.7 * (epoch_idx / (len(self.filter_snapshots) - 1))  # Fade older epochs
+                        label = f'Epoch {epoch_idx + 1}' if epoch_idx in [0, len(self.filter_snapshots)-1] else None
+                        axes[i].plot(snapshot[i], color=colors[epoch_idx], alpha=alpha, 
+                                   linewidth=2 if epoch_idx == len(self.filter_snapshots)-1 else 1,
+                                   label=label)
+                    
+                    axes[i].set_title(f'Filter {i+1} Evolution')
+                    axes[i].set_xlabel('Frequency Bin')
+                    axes[i].set_ylabel('Weight')
+                    axes[i].grid(True, alpha=0.3)
+                    if i == 0:  # Add legend only to first subplot
+                        axes[i].legend()
+                
+                # Hide unused subplots
+                for i in range(8, len(axes)):
+                    axes[i].set_visible(False)
+                
+                plt.tight_layout()
+                plt.savefig(viz_dir / "filter_evolution_composite.png", dpi=150, bbox_inches='tight')
+                plt.close()
+            
+            # 3. HEATMAP: Complete filter bank visualization
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+            
+            # Current state heatmap
+            im1 = ax1.imshow(filter_matrix, aspect='auto', cmap='viridis', interpolation='nearest')
+            ax1.set_title(f'All 64 Filters - Epoch {self.epoch}')
+            ax1.set_xlabel('Frequency Bin')
+            ax1.set_ylabel('Filter Index')
+            plt.colorbar(im1, ax=ax1, shrink=0.8)
+            
+            # Statistics evolution (if available)
+            if hasattr(self, 'filter_stats_history') and len(self.filter_stats_history) > 1:
+                epochs_so_far = list(range(1, len(self.filter_stats_history) + 1))
+                means = [stats['mean'] for stats in self.filter_stats_history]
+                stds = [stats['std'] for stats in self.filter_stats_history]
+                similarities = [stats['cross_filter_similarity'] for stats in self.filter_stats_history]
+                grad_norms = [stats['grad_norm'] for stats in self.filter_stats_history]
+                
+                ax2_twin1 = ax2.twinx()
+                ax2_twin2 = ax2.twinx()
+                ax2_twin2.spines['right'].set_position(('outward', 60))
+                
+                line1 = ax2.plot(epochs_so_far, means, 'b.-', linewidth=2, label='Mean', markersize=6)
+                line2 = ax2_twin1.plot(epochs_so_far, similarities, 'r.-', linewidth=2, label='Similarity', markersize=6)
+                line3 = ax2_twin2.plot(epochs_so_far, grad_norms, 'g.-', linewidth=2, label='Grad Norm', markersize=6)
+                
+                ax2.set_xlabel('Epoch')
+                ax2.set_ylabel('Filter Mean', color='b')
+                ax2_twin1.set_ylabel('Cross-Filter Similarity', color='r')
+                ax2_twin2.set_ylabel('Gradient Norm', color='g')
+                
+                ax2.tick_params(axis='y', labelcolor='b')
+                ax2_twin1.tick_params(axis='y', labelcolor='r')
+                ax2_twin2.tick_params(axis='y', labelcolor='g')
+                
+                ax2.set_title('Filter Statistics Evolution')
+                ax2.grid(True, alpha=0.3)
+                
+                # Combine legends
+                lines = line1 + line2 + line3
+                labels = [l.get_label() for l in lines]
+                ax2.legend(lines, labels, loc='upper right')
+            else:
+                ax2.text(0.5, 0.5, f'Statistics tracking started.\nComplete evolution available\nafter multiple epochs.', 
+                        ha='center', va='center', transform=ax2.transAxes, fontsize=12,
+                        bbox=dict(boxstyle="round,pad=0.5", facecolor="lightgray", alpha=0.5))
+                ax2.set_title('Filter Statistics Evolution (Pending)')
+            
+            plt.tight_layout()
+            plt.savefig(viz_dir / "filter_analysis_composite.png", dpi=150, bbox_inches='tight')
+            plt.close()
+            
+            logger.info(f"Enhanced filter visualizations saved for epoch {self.epoch}")
+            
+        except ImportError:
+            logger.warning("matplotlib not available, skipping filter visualization")
+        except Exception as e:
+            logger.error(f"Error saving filter visualization: {e}")
+    
+    def _generate_fully_learnable_summary(self):
+        """Generate comprehensive summary of fully learnable filter evolution."""
+        try:
+            import matplotlib.pyplot as plt
+            import numpy as np
+            
+            logger.info("Generating fully learnable filter summary...")
+            
+            # Create summary directory
+            summary_dir = self.output_dir / "fully_learnable_summary"
+            summary_dir.mkdir(exist_ok=True)
+            
+            # Final filter state analysis
+            final_filters = self.filter_snapshots[-1]  # [64, 513]
+            
+            # 1. COMPREHENSIVE FILTER SHOWCASE (3x3 grid of 9 representative filters)
+            fig, axes = plt.subplots(3, 3, figsize=(18, 15))
+            fig.suptitle('Representative Fully Learnable Filters - Final State', fontsize=18)
+            
+            # Select 9 diverse filters (every 7th filter to get good coverage)
+            selected_filters = [i * 7 for i in range(9) if i * 7 < final_filters.shape[0]]
+            
+            for idx, filter_idx in enumerate(selected_filters):
+                row, col = idx // 3, idx % 3
+                ax = axes[row, col]
+                
+                filter_weights = final_filters[filter_idx]
+                ax.plot(filter_weights, linewidth=3, alpha=0.9, color='darkblue')
+                ax.fill_between(range(len(filter_weights)), filter_weights, alpha=0.3, color='lightblue')
+                
+                # Add statistics
+                mean_val = filter_weights.mean()
+                std_val = filter_weights.std()
+                peak_freq = np.argmax(filter_weights)
+                
+                ax.set_title(f'Filter {filter_idx+1}\nPeak @ bin {peak_freq} | μ={mean_val:.3f}, σ={std_val:.3f}', 
+                            fontsize=12, fontweight='bold')
+                ax.set_xlabel('Frequency Bin')
+                ax.set_ylabel('Filter Weight')
+                ax.grid(True, alpha=0.4)
+                ax.set_ylim([final_filters.min() * 1.1, final_filters.max() * 1.1])
+            
+            plt.tight_layout()
+            plt.savefig(summary_dir / "representative_filters_final.png", dpi=200, bbox_inches='tight')
+            plt.close()
+            
+            # 2. FILTER DIVERSITY ANALYSIS
+            fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+            fig.suptitle('Fully Learnable Filter Bank Analysis', fontsize=16)
+            
+            # Diversity heatmap
+            from scipy.spatial.distance import pdist, squareform
+            import matplotlib.cm as cm
+            
+            # Compute pairwise correlations
+            correlations = np.corrcoef(final_filters)
+            
+            im1 = ax1.imshow(correlations, cmap='RdBu_r', vmin=-1, vmax=1)
+            ax1.set_title('Filter Correlation Matrix\n(Diagonal = Self-correlation = 1)')
+            ax1.set_xlabel('Filter Index')
+            ax1.set_ylabel('Filter Index')
+            plt.colorbar(im1, ax=ax1, shrink=0.8)
+            
+            # Filter peak frequencies
+            peak_frequencies = np.argmax(final_filters, axis=1)
+            ax2.hist(peak_frequencies, bins=20, alpha=0.7, edgecolor='black')
+            ax2.set_title('Distribution of Filter Peak Frequencies')
+            ax2.set_xlabel('Frequency Bin (Peak Response)')
+            ax2.set_ylabel('Number of Filters')
+            ax2.grid(True, alpha=0.3)
+            
+            # Filter selectivity (std as proxy for selectivity)
+            filter_selectivity = np.std(final_filters, axis=1)
+            ax3.scatter(range(len(filter_selectivity)), filter_selectivity, alpha=0.7, s=50)
+            ax3.set_title('Filter Selectivity (Higher = More Selective)')
+            ax3.set_xlabel('Filter Index')
+            ax3.set_ylabel('Standard Deviation (Selectivity)')
+            ax3.grid(True, alpha=0.3)
+            
+            # Evolution summary (if we have multiple snapshots)
+            if len(self.filter_snapshots) > 1:
+                epochs = list(range(1, len(self.filter_snapshots) + 1))
+                
+                # Track evolution of first 5 filters
+                for i in range(min(5, final_filters.shape[0])):
+                    evolution = [snapshot[i].std() for snapshot in self.filter_snapshots]
+                    ax4.plot(epochs, evolution, '.-', linewidth=2, label=f'Filter {i+1}', alpha=0.8)
+                
+                ax4.set_title('Filter Selectivity Evolution')
+                ax4.set_xlabel('Epoch')
+                ax4.set_ylabel('Filter Selectivity (Std)')
+                ax4.legend()
+                ax4.grid(True, alpha=0.3)
+            else:
+                ax4.text(0.5, 0.5, 'Evolution tracking\nrequires multiple epochs', 
+                        ha='center', va='center', transform=ax4.transAxes, fontsize=12)
+                ax4.set_title('Filter Evolution (Insufficient Data)')
+            
+            plt.tight_layout()
+            plt.savefig(summary_dir / "filter_analysis_comprehensive.png", dpi=200, bbox_inches='tight')
+            plt.close()
+            
+            # 3. SAVE FILTER DATA FOR EXTERNAL ANALYSIS
+            np.save(summary_dir / "final_filter_weights.npy", final_filters)
+            
+            # Create text summary
+            summary_text = f"""
+FULLY LEARNABLE FILTER BANK SUMMARY
+===================================
+
+Training Epochs: {len(self.filter_snapshots)}
+Total Filter Parameters: {final_filters.size:,}
+Filter Bank Shape: {final_filters.shape}
+
+FINAL STATE STATISTICS:
+- Mean Weight: {final_filters.mean():.6f}
+- Std Weight: {final_filters.std():.6f}
+- Min Weight: {final_filters.min():.6f}
+- Max Weight: {final_filters.max():.6f}
+- Weight Range: {final_filters.max() - final_filters.min():.6f}
+
+FILTER DIVERSITY:
+- Average Inter-Filter Correlation: {np.mean(correlations[np.triu_indices_from(correlations, k=1)]):.6f}
+- Most Similar Filters: {np.unravel_index(np.argmax(correlations - np.eye(len(correlations))), correlations.shape)}
+- Peak Frequency Spread: {np.std(peak_frequencies):.2f} bins
+
+SPECIALIZATION ANALYSIS:
+- Most Selective Filter: #{np.argmax(filter_selectivity)+1} (std={np.max(filter_selectivity):.6f})
+- Least Selective Filter: #{np.argmin(filter_selectivity)+1} (std={np.min(filter_selectivity):.6f})
+- Average Selectivity: {np.mean(filter_selectivity):.6f}
+
+FILES GENERATED:
+- representative_filters_final.png: 9 representative filters
+- filter_analysis_comprehensive.png: Complete analysis
+- final_filter_weights.npy: Raw filter weights for analysis
+
+INTERPRETATION:
+{'✅ Good filter diversity' if np.mean(correlations[np.triu_indices_from(correlations, k=1)]) < 0.1 else '⚠️ Some filter redundancy detected'}
+{'✅ Healthy weight distribution' if 0.01 < final_filters.std() < 0.5 else '⚠️ Check weight initialization/learning rates'}
+{'✅ Specialized filters developed' if np.std(filter_selectivity) > 0.01 else '⚠️ Filters may be too similar'}
+"""
+            
+            with open(summary_dir / "filter_summary.txt", 'w') as f:
+                f.write(summary_text)
+            
+            logger.info(f"Fully learnable filter summary saved to {summary_dir}")
+            
+        except Exception as e:
+            logger.error(f"Error generating fully learnable summary: {e}")
     
     def test(self):
         """Test the model and generate metrics"""
@@ -930,6 +1342,11 @@ class DistillationTrainer:
                 logger.info(f"Generated {len(advanced_plots)} advanced analysis plots")
             except Exception as e:
                 logger.warning(f"Could not generate advanced plots: {e}")
+                
+        # Generate fully learnable filter summary (if applicable)
+        if (self.config.model.get('spectrogram_type') == 'fully_learnable' and 
+            hasattr(self, 'filter_snapshots') and len(self.filter_snapshots) > 0):
+            self._generate_fully_learnable_summary()
 
     def save_results(self, test_acc, report_dict):
         """Saves test results to a JSON file."""

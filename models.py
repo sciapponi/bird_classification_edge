@@ -5,7 +5,7 @@ import torchaudio
 import numpy as np # Added for linspace in filterbank
 import sys
 sys.path.append('.')
-from differentiable_spec_torch import DifferentiableSpectrogram
+from differentiable_spec_torch import DifferentiableSpectrogram, create_spectrogram_module
 
 # Helper function for Linear Triangular Filterbank (Hz-based)
 def _create_triangular_filterbank_hz(num_filters, n_fft, sample_rate, min_freq_hz=0.0, max_freq_hz=None):
@@ -100,35 +100,27 @@ class Improved_Phi_GRU_ATT(nn.Module):
                 max_freq_hz=self.f_max
             )
             current_n_input_features = self.n_linear_filters
-        elif self.spectrogram_type == "combined_log_linear":
-            # Nuova modalità: filtro log-lineare apprendibile
-            # Assicurati che i parametri passati a DifferentiableSpectrogram siano corretti
-            # initial_breakpoint e initial_transition_width dovrebbero venire dalla configurazione del modello,
-            # non da self.breakpoint e self.transition_width della classe Improved_Phi_GRU_ATT,
-            # a meno che non siano stati specificamente passati e memorizzati per questo scopo.
-            # Se breakpoint e transition_width sono in cfg.model.matchbox, usali.
-            # Altrimenti, usa i valori di default di DifferentiableSpectrogram o i valori passati a Improved_Phi_GRU_ATT.
-
-            # Cerca i valori di breakpoint e transition_width nella config passata, es. dentro matchbox
-            # Il costruttore di Improved_Phi_GRU_ATT riceve `matchbox` come dict e `breakpoint`, `transition_width` come argomenti separati.
-            # Usiamo gli argomenti `breakpoint` e `transition_width` passati a Improved_Phi_GRU_ATT.
+        elif self.spectrogram_type in ["combined_log_linear", "fully_learnable"]:
+            # Usa la factory function per creare il modulo spectrogram corretto
+            spectrogram_config = {
+                'spectrogram_type': self.spectrogram_type,
+                'sample_rate': self.sample_rate,
+                'n_linear_filters': self.n_linear_filters,
+                'f_min': self.f_min,
+                'f_max': self.f_max,
+                'n_fft': self.n_fft,
+                'hop_length': self.hop_length,
+                'initial_breakpoint': self.breakpoint,
+                'initial_transition_width': self.transition_width,
+                'filter_init_strategy': kwargs.get('filter_init_strategy', 'triangular_noise'),
+                'trainable_filterbank': True,
+                'debug': False
+            }
             
-            self.combined_log_linear_spec = DifferentiableSpectrogram(
-                sr=self.sample_rate, # Passa sample_rate
-                n_filters=self.n_linear_filters, # n_linear_filters è il numero di filtri per combined
-                f_min=self.f_min,
-                f_max=self.f_max,
-                n_fft=self.n_fft,
-                hop_length=self.hop_length,
-                initial_breakpoint=self.breakpoint, # Questo è il valore passato a Improved_Phi_GRU_ATT
-                initial_transition_width=self.transition_width, # Questo è il valore passato a Improved_Phi_GRU_ATT
-                trainable_filterbank=True, # Abilita l'apprendimento per questa modalità
-                spec_type="combined_log_linear", # Specifica il tipo di spettrogramma
-                debug=False # Imposta a True per debug prints da DifferentiableSpectrogram
-            )
+            self.combined_log_linear_spec = create_spectrogram_module(spectrogram_config)
             current_n_input_features = self.n_linear_filters
         else:
-            raise ValueError(f"Unsupported spectrogram_type: {self.spectrogram_type}. Choose 'mel', 'linear_stft', 'linear_triangular', or 'combined_log_linear'.")
+            raise ValueError(f"Unsupported spectrogram_type: {self.spectrogram_type}. Choose 'mel', 'linear_stft', 'linear_triangular', 'combined_log_linear', or 'fully_learnable'.")
 
         self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype="power", top_db=80)
 
@@ -167,8 +159,8 @@ class Improved_Phi_GRU_ATT(nn.Module):
                 x = torch.matmul(x, self.linear_filterbank.T.to(x.device))
                 x = x.permute(0, 2, 1) # -> (batch, freq_filt, time)
                 # self.amplitude_to_db viene applicato dopo, se non è combined_log_linear
-            elif self.spectrogram_type == "combined_log_linear":
-                # DifferentiableSpectrogram restituisce la magnitudine filtrata
+            elif self.spectrogram_type in ["combined_log_linear", "fully_learnable"]:
+                # Il modulo spectrogram restituisce la magnitudine filtrata
                 x_mag_filt = self.combined_log_linear_spec(x)
                 # Converti magnitudine filtrata a dB
                 # Se AmplitudeToDB si aspetta potenza, dobbiamo fare x_mag_filt**2

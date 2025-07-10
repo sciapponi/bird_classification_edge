@@ -61,6 +61,62 @@ def setup_timestamped_output_paths(cfg: DictConfig, original_cwd: str) -> str:
     return timestamped_dir
 
 
+def replicate_dataset_split(file_list: List[str], split_config: dict) -> List[str]:
+    """
+    Replicate the exact same dataset splitting logic used in training.
+    
+    Args:
+        file_list: List of all audio files for a class
+        split_config: Configuration with validation_split, test_split, split_seed, subset
+        
+    Returns:
+        List of files for the specified subset (training/validation/testing)
+    """
+    import random
+    import math
+    
+    if not file_list:
+        return []
+    
+    # Extract split parameters
+    validation_split = split_config.get('validation_split', 0.15)
+    test_split = split_config.get('test_split', 0.15)
+    split_seed = split_config.get('split_seed', 42)
+    subset = split_config.get('subset', 'testing')
+    
+    # Replicate exact splitting logic from BirdSoundDataset
+    num_files = len(file_list)
+    
+    # Create random generator with same seed
+    rng = random.Random(split_seed)
+    file_list_copy = file_list.copy()
+    rng.shuffle(file_list_copy)
+    
+    # Calculate split sizes (same logic as training)
+    num_val = math.floor(validation_split * num_files)
+    num_test = math.floor(test_split * num_files)
+    num_train = num_files - num_val - num_test
+    
+    if num_train <= 0 or num_val < 0 or num_test < 0:
+        # Invalid split, return empty for non-training subsets
+        if subset == 'training':
+            return file_list_copy
+        else:
+            return []
+    
+    # Select files based on subset (same logic as BirdSoundDataset)
+    if subset == 'training':
+        selected_files = file_list_copy[:num_train]
+    elif subset == 'validation':
+        selected_files = file_list_copy[num_train : num_train + num_val]
+    elif subset == 'testing':
+        selected_files = file_list_copy[num_train + num_val :]
+    else:
+        raise ValueError(f"Invalid subset: {subset}")
+    
+    return selected_files
+
+
 def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict], pd.DataFrame]:
     """
     Discover audio files from the dataset structure and create ground truth.
@@ -73,6 +129,14 @@ def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict]
         Tuple of (file_info_list, ground_truth_dataframe)
     """
     file_info = []
+    
+    # Check if we should use test set only
+    use_test_set_only = cfg.benchmark.mode.get('use_test_set_only', False)
+    split_config = cfg.get('dataset_split', {})
+    
+    if use_test_set_only:
+        logger.info("🎯 TEST SET ONLY MODE: Using same split logic as training")
+        logger.info(f"   Split parameters: {split_config}")
     
     # Process bird sound dataset
     bird_dataset_path = os.path.join(original_cwd, cfg.benchmark.paths.audio_dir)
@@ -88,13 +152,21 @@ def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict]
             
             logger.info(f"Processing species: {species_dir}")
             
-            audio_files = []
+            # Get all audio files for this species
+            all_audio_files = []
             for ext in ['.wav', '.mp3', '.flac', '.ogg', '.m4a', '.aac']:
                 pattern = os.path.join(species_path, f"*{ext}")
                 import glob
-                audio_files.extend(glob.glob(pattern))
+                all_audio_files.extend(glob.glob(pattern))
             
-            # Limit files per class if specified
+            # Apply dataset split filtering if enabled
+            if use_test_set_only and split_config:
+                audio_files = replicate_dataset_split(all_audio_files, split_config)
+                logger.info(f"   Filtered to test set: {len(audio_files)}/{len(all_audio_files)} files")
+            else:
+                audio_files = all_audio_files
+            
+            # Limit files per class if specified (applied after split filtering)
             max_files = cfg.get('debug', {}).get('max_files_per_class', None)
             if max_files and len(audio_files) > max_files:
                 audio_files = audio_files[:max_files]
@@ -123,11 +195,19 @@ def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict]
         if os.path.exists(no_birds_path):
             logger.info(f"Scanning no_birds dataset: {no_birds_path}")
             
-            audio_files = []
+            # Get all no_birds files
+            all_audio_files = []
             for ext in ['.wav', '.mp3', '.flac', '.ogg', '.m4a', '.aac']:
                 pattern = os.path.join(no_birds_path, f"*{ext}")
                 import glob
-                audio_files.extend(glob.glob(pattern))
+                all_audio_files.extend(glob.glob(pattern))
+            
+            # Apply dataset split filtering if enabled (treat no_birds as a single class)
+            if use_test_set_only and split_config:
+                audio_files = replicate_dataset_split(all_audio_files, split_config)
+                logger.info(f"   Filtered no_birds to test set: {len(audio_files)}/{len(all_audio_files)} files")
+            else:
+                audio_files = all_audio_files
             
             # Limit files if specified
             max_files = cfg.get('debug', {}).get('max_files_per_class', None)
@@ -162,7 +242,7 @@ def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict]
         logger.error("No audio files found!")
         return [], ground_truth_df
     
-    # Apply global files limit if specified
+    # Apply global files limit if specified (after split filtering)
     files_limit = cfg.get('debug', {}).get('files_limit', None)
     if files_limit and len(ground_truth_df) > files_limit:
         # Sample proportionally from each class
@@ -184,6 +264,9 @@ def discover_audio_files(cfg: DictConfig, original_cwd: str) -> Tuple[List[Dict]
     logger.info("Class distribution:")
     for label, count in class_counts.items():
         logger.info(f"  {label}: {count} files")
+    
+    if use_test_set_only:
+        logger.info("✅ TEST SET FILTERING COMPLETED - Using same files as training test set")
     
     return file_info, ground_truth_df
 

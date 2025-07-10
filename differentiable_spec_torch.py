@@ -3,6 +3,7 @@ import torchaudio
 import torchaudio.functional as F
 # import matplotlib.pyplot as plt  # Commented out - only used in commented test code
 import torch.nn as nn
+import numpy as np
 import math # Per pi, cos, etc. se necessario per filtri più avanzati
 
 # Load audio file
@@ -269,6 +270,113 @@ def check_differentiability():
     except Exception as e:
         print(f"Differentiability check FAILED: {str(e)}")
         return False
+
+class FullyLearnableFilterBank(nn.Module):
+    """Completely learnable filter bank - ogni coefficiente è un parametro"""
+    
+    def __init__(self, n_filters=64, n_freq_bins=513, sample_rate=32000, init_strategy='triangular_noise', n_fft=1024, hop_length=320):
+        super().__init__()
+        self.n_filters = n_filters
+        self.n_freq_bins = n_freq_bins
+        self.sample_rate = sample_rate
+        self.init_strategy = init_strategy
+        self.n_fft = n_fft
+        self.hop_length = hop_length
+        
+        # La matrice di filtri completamente apprendibile
+        self.filter_bank = nn.Parameter(
+            self._initialize_filters_intelligently(n_filters, n_freq_bins)
+        )
+        
+    def forward(self, waveform):
+        """
+        Args:
+            waveform: [batch, time] or [time] - raw audio waveform
+        Returns:
+            filtered_features: [batch, n_filters, time_frames]
+        """
+        # Handle single waveform input
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)  # Add batch dimension
+        
+        device = waveform.device
+        
+        # 1. Compute STFT
+        window = torch.hann_window(self.n_fft, device=device)
+        stft_complex = torch.stft(waveform, 
+                                  n_fft=self.n_fft, 
+                                  hop_length=self.hop_length,
+                                  window=window,
+                                  return_complex=True)  # [batch, freq_bins, time_frames]
+        
+        magnitude_stft = torch.abs(stft_complex)  # [batch, freq_bins, time_frames]
+        
+        # 2. Apply learnable filter bank
+        # filter_bank: [n_filters, freq_bins] = [n, f]
+        # magnitude_stft: [batch, freq_bins, time_frames] = [b, f, t]
+        # Result: [batch, n_filters, time_frames] = [b, n, t]
+        return torch.einsum('nf,bft->bnt', self.filter_bank, magnitude_stft)
+    
+    def _initialize_filters_intelligently(self, n_filters, n_freq_bins):
+        """Diverse strategie di inizializzazione"""
+        
+        if self.init_strategy == 'random':
+            # Semplice random Gaussian
+            return torch.randn(n_filters, n_freq_bins) * 0.01
+            
+        elif self.init_strategy == 'triangular_noise':
+            # Inizializza come filtri triangolari + noise
+            triangular_base = self._generate_triangular_filters(n_filters, n_freq_bins)
+            noise = torch.randn_like(triangular_base) * 0.01
+            return triangular_base + noise
+            
+        elif self.init_strategy == 'xavier':
+            # Xavier initialization
+            std = np.sqrt(2.0 / (n_filters + n_freq_bins))
+            return torch.randn(n_filters, n_freq_bins) * std
+            
+        else:
+            raise ValueError(f"Unknown init strategy: {self.init_strategy}")
+    
+    def _generate_triangular_filters(self, n_filters, n_freq_bins):
+        """Genera baseline triangolare come starting point"""
+        # Create triangular filters as baseline
+        filter_bank = torch.zeros(n_filters, n_freq_bins)
+        
+        # Compute center frequencies (log-spaced for better coverage)
+        f_min = 150.0
+        f_max = self.sample_rate / 2.0  # Nyquist frequency
+        
+        # Log-spaced center frequencies
+        log_min = np.log(f_min)
+        log_max = np.log(f_max)
+        center_freqs = torch.exp(torch.linspace(log_min, log_max, n_filters))
+        
+        # Convert frequencies to bin indices
+        freq_to_bin = (n_freq_bins - 1) / (self.sample_rate / 2.0)
+        center_bins = (center_freqs * freq_to_bin).long()
+        center_bins = torch.clamp(center_bins, 1, n_freq_bins - 2)
+        
+        # Generate triangular filters
+        for i in range(n_filters):
+            left = center_bins[i - 1].item() if i > 0 else 0
+            center = center_bins[i].item()
+            right = center_bins[i + 1].item() if i < n_filters - 1 else n_freq_bins - 1
+            
+            # Left slope
+            if center > left:
+                slope_len = center - left
+                if slope_len > 0:
+                    filter_bank[i, left:center] = torch.linspace(0, 1, slope_len)
+            
+            # Right slope
+            if right > center:
+                slope_len = right - center
+                if slope_len > 0:
+                    filter_bank[i, center:right] = torch.linspace(1, 0, slope_len)
+        
+        return filter_bank
+
 
 class DifferentiableSpectrogram(nn.Module):
     def __init__(self, sr=32000, n_filters=64, 
@@ -653,6 +761,63 @@ def test_differentiable_spectrogram_module():
         assert spec_output_stft.shape[1] == expected_freq_bins
     except Exception as e:
         print(f"  ERROR during Linear STFT test: {e}")
+
+
+def create_spectrogram_module(config):
+    """Factory function per creare il modulo spectrogram corretto"""
+    
+    spec_type = config.get('spectrogram_type', 'combined_log_linear')
+    
+    if spec_type == 'combined_log_linear':
+        # Usa la classe esistente
+        return DifferentiableSpectrogram(
+            sr=config.get('sample_rate', 32000),
+            n_filters=config.get('n_linear_filters', 64),
+            f_min=config.get('f_min', 150.0),
+            f_max=config.get('f_max', 10000.0),
+            n_fft=config.get('n_fft', 1024),
+            hop_length=config.get('hop_length', 320),
+            initial_breakpoint=config.get('initial_breakpoint', 4000.0),
+            initial_transition_width=config.get('initial_transition_width', 100.0),
+            trainable_filterbank=config.get('trainable_filterbank', True),
+            spec_type=spec_type,
+            debug=config.get('debug', False)
+        )
+    
+    elif spec_type == 'fully_learnable':
+        # Usa la nuova classe
+        n_filters = config.get('n_linear_filters', 64)
+        n_fft = config.get('n_fft', 1024)
+        n_freq_bins = n_fft // 2 + 1
+        sample_rate = config.get('sample_rate', 32000)
+        hop_length = config.get('hop_length', 320)
+        init_strategy = config.get('filter_init_strategy', 'triangular_noise')
+        
+        return FullyLearnableFilterBank(
+            n_filters=n_filters,
+            n_freq_bins=n_freq_bins,
+            sample_rate=sample_rate,
+            init_strategy=init_strategy,
+            n_fft=n_fft,
+            hop_length=hop_length
+        )
+    
+    elif spec_type in ['mel', 'linear_triangular', 'linear_stft']:
+        # Altri tipi esistenti
+        return DifferentiableSpectrogram(
+            sr=config.get('sample_rate', 32000),
+            n_filters=config.get('n_linear_filters', 64),
+            f_min=config.get('f_min', 150.0),
+            f_max=config.get('f_max', 10000.0),
+            n_fft=config.get('n_fft', 1024),
+            hop_length=config.get('hop_length', 320),
+            trainable_filterbank=config.get('trainable_filterbank', True),
+            spec_type=spec_type,
+            debug=config.get('debug', False)
+        )
+    
+    else:
+        raise ValueError(f"Unknown spectrogram type: {spec_type}")
 
 
 if __name__ == '__main__':
