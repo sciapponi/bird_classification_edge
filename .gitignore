@@ -3,8 +3,10 @@ esc-50/
 .env
 birdenv
 augmented_dataset/
+bird_sound_dataset_preprocessed/*
 show.md
 venv/
+benchmark/
 __pycache__/
 riassunto.md
 get_bird_images.py
@@ -90,3 +92,4 @@ venv.bak/
 logs/
 logs_backup/
 #*.log
+TODO

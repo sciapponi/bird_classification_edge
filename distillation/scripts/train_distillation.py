@@ -27,6 +27,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from distillation.losses.distillation_loss import DistillationLoss, AdaptiveDistillationLoss
 from distillation.losses.focal_loss import FocalLoss, FocalDistillationLoss, AdaptiveFocalDistillationLoss
 from distillation.datasets.distillation_dataset import create_distillation_dataloader
+from distillation.datasets.hybrid_dataset import create_hybrid_dataloader
 from models import Improved_Phi_GRU_ATT
 # from utils.metrics import calculate_metrics, save_confusion_matrix
 # from utils.training_utils import EarlyStopping, save_checkpoint, load_checkpoint
@@ -134,20 +135,44 @@ class DistillationTrainer:
         """Setup data loaders for distillation training"""
         logger.info("Setting up data loaders with soft labels...")
         
-        # Create train loader
-        self.train_loader, train_dataset = create_distillation_dataloader(
-            self.config.dataset, self.soft_labels_path, split='train'
-        )
+        # Check if we should use hybrid dataset (supports both preprocessed and original files)
+        use_hybrid_dataset = self.config.dataset.get('use_hybrid', False)
         
-        # Create validation loader
-        self.val_loader, val_dataset = create_distillation_dataloader(
-            self.config.dataset, self.soft_labels_path, split='val'
-        )
-        
-        # Create test loader
-        self.test_loader, test_dataset = create_distillation_dataloader(
-            self.config.dataset, self.soft_labels_path, split='test'
-        )
+        if use_hybrid_dataset:
+            logger.info("Using Hybrid Dataset (supports preprocessed and original files)")
+            
+            # Create train loader
+            self.train_loader, train_dataset = create_hybrid_dataloader(
+                self.config.dataset, self.soft_labels_path, split='train'
+            )
+            
+            # Create validation loader
+            self.val_loader, val_dataset = create_hybrid_dataloader(
+                self.config.dataset, self.soft_labels_path, split='val'
+            )
+            
+            # Create test loader
+            self.test_loader, test_dataset = create_hybrid_dataloader(
+                self.config.dataset, self.soft_labels_path, split='test'
+            )
+            
+        else:
+            logger.info("Using Original Distillation Dataset")
+            
+            # Create train loader
+            self.train_loader, train_dataset = create_distillation_dataloader(
+                self.config.dataset, self.soft_labels_path, split='train'
+            )
+            
+            # Create validation loader
+            self.val_loader, val_dataset = create_distillation_dataloader(
+                self.config.dataset, self.soft_labels_path, split='val'
+            )
+            
+            # Create test loader
+            self.test_loader, test_dataset = create_distillation_dataloader(
+                self.config.dataset, self.soft_labels_path, split='test'
+            )
         
         # Log dataset info
         logger.info(f"Train samples: {len(train_dataset)}")
@@ -162,6 +187,11 @@ class DistillationTrainer:
         logger.info(f"Soft labels info: {soft_info}")
         logger.info(f"Number of classes: {self.num_classes}")
         logger.info(f"Class names: {self.class_names}")
+        
+        # Log dataset type for clarity
+        if use_hybrid_dataset:
+            use_preprocessed = self.config.dataset.get('use_preprocessed', False)
+            logger.info(f"Hybrid dataset mode: {'Preprocessed files' if use_preprocessed else 'Original files'}")
         
         return train_dataset, val_dataset, test_dataset
     

@@ -1,0 +1,80 @@
+experiment_name: hybrid_preprocessed_training
+
+hydra:
+  run:
+    dir: ./logs/${experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: ${experiment_name}
+
+# Training parameters
+training:
+  batch_size: 32
+  epochs: 50
+  patience: 10
+  min_delta: 0.001
+  seed: 42
+
+# Dataset configuration - HYBRID MODE WITH PREPROCESSED FILES
+dataset:
+  use_hybrid: true                     # Enable hybrid dataset
+  use_preprocessed: true               # Use preprocessed files
+  dataset_path: "bird_sound_dataset"         # Original dataset path (for class structure)
+  preprocessed_dataset_path: "preprocessed_dataset"  # Preprocessed files path
+  soft_labels_path: "test_soft_labels/soft_labels.json"
+  
+  # Audio processing config (ignored for preprocessed files, but kept for compatibility)
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: true
+  
+  # DataLoader settings
+  batch_size: ${training.batch_size}
+  num_workers: 4
+
+# Distillation parameters
+distillation:
+  alpha: 0.5
+  temperature: 4.0
+  adaptive: false
+
+# Loss configuration
+loss:
+  type: "distillation"  # "distillation", "focal", "focal_distillation"
+  gamma: 2.0
+  class_weights: null
+
+# Model configuration
+model:
+  _target_: models.Improved_Phi_GRU_ATT
+  spectrogram_type: "combined_log_linear"
+  num_classes: 9  # Will be set automatically from dataset
+  n_mel_bins: 64
+  n_linear_filters: 64
+  hidden_dim: 64
+  n_fft: 1024
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 5
+    stride: 1
+    dropout: 0.05
+    breakpoint: 4000
+    transition_width: 100
+  export_mode: false
+
+# Optimizer
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.001
+  weight_decay: 0.01
+
+# Scheduler
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.5
+  patience: 5
+  verbose: true 
