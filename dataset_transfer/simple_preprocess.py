@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Add project root to path
-sys.path.append(os.path.join(os.path.dirname(__file__)))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Import the preprocessing functions
 from datasets.audio_utils import extract_call_segments, apply_bandpass_filter
@@ -233,23 +233,55 @@ def process_single_file(input_path: Path, output_dir: Path, config: Dict[str, An
             'fallback_used': False
         }
 
-def find_audio_files(input_dir: Path, extensions: list = None) -> list:
-    """Find all audio files in directory and subdirectories."""
+def load_species_list(species_file: Path) -> list:
+    """Load species list from file."""
+    try:
+        with open(species_file, 'r', encoding='utf-8') as f:
+            species = [line.strip() for line in f if line.strip()]
+        logger.info(f"Loaded {len(species)} species from {species_file}")
+        for i, species_name in enumerate(species, 1):
+            logger.info(f"  {i}. {species_name}")
+        return species
+    except Exception as e:
+        logger.error(f"Failed to load species file {species_file}: {e}")
+        sys.exit(1)
+
+def find_audio_files(input_dir: Path, extensions: list = None, allowed_species: list = None) -> list:
+    """Find all audio files in directory and subdirectories, optionally filtered by species."""
     if extensions is None:
         extensions = ['.wav', '.mp3', '.flac', '.m4a', '.aac', '.ogg']
     
     audio_files = []
-    for ext in extensions:
-        audio_files.extend(input_dir.rglob(f'*{ext}'))
-        audio_files.extend(input_dir.rglob(f'*{ext.upper()}'))
+    
+    if allowed_species is not None:
+        # Filter by specific species directories
+        logger.info(f"Filtering files by {len(allowed_species)} specified species:")
+        for species in allowed_species:
+            species_dir = input_dir / species
+            if species_dir.exists() and species_dir.is_dir():
+                logger.info(f"  Processing species: {species}")
+                species_files = []
+                for ext in extensions:
+                    species_files.extend(species_dir.glob(f'*{ext}'))
+                    species_files.extend(species_dir.glob(f'*{ext.upper()}'))
+                audio_files.extend(species_files)
+                logger.info(f"    Found {len(species_files)} files in {species}")
+            else:
+                logger.warning(f"  Species directory not found: {species_dir}")
+    else:
+        # Process all files (original behavior)
+        for ext in extensions:
+            audio_files.extend(input_dir.rglob(f'*{ext}'))
+            audio_files.extend(input_dir.rglob(f'*{ext.upper()}'))
     
     return sorted(audio_files)
 
 def process_all_files(input_dir: Path, output_dir: Path, config: Dict[str, Any]) -> Dict[str, Any]:
     """Process all audio files in the input directory."""
     
-    # Find all audio files
-    audio_files = find_audio_files(input_dir)
+    # Find all audio files (filtered by species if specified)
+    allowed_species = config.get('allowed_species', None)
+    audio_files = find_audio_files(input_dir, allowed_species=allowed_species)
     
     if not audio_files:
         logger.warning(f"No audio files found in {input_dir}")
@@ -341,6 +373,8 @@ def main():
     parser.add_argument('--highcut', type=float, default=16000.0, help='Bandpass filter high cutoff (default: 16000.0)')
     parser.add_argument('--format', type=str, choices=['wav', 'mp3', 'npy', 'npz', 'npz_compressed', 'preserve'], 
                        default='preserve', help='Output format (default: preserve)')
+    parser.add_argument('--species-file', type=str, default=None,
+                       help='File containing list of species to process (one per line). If not provided, processes all species.')
     
     args = parser.parse_args()
     
@@ -356,6 +390,15 @@ def main():
     # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # Load species list if provided
+    allowed_species = None
+    if args.species_file:
+        species_file_path = Path(args.species_file)
+        if not species_file_path.exists():
+            logger.error(f"Species file does not exist: {species_file_path}")
+            sys.exit(1)
+        allowed_species = load_species_list(species_file_path)
+    
     # Configuration
     config = {
         'sample_rate': args.sample_rate,
@@ -363,7 +406,8 @@ def main():
         'lowcut': args.lowcut,
         'highcut': args.highcut,
         'extract_calls': True,
-        'save_format': args.format
+        'save_format': args.format,
+        'allowed_species': allowed_species
     }
     
     logger.info("Starting preprocessing with configuration:")
