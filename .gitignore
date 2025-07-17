@@ -3,6 +3,7 @@ esc-50/
 .env
 birdenv
 augmented_dataset/
+bird_sound_dataset_preprocessed/
 bird_sound_dataset_preprocessed/*
 show.md
 venv/
@@ -93,3 +94,5 @@ logs/
 logs_backup/
 #*.log
 TODO
+present.pdf
+bird_sound_dataset_preprocessed

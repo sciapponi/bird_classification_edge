@@ -52,6 +52,127 @@ class EarlyStopping:
             self.counter += 1
         return self.counter >= self.patience
 
+class PreprocessedDistillationDataset:
+    """
+    Wrapper dataset that combines preprocessed files with soft labels for distillation.
+    """
+    
+    def __init__(self, preprocessed_dataset, soft_labels_path):
+        """
+        Initialize preprocessed distillation dataset.
+        
+        Args:
+            preprocessed_dataset: Instance of PreprocessedBirdDataset
+            soft_labels_path: Path to directory containing soft_labels.json
+        """
+        self.preprocessed_dataset = preprocessed_dataset
+        self.soft_labels_path = Path(soft_labels_path)
+        self.soft_labels_data = {}
+        self.soft_labels_metadata = {}
+        
+        # Load soft labels
+        self._load_soft_labels()
+        
+        logger.info(f"PreprocessedDistillationDataset initialized:")
+        logger.info(f"  Preprocessed dataset samples: {len(self.preprocessed_dataset)}")
+        logger.info(f"  Soft labels available: {len(self.soft_labels_data)}")
+        logger.info(f"  Soft labels classes: {self.soft_labels_metadata.get('num_classes', 'Unknown')}")
+    
+    def _load_soft_labels(self):
+        """Load soft labels from JSON file"""
+        soft_labels_file = self.soft_labels_path / "soft_labels.json"
+        metadata_file = self.soft_labels_path / "soft_labels_metadata.json"
+        
+        if not soft_labels_file.exists():
+            raise FileNotFoundError(f"Soft labels file not found: {soft_labels_file}")
+        
+        # Load soft labels data
+        with open(soft_labels_file, 'r') as f:
+            self.soft_labels_data = json.load(f)
+        
+        # Load metadata if available
+        if metadata_file.exists():
+            with open(metadata_file, 'r') as f:
+                self.soft_labels_metadata = json.load(f)
+        
+        logger.info(f"Loaded soft labels for {len(self.soft_labels_data)} files")
+    
+    def __len__(self):
+        return len(self.preprocessed_dataset)
+    
+    def __getitem__(self, idx):
+        """
+        Get item with audio, hard label, and soft label.
+        
+        Returns:
+            tuple: (audio_tensor, hard_label, soft_label_tensor)
+        """
+        # Get preprocessed audio and metadata
+        if self.preprocessed_dataset.return_metadata:
+            audio, metadata = self.preprocessed_dataset[idx]
+            original_filename = metadata.get('original_filename', '')
+        else:
+            audio = self.preprocessed_dataset[idx]
+            # Try to get filename from dataset internal data
+            sample_data = self.preprocessed_dataset.samples[idx]
+            original_filename = sample_data.get('original_filename', sample_data.get('filename', ''))
+        
+        # Get hard label (class index)
+        hard_label = self.preprocessed_dataset.samples[idx]['class_idx']
+        
+        # Get soft label
+        soft_label = self._get_soft_label_for_file(original_filename)
+        
+        return audio, hard_label, soft_label
+    
+    def _get_soft_label_for_file(self, filename):
+        """
+        Get soft label for a given filename.
+        
+        Args:
+            filename: Original filename
+            
+        Returns:
+            torch.Tensor: Soft label probabilities
+        """
+        # Remove extension and path to match soft labels keys
+        base_filename = Path(filename).stem
+        
+        # Try to find soft label by exact match first
+        if base_filename in self.soft_labels_data:
+            soft_label = self.soft_labels_data[base_filename]
+        else:
+            # Try partial matching (filename might contain additional info)
+            matching_keys = [key for key in self.soft_labels_data.keys() if base_filename in key or key in base_filename]
+            if matching_keys:
+                # Use first match
+                soft_label = self.soft_labels_data[matching_keys[0]]
+                logger.debug(f"Soft label found using partial match: {base_filename} -> {matching_keys[0]}")
+            else:
+                # No soft label found, create uniform distribution
+                num_classes = self.soft_labels_metadata.get('num_classes', len(self.get_classes()))
+                soft_label = [1.0 / num_classes] * num_classes
+                logger.warning(f"No soft label found for {base_filename}, using uniform distribution")
+        
+        return torch.tensor(soft_label, dtype=torch.float32)
+    
+    def get_soft_labels_info(self):
+        """Get information about soft labels"""
+        return {
+            'total_files_with_soft_labels': len(self.soft_labels_data),
+            'num_classes': self.soft_labels_metadata.get('num_classes', len(self.get_classes())),
+            'metadata': self.soft_labels_metadata
+        }
+    
+    def get_classes(self):
+        """Get class names"""
+        # Try to get from soft labels metadata first
+        if 'class_names' in self.soft_labels_metadata:
+            return self.soft_labels_metadata['class_names']
+        
+        # Fall back to preprocessed dataset classes
+        return self.preprocessed_dataset.classes
+
 def save_checkpoint(model, optimizer, epoch, val_loss, val_acc, filepath='checkpoint.pt'):
     torch.save({
         'model_state_dict': model.state_dict(),
@@ -135,44 +256,56 @@ class DistillationTrainer:
         """Setup data loaders for distillation training"""
         logger.info("Setting up data loaders with soft labels...")
         
-        # Check if we should use hybrid dataset (supports both preprocessed and original files)
-        use_hybrid_dataset = self.config.dataset.get('use_hybrid', False)
+        # Check if we should use preprocessed files (no runtime processing)
+        use_preprocessed_files = not self.config.dataset.get('process', True)  # Default: process=True (do preprocessing)
         
-        if use_hybrid_dataset:
-            logger.info("Using Hybrid Dataset (supports preprocessed and original files)")
+        if use_preprocessed_files:
+            logger.info("Using Preprocessed Files (no runtime preprocessing)")
             
-            # Create train loader
-            self.train_loader, train_dataset = create_hybrid_dataloader(
-                self.config.dataset, self.soft_labels_path, split='train'
-            )
-            
-            # Create validation loader
-            self.val_loader, val_dataset = create_hybrid_dataloader(
-                self.config.dataset, self.soft_labels_path, split='val'
-            )
-            
-            # Create test loader
-            self.test_loader, test_dataset = create_hybrid_dataloader(
-                self.config.dataset, self.soft_labels_path, split='test'
-            )
+            # Create preprocessed dataloaders with soft labels
+            self.train_loader, train_dataset = self._create_preprocessed_distillation_dataloader(split='train')
+            self.val_loader, val_dataset = self._create_preprocessed_distillation_dataloader(split='validation')  
+            self.test_loader, test_dataset = self._create_preprocessed_distillation_dataloader(split='test')
             
         else:
-            logger.info("Using Original Distillation Dataset")
+            # Check if we should use hybrid dataset (supports both preprocessed and original files)
+            use_hybrid_dataset = self.config.dataset.get('use_hybrid', False)
             
-            # Create train loader
-            self.train_loader, train_dataset = create_distillation_dataloader(
-                self.config.dataset, self.soft_labels_path, split='train'
-            )
-            
-            # Create validation loader
-            self.val_loader, val_dataset = create_distillation_dataloader(
-                self.config.dataset, self.soft_labels_path, split='val'
-            )
-            
-            # Create test loader
-            self.test_loader, test_dataset = create_distillation_dataloader(
-                self.config.dataset, self.soft_labels_path, split='test'
-            )
+            if use_hybrid_dataset:
+                logger.info("Using Hybrid Dataset (supports preprocessed and original files)")
+                
+                # Create train loader
+                self.train_loader, train_dataset = create_hybrid_dataloader(
+                    self.config.dataset, self.soft_labels_path, split='train'
+                )
+                
+                # Create validation loader
+                self.val_loader, val_dataset = create_hybrid_dataloader(
+                    self.config.dataset, self.soft_labels_path, split='val'
+                )
+                
+                # Create test loader
+                self.test_loader, test_dataset = create_hybrid_dataloader(
+                    self.config.dataset, self.soft_labels_path, split='test'
+                )
+                
+            else:
+                logger.info("Using Original Distillation Dataset (with runtime preprocessing)")
+                
+                # Create train loader
+                self.train_loader, train_dataset = create_distillation_dataloader(
+                    self.config.dataset, self.soft_labels_path, split='train'
+                )
+                
+                # Create validation loader
+                self.val_loader, val_dataset = create_distillation_dataloader(
+                    self.config.dataset, self.soft_labels_path, split='val'
+                )
+                
+                # Create test loader
+                self.test_loader, test_dataset = create_distillation_dataloader(
+                    self.config.dataset, self.soft_labels_path, split='test'
+                )
         
         # Log dataset info
         logger.info(f"Train samples: {len(train_dataset)}")
@@ -189,11 +322,76 @@ class DistillationTrainer:
         logger.info(f"Class names: {self.class_names}")
         
         # Log dataset type for clarity
-        if use_hybrid_dataset:
+        if use_preprocessed_files:
+            logger.info("Using preprocessed files: No runtime preprocessing will be performed")
+        elif use_hybrid_dataset:
             use_preprocessed = self.config.dataset.get('use_preprocessed', False)
             logger.info(f"Hybrid dataset mode: {'Preprocessed files' if use_preprocessed else 'Original files'}")
+        else:
+            logger.info("Original dataset mode: Runtime preprocessing will be performed")
         
         return train_dataset, val_dataset, test_dataset
+    
+    def _create_preprocessed_distillation_dataloader(self, split='train'):
+        """
+        Create dataloader for preprocessed files with soft labels for distillation.
+        
+        Args:
+            split: 'train', 'validation', or 'test'
+            
+        Returns:
+            tuple: (dataloader, dataset)
+        """
+        import sys
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+        from datasets.preprocessed_dataset import PreprocessedBirdDataset
+        from torch.utils.data import DataLoader
+        
+        # Map split names
+        subset_mapping = {
+            'train': 'training',
+            'validation': 'validation', 
+            'test': 'test'
+        }
+        subset = subset_mapping.get(split, split)
+        
+        # Get configuration
+        dataset_config = self.config.dataset
+        
+        # Create preprocessed dataset
+        preprocessed_dataset = PreprocessedBirdDataset(
+            root_dir=dataset_config.get('preprocessed_root_dir', dataset_config.get('root_dir')),
+            allowed_classes=dataset_config.get('species_list', None),
+            subset=subset,
+            validation_split=dataset_config.get('validation_split', 0.15),
+            test_split=dataset_config.get('test_split', 0.15),
+            split_seed=dataset_config.get('split_seed', 42),
+            transform=None,  # No transforms for preprocessed files
+            return_metadata=True
+        )
+        
+        # Create distillation wrapper that adds soft labels
+        distillation_dataset = PreprocessedDistillationDataset(
+            preprocessed_dataset=preprocessed_dataset,
+            soft_labels_path=self.soft_labels_path
+        )
+        
+        # Create dataloader
+        batch_size = dataset_config.get('batch_size', 32)
+        num_workers = dataset_config.get('num_workers', 4)
+        shuffle = (split == 'train')
+        
+        dataloader = DataLoader(
+            distillation_dataset,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            num_workers=num_workers,
+            pin_memory=torch.cuda.is_available(),
+            drop_last=(split == 'train')  # Drop last batch only for training
+        )
+        
+        logger.info(f"Created preprocessed distillation dataloader for {split}: {len(distillation_dataset)} samples")
+        return dataloader, distillation_dataset
     
     def setup_model(self):
         """Setup student model"""

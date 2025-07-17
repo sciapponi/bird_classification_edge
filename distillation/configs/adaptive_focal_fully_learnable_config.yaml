@@ -5,7 +5,7 @@ defaults:
   - distillation_config
 
 # Override experiment name
-experiment_name: "adaptive_focal_fully_learnable"
+experiment_name: "adaptive_focal_fully_learnable_corrected"
 
 # Loss function configuration - Adaptive focal distillation
 loss:
@@ -13,11 +13,11 @@ loss:
   gamma: 2.0                    # Starting gamma (will be adapted)
   class_weights: "auto"         # Automatically compute and adapt
   alpha_scaling: 2.0            # Higher scaling for very imbalanced data
-  num_classes: 3                # EXPLICIT: 2 bird classes + 1 no_birds class
+  num_classes: 9                # EXPLICIT: 8 bird classes + 1 no_birds class
   
   # FORCE FULL DATASET CALCULATION FOR PRODUCTION
-  use_fast_sampling: true      # Use ALL samples for accurate weights
-  weight_calculation_samples: 50  # Use all available samples
+  use_fast_sampling: true       # Use sampling for faster weight calculation
+  weight_calculation_samples: 1000  # Use 1000 samples for weight calculation
   cache_max_age_hours: 24       # Cache for 1 day
 
 # Adaptive distillation parameters
@@ -29,17 +29,17 @@ distillation:
 
 # Training parameters optimized for adaptive learning
 training:
-  epochs: 2                   # Medium-length training
+  epochs: 75                    # Medium-length training
   batch_size: 48                # Slightly smaller batches for better gradient estimates
-  patience: 20                  # Patience for adaptive methods
+  patience: 40                  # Patience for adaptive methods
   min_delta: 0.0005             # More sensitive to improvements
   seed: 42
 
 # Model parameters - FULLY LEARNABLE FILTER BANK
 model:
-  num_classes: 3                # EXPLICIT: 2 bird classes + 1 no_birds class
+  num_classes: 9                # EXPLICIT: 8 bird classes + 1 no_birds class
   spectrogram_type: "fully_learnable"  # ← MAIN CHANGE: Use fully learnable instead of combined_log_linear
-  hidden_dim: 80                # Slightly larger for complex imbalanced patterns
+  hidden_dim: 32                
   n_mel_bins: 64
   n_linear_filters: 64
   trainable_filterbank: true    # Kept for compatibility but not used in fully learnable
@@ -65,14 +65,11 @@ optimizer:
   betas: [0.9, 0.999]
   eps: 1e-8
 
-# More conservative scheduler for adaptive learning
+# Cosine annealing scheduler for adaptive learning
 scheduler:
-  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
-  mode: 'min'
-  factor: 0.6                   # Less aggressive reduction
-  patience: 7                   # Medium patience
-  min_lr: 5e-7
-  cooldown: 3                   # Cooldown period after reduction
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 75                     # Number of epochs (matches training.epochs)
+  eta_min: 5e-7                 # Minimum learning rate
 
 # Dataset configuration - SMALL TEST DATASET
 dataset:
@@ -81,12 +78,17 @@ dataset:
   allowed_bird_classes:
     - "Bubo_bubo"
     - "Certhia_familiaris"
-    # Reduced to 2 bird classes for testing
+    - "Apus_apus"
+    - "Certhia_brachydactyla"
+    - "Emberiza_cia"
+    - "Lophophanes_cristatus"
+    - "Periparus_ater"
+    - "Poecile_montanus"
   
   # Use minimal no_birds dataset for quick testing
   load_pregenerated_no_birds: true
   pregenerated_no_birds_dir: augmented_dataset/no_birds
-  num_no_bird_samples: 10       # Just 10 no-bird samples for testing
+  num_no_bird_samples: 836      # Use all no-bird samples for better balance
   
   # Moderate augmentation - let adaptive methods handle the complexity
   augmentation:

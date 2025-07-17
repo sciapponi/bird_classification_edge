@@ -1,0 +1,84 @@
+# Quick Test Configuration - 1 Epoch Test Run
+# Use this for testing the preprocessing pipeline on your PC
+
+experiment_name: "quick_test_1_epoch"
+
+# Loss function configuration (simple)
+loss:
+  type: "distillation"
+  class_weights: null
+
+# Distillation parameters (simple)
+distillation:
+  alpha: 0.5
+  temperature: 3.0
+  adaptive: false
+
+# Training parameters - MINIMAL FOR TESTING
+training:
+  epochs: 1                    # Just 1 epoch for testing
+  batch_size: 8               # Small batch size for PC testing
+  patience: 1
+  min_delta: 0.001
+  seed: 42
+
+# Model parameters (minimal)
+model:
+  spectrogram_type: "mel"     # Simple mel spectrogram (faster)
+  hidden_dim: 32              # Smaller model for testing
+  n_mel_bins: 32              # Less bins for faster processing
+  n_fft: 512                  # Smaller FFT
+  hop_length: 160
+  matchbox:
+    base_filters: 16          # Minimal matchbox
+    num_layers: 2
+    kernel_size: 3
+    dropout: 0.1
+
+# Optimizer
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 0.001
+
+# No scheduler for quick test
+# scheduler: null
+
+# Dataset parameters - TEST WITH PREPROCESSING
+dataset:
+  soft_labels_path: "test_soft_labels"
+  
+  # CHOOSE: Test with preprocessing (process: true) or preprocessed files (process: false)
+  process: true                        # Set to false to test preprocessed files
+  preprocessed_root_dir: "bird_sound_dataset_preprocessed"  # Only used if process: false
+  main_data_dir: "bird_sound_dataset"  # Only used if process: true
+  
+  # Minimal classes for testing
+  allowed_bird_classes:
+    - "Bubo_bubo"
+    - "Certhia_familiaris" 
+    - "Apus_apus"
+  
+  # Quick splits
+  validation_split: 0.2
+  test_split: 0.2
+  split_seed: 42
+  
+  # Small dataloader settings
+  batch_size: 8
+  num_workers: 2               # Few workers for PC testing
+  
+  # Minimal preprocessing settings (if process: true)
+  sample_rate: 32000
+  clip_duration: 3.0
+  extract_calls: false         # Disable call extraction for speed
+  
+  # Minimal augmentation
+  augmentation:
+    enabled: false            # Disable for speed
+
+# Logging
+hydra:
+  run:
+    dir: ./logs/quick_test/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: quick_test 
