@@ -12,8 +12,8 @@ hydra-core
 omegaconf
 tqdm
 librosa
-torchsummary
-birdnetlib
+torchsummary==1.5.1
+birdnetlib==0.18.0
 tensorflow>=2.8.0
 tflite-runtime
 ffmpeg-python

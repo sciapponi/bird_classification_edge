@@ -11,20 +11,30 @@ RUN apt-get update && apt-get install -y \
     portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --yes
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --yes
+
+
 # Set the working directory in the container
 WORKDIR /app
 
 # Configure pip for better timeout handling
-RUN pip config set global.timeout 300
-RUN pip config set global.retries 3
+RUN uv pip config set global.timeout 300
+RUN uv pip config set global.retries 3
 
-# Install PyTorch with CUDA support first
-RUN pip install --no-cache-dir --timeout 300 torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# Install PyTorch separately to ensure compatibility with system CUDA if needed
+RUN uv pip install --no-cache-dir --timeout 300 torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Copy the requirements file and install other packages
+# Explicitly install TensorFlow for BirdNET-Analyzer
+RUN uv pip install --no-cache-dir --timeout 600 tensorflow
+
+# Copy and install other requirements
 COPY requirements.txt .
-# Remove only exact torch package lines from requirements to avoid conflicts
+# Remove torch dependencies from requirements.txt to avoid conflicts
+# This is a safe way to handle cases where torch is also in requirements
 RUN sed -i '/^torch$/d; /^torchaudio$/d; /^torchvision$/d' requirements.txt
+RUN uv pip install --no-cache-dir --timeout 300 -r requirements.txt
 
 # Install packages with retry logic for birdnetlib specifically
 RUN pip install --no-cache-dir --timeout 300 \
@@ -33,7 +43,7 @@ RUN pip install --no-cache-dir --timeout 300 \
 
 # Install birdnetlib separately with multiple retries
 RUN for i in 1 2 3; do \
-    pip install --no-cache-dir --timeout 600 birdnetlib && break || \
+    uv pip install --no-cache-dir --timeout 600 birdnetlib && break || \
     (echo "Attempt $i failed, retrying..." && sleep 10); \
     done
 

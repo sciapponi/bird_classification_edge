@@ -9,6 +9,12 @@ set -e
 DOCKER_IMAGE_NAME="bird_classification_edge"
 DEFAULT_CONTAINER_NAME="distillation_training"
 
+# Auto-detect macOS
+IS_MAC=false
+if [[ "$(uname)" == "Darwin" ]]; then
+    IS_MAC=true
+fi
+
 # Directories to mount
 HOST_PROJECT_DIR="$PWD"
 HOST_BIRD_SOUND_DATASET_DIR="$PWD/bird_sound_dataset"
@@ -35,7 +41,7 @@ HYDRA_OVERRIDES=()
 for arg in "$@"; do
     if [[ $arg == GPU_ID=* ]]; then
         GPU_ID="${arg#GPU_ID=}"
-    elif [[ $arg == "MAC" ]]; then
+    elif [[ $arg == "MAC" || "$IS_MAC" == true ]]; then
         USE_GPU=false
     elif [[ -z $CONTAINER_NAME_SET ]]; then
         CONTAINER_NAME="$arg"
@@ -129,8 +135,6 @@ DOCKER_CMD="$DOCKER_CMD $DOCKER_IMAGE_NAME"
 
 # Default distillation command
 DISTILLATION_CMD="python train_distillation.py"
-# The path inside the container must match the mounted volume
-DISTILLATION_CMD="$DISTILLATION_CMD dataset.soft_labels_path=test_soft_labels"
 
 # Add any Hydra overrides
 if [[ ${#HYDRA_OVERRIDES[@]} -gt 0 ]]; then

@@ -40,12 +40,14 @@ class SoftLabelExtractor:
         print(f"Loaded {self.num_classes} target species")
         print(f"Using confidence threshold: {confidence_threshold}")
     
+    
+    # carica i nomi delle specie target dalla cartella del dataset
     def load_target_species(self, species_list_path):
         """Load scientific names from species.txt and match with actual dataset"""
         import os
         
         # Get species from actual dataset directories
-        dataset_path = "bird_sound_dataset"
+        dataset_path = "bird_sound_dataset_processed"
         actual_species = []
         if os.path.exists(dataset_path):
             for item in os.listdir(dataset_path):
@@ -53,11 +55,11 @@ class SoftLabelExtractor:
                     # Convert directory name to scientific name (e.g., "Bubo_bubo" -> "Bubo bubo")
                     scientific_name = item.replace('_', ' ')
                     actual_species.append(scientific_name)
-        
-        print(f"Found {len(actual_species)} species in dataset: {actual_species}")
-        
         # Also add a "non-bird" class at the end
         actual_species.append("non-bird")
+        print(f"Found {len(actual_species)} species in dataset: {actual_species}")
+        
+        
         
         return actual_species
     
@@ -202,7 +204,7 @@ class SoftLabelExtractor:
 
 def main():
     parser = argparse.ArgumentParser(description="Extract soft labels from BirdNET")
-    parser.add_argument("--dataset_path", type=str, default="bird_sound_dataset",
+    parser.add_argument("--dataset_path", type=str, default="bird_sound_dataset_processed",
                        help="Path to bird sound dataset")
     parser.add_argument("--output_path", type=str, default="soft_labels",
                        help="Output directory for soft labels")
