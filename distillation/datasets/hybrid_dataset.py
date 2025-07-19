@@ -241,7 +241,7 @@ class HybridBirdDataset(Dataset):
                 return self.soft_labels[key]
         
         # Return uniform distribution as fallback
-        num_classes = len(self.class_to_idx)
+        num_classes = self.num_classes
         return torch.ones(num_classes, dtype=torch.float32) / num_classes
     
     def __len__(self):

@@ -2,13 +2,13 @@
 # Standalone configuration with all required parameters
 
 # Override experiment name
-experiment_name: "bird_classification_distillation_extract_calls_100_epochs"
+experiment_name: "bird_full_training_fulldataset"
 
 # Loss function configuration
 loss:
-  type: "distillation"          # Options: "distillation", "focal", "focal_distillation"
+  type: "focal_distillation"          # Options: "distillation", "focal", "focal_distillation"
   gamma: 2.0                    # Focal loss gamma parameter (only used for focal loss types)
-  class_weights: null           # Options: null, "auto", or list of per-class weights
+  class_weights: auto           # Options: null, "auto", or list of per-class weights
   alpha_scaling: 1.0            # Scaling factor for automatic class weights
 
 # Distillation-specific parameters
@@ -32,7 +32,7 @@ distillation:
 training:
   epochs: 50            # Full training with extract_calls
   batch_size: 64               # Can be larger since we're not running teacher online
-  patience: 20                  # Much longer patience to reach 100 epochs
+  patience: 40                  # Much longer patience to reach 100 epochs
   min_delta: 0.001             # More sensitive to small improvements
   seed: 42
 
@@ -45,7 +45,7 @@ model:
   trainable_filterbank: true
   initial_breakpoint: 4000.0
   initial_transition_width: 100.0
-  n_fft: 1024
+  n_fft: 512 
   hop_length: 320
   matchbox:
     base_filters: 32
@@ -60,21 +60,24 @@ optimizer:
   weight_decay: 0.01
 
 # Learning rate scheduler
+#scheduler:
+#  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#  mode: 'min'                   # Monitor validation loss
+#  factor: 0.5
+#  patience: 5
+#  min_lr: 1e-6
 scheduler:
-  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
-  mode: 'min'                   # Monitor validation loss
-  factor: 0.5
-  patience: 5
-  min_lr: 1e-6
-
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 75                     # Number of epochs (matches training.epochs)
+  eta_min: 5e-7                 # Minimum learning rate
 # Dataset parameters
 dataset:
-  soft_labels_path: "test_soft_labels"  # Path to soft labels (can be overridden)
-  main_data_dir: bird_sound_dataset
+  soft_labels_path: "soft_labels_complete"  # Path to soft labels (can be overridden)
+  main_data_dir: bird_sound_dataset_processed
   
   # NEW: Control preprocessing behavior
   process: true                         # Set to false to use preprocessed files (no runtime preprocessing)
-  preprocessed_root_dir: "bird_sound_dataset_preprocessed"  # Directory with preprocessed files (used when process=false)
+  preprocessed_root_dir: "bird_sound_dataset_processed"  # Directory with preprocessed files (used when process=false)
   # Explicitly define the classes to match the teacher model's output
   allowed_bird_classes:
     - "Accipiter_gentilis"
@@ -169,7 +172,7 @@ dataset:
   clip_duration: 3.0
   lowcut: 150.0
   highcut: 16000.0
-  extract_calls: true  # CHANGED: Use call extraction for better training data
+  extract_calls: false  # CHANGED: Use call extraction for better training data
   
   # Dynamic balancing for non-bird class
   esc50_dir: "esc-50/ESC-50-master"

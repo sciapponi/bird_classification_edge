@@ -49,6 +49,7 @@ class SoftLabelExtractor:
         # Get species from actual dataset directories
         dataset_path = "bird_sound_dataset_processed"
         actual_species = []
+        print(f"Dataset_path: {dataset_path}")
         if os.path.exists(dataset_path):
             for item in os.listdir(dataset_path):
                 if os.path.isdir(os.path.join(dataset_path, item)) and not item.startswith('.'):
@@ -140,6 +141,7 @@ class SoftLabelExtractor:
             output_path: Path to save soft labels
             max_files_per_class: Limit files per species (for testing)
         """
+        
         dataset_path = Path(dataset_path)
         output_path = Path(output_path)
         output_path.mkdir(exist_ok=True)
@@ -151,9 +153,8 @@ class SoftLabelExtractor:
         audio_files = []
         for species_dir in dataset_path.iterdir():
             if species_dir.is_dir():
-                species_files = []
-                for ext in ['*.mp3', '*.wav', '*.flac']:
-                    species_files.extend(list(species_dir.glob(ext)))
+                # Get all files in the directory (no extension filtering)
+                species_files = [f for f in species_dir.iterdir() if f.is_file()]
                 
                 # Limit files per class if specified
                 if max_files_per_class:

@@ -17,7 +17,7 @@ fi
 
 # Directories to mount
 HOST_PROJECT_DIR="$PWD"
-HOST_BIRD_SOUND_DATASET_DIR="$PWD/bird_sound_dataset"
+HOST_BIRD_SOUND_DATASET_DIR="$PWD/bird_sound_dataset_processed"
 HOST_AUGMENTED_DATASET_DIR="$PWD/augmented_dataset"
 HOST_ESC50_DIR="$PWD/esc-50"
 HOST_SOFT_LABELS_OUTPUT_DIR="$PWD/soft_labels_complete"
@@ -25,7 +25,7 @@ HOST_LOGS_DIR="$PWD/logs"
 
 # Container paths
 CONTAINER_PROJECT_DIR="/app"
-CONTAINER_BIRD_SOUND_DATASET_DIR="/app/bird_sound_dataset"
+CONTAINER_BIRD_SOUND_DATASET_DIR="/app/bird_sound_dataset_processed"
 CONTAINER_AUGMENTED_DATASET_DIR="/app/augmented_dataset"
 CONTAINER_ESC50_DIR="/app/esc-50"
 CONTAINER_SOFT_LABELS_OUTPUT_DIR="/app/soft_labels_complete"
@@ -117,7 +117,7 @@ DOCKER_CMD="$DOCKER_CMD $DOCKER_IMAGE_NAME"
 
 # Default soft label extraction command
 SOFT_LABELS_CMD="python extract_soft_labels.py"
-SOFT_LABELS_CMD="$SOFT_LABELS_CMD --dataset_path bird_sound_dataset"
+SOFT_LABELS_CMD="$SOFT_LABELS_CMD --dataset_path bird_sound_dataset_processed"
 SOFT_LABELS_CMD="$SOFT_LABELS_CMD --output_path soft_labels_complete"
 SOFT_LABELS_CMD="$SOFT_LABELS_CMD --confidence_threshold 0.05"
 

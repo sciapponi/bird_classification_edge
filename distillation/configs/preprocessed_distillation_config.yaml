@@ -70,7 +70,7 @@ dataset:
   
   # PREPROCESSED FILES CONFIGURATION
   process: false                        # Use preprocessed files (no runtime preprocessing)
-  preprocessed_root_dir: "bird_sound_dataset_preprocessed"  # Directory with preprocessed files
+  preprocessed_root_dir: "bird_sound_dataset_processed"  # Directory with preprocessed files
   
   # Classes to match the teacher model's output
   allowed_bird_classes:

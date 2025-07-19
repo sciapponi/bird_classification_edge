@@ -98,10 +98,10 @@ class PreprocessedBirdDataset(Dataset):
             species_name = species_dir.name
             class_idx = self.class_to_idx[species_name]
             
-            # Find preprocessed files (NPZ or WAV)
+            # Find ALL files in the species directory (no extension filter)
             files = []
-            files.extend(list(species_dir.glob("*.npz")))
-            files.extend(list(species_dir.glob("*.wav")))
+            # Get all files, regardless of extension
+            files = [f for f in species_dir.iterdir() if f.is_file()]
             
             if not files:
                 logger.warning(f"No preprocessed files found in {species_dir}")
@@ -201,18 +201,18 @@ class PreprocessedBirdDataset(Dataset):
                 audio_data = data['audio']
                 metadata = data['metadata'].item() if 'metadata' in data else {}
                 
-            elif file_path.suffix == '.wav':
-                # Load WAV file
+            elif file_path.suffix.lower() in ['.wav', '.mp3', '.flac', '.ogg', '.m4a', '.aac']:
+                # Load audio file using torchaudio (supports multiple formats)
                 waveform, sr = torchaudio.load(str(file_path))
                 audio_data = waveform.squeeze().numpy()
                 
-                # Load metadata from JSON file
+                # Load metadata from JSON file if exists
                 metadata_path = file_path.with_suffix('.json')
                 if metadata_path.exists():
                     with open(metadata_path, 'r') as f:
                         metadata = json.load(f)
                 else:
-                    metadata = {'sample_rate': sr}
+                    metadata = {'sample_rate': sr, 'original_file': str(file_path)}
             
             else:
                 raise ValueError(f"Unsupported file format: {file_path.suffix}")
@@ -224,13 +224,33 @@ class PreprocessedBirdDataset(Dataset):
             if audio_tensor.dim() == 1:
                 audio_tensor = audio_tensor.unsqueeze(0)
             
+            # IMPORTANT: Fix tensor dimensions and make resizable
+            target_length = 96000  # 3 seconds at 32kHz (consistent length)
+            
+            # Ensure mono
+            if audio_tensor.shape[0] > 1:
+                audio_tensor = audio_tensor.mean(dim=0, keepdim=True)
+            
+            # Pad or truncate to target length
+            current_length = audio_tensor.shape[1]
+            if current_length > target_length:
+                # Truncate
+                audio_tensor = audio_tensor[:, :target_length]
+            elif current_length < target_length:
+                # Pad with zeros
+                padding = target_length - current_length
+                audio_tensor = torch.nn.functional.pad(audio_tensor, (0, padding))
+            
+            # Clone to make tensor resizable and contiguous
+            audio_tensor = audio_tensor.clone().contiguous()
+            
             return audio_tensor, metadata
             
         except Exception as e:
             logger.error(f"Failed to load {file_path}: {e}")
-            # Return silence as fallback
-            fallback_length = 96000  # 3 seconds at 32kHz
-            audio_tensor = torch.zeros(1, fallback_length)
+            # Return silence as fallback with consistent shape
+            target_length = 96000  # 3 seconds at 32kHz
+            audio_tensor = torch.zeros(1, target_length).clone().contiguous()
             metadata = {'error': str(e)}
             return audio_tensor, metadata
     

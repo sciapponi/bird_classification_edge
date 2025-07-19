@@ -21,7 +21,7 @@ loss:
   
   # ULTRA-FAST WEIGHT CALCULATION 
   use_fast_sampling: true     # Use statistical sampling instead of full dataset scan
-  weight_calculation_samples: 100  # ULTRA-FAST: Only 100 samples for weight calculation
+  weight_calculation_samples: 10000  # ULTRA-FAST: Only 100 samples for weight calculation
   cache_max_age_hours: 168    # Cache for 1 week to avoid recalculation
 
 # Standard distillation parameters

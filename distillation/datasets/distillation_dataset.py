@@ -259,11 +259,10 @@ def create_distillation_dataloader(config, soft_labels_path, split='train'):
     )
 
     # Get DataLoader parameters from config with safe fallbacks
-    # First try config.training, then config.dataset, then defaults
-    training_config = getattr(config, 'training', {})
-    batch_size = training_config.get('batch_size') or config.get('batch_size', 16)
-    num_workers = training_config.get('num_workers') or config.get('num_workers', 0)
-    pin_memory = training_config.get('pin_memory') or config.get('pin_memory', False)
+    # The config passed here is config.dataset, so we need to look for training parameters differently
+    batch_size = config.get('batch_size', 16)  # Use dataset.batch_size if available, otherwise default to 16
+    num_workers = config.get('num_workers', 0)
+    pin_memory = config.get('pin_memory', False)
     
     # Log the DataLoader configuration for debugging
     print(f"Creating {split} DataLoader with:")

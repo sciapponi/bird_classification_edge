@@ -49,7 +49,7 @@ dataset:
   
   # CHOOSE: Test with preprocessing (process: true) or preprocessed files (process: false)
   process: true                        # Set to false to test preprocessed files
-  preprocessed_root_dir: "bird_sound_dataset_preprocessed"  # Only used if process: false
+  preprocessed_root_dir: "bird_sound_dataset_processed"  # Only used if process: false
   main_data_dir: "bird_sound_dataset"  # Only used if process: true
   
   # Minimal classes for testing

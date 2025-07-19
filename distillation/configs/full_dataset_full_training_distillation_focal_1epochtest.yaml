@@ -1,0 +1,70 @@
+# Adaptive Focal Distillation Configuration
+# Best for highly imbalanced datasets where class distribution changes
+
+defaults:
+  - distillation_config
+
+# Override experiment name
+experiment_name: "adaptive_focal_distillation"
+
+# Loss function configuration - Adaptive focal distillation
+loss:
+  type: "focal_distillation"    # Focal loss + knowledge distillation
+  gamma: 2.0                    # Starting gamma (will be adapted)
+  class_weights: "auto"         # Automatically compute and adapt
+  alpha_scaling: 2.0            # Higher scaling for very imbalanced data
+  
+  # FORCE FULL DATASET CALCULATION FOR PRODUCTION
+  use_fast_sampling: false      # Use ALL samples for accurate weights
+  weight_calculation_samples: 10000  # Use all available samples
+  cache_max_age_hours: 24       # Cache for 1 day
+
+# Adaptive distillation parameters
+distillation:
+  alpha: 0.25                   # Start with more focus on focal loss
+  temperature: 5.0              # Higher temperature for softer distillation
+  adaptive: true                # Enable adaptive alpha adjustment
+  adaptation_rate: 0.15         # More aggressive adaptation
+
+# Training parameters optimized for adaptive learning
+training:
+  epochs: 1                    # Medium-length training
+  batch_size: 384                # Slightly smaller batches for better gradient estimates
+  patience: 20                  # Patience for adaptive methods
+  min_delta: 0.0005             # More sensitive to improvements
+  seed: 42
+
+# Model parameters - robust architecture for imbalanced data
+model:
+  spectrogram_type: "combined_log_linear"
+  hidden_dim: 64                # Slightly larger for complex imbalanced patterns
+  n_mel_bins: 64
+  n_linear_filters: 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 512
+  hop_length: 320
+  matchbox:
+    base_filters: 32            # Keep compatible with base config
+    num_layers: 3               # Keep compatible with base config  
+    kernel_size: 3
+    dropout: 0.15               # Higher dropout for regularization
+
+# Optimizer with careful learning rate for adaptive methods
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0008                    # Lower LR for stable adaptive learning
+  weight_decay: 0.015
+  betas: [0.9, 0.999]
+  eps: 1e-8
+
+# More conservative scheduler for adaptive learning
+scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 75                     # Number of epochs (matches training.epochs)
+  eta_min: 5e-7                 # Minimum learning rate
+  
+dataset:
+  num_workers: 8
+  pin_memory: true

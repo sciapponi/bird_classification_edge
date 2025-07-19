@@ -15,7 +15,7 @@ set -euo pipefail  # Exit on error, undefined vars, pipe failures
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-DEFAULT_DATASET_PATH="$PROJECT_ROOT/bird_sound_dataset_preprocessed"
+DEFAULT_DATASET_PATH="$PROJECT_ROOT/bird_sound_dataset_processed"
 DEFAULT_REMOTE_PATH="/data/datasets/"
 COMPRESSION_ENABLED=true
 VERIFY_TRANSFER=true

@@ -365,8 +365,8 @@ def main():
     parser = argparse.ArgumentParser(description='Preprocess audio files using training pipeline')
     parser.add_argument('--input-dir', type=str, default='bird_sound_dataset', 
                        help='Input directory containing audio files (default: bird_sound_dataset)')
-    parser.add_argument('--output-dir', type=str, default='bird_sound_dataset_preprocessed', 
-                       help='Output directory for preprocessed files (default: bird_sound_dataset_preprocessed)')
+    parser.add_argument('--output-dir', type=str, default='bird_sound_dataset_processed', 
+                       help='Output directory for preprocessed files (default: bird_sound_dataset_processed)')
     parser.add_argument('--sample-rate', type=int, default=32000, help='Target sample rate (default: 32000)')
     parser.add_argument('--clip-duration', type=float, default=3.0, help='Clip duration in seconds (default: 3.0)')
     parser.add_argument('--lowcut', type=float, default=150.0, help='Bandpass filter low cutoff (default: 150.0)')

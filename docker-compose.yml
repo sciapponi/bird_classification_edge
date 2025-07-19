@@ -8,6 +8,7 @@ services:
     container_name: bird_train_container
     volumes:
       - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./bird_sound_dataset_processed:/app/bird_sound_dataset_processed
       - ./augmented_dataset:/app/augmented_dataset
       - ./esc-50:/app/esc-50
       - ./config:/app/config
@@ -34,6 +35,7 @@ services:
     volumes:
       - .:/app
       - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./bird_sound_dataset_processed:/app/bird_sound_dataset_processed
       - ./augmented_dataset:/app/augmented_dataset
       - ./esc-50:/app/esc-50
       - ./test_soft_labels:/app/test_soft_labels
@@ -61,6 +63,7 @@ services:
     volumes:
       - .:/app
       - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./bird_sound_dataset_processed:/app/bird_sound_dataset_processed
       - ./augmented_dataset:/app/augmented_dataset
       - ./esc-50:/app/esc-50
       - ./soft_labels_complete:/app/soft_labels_complete
@@ -88,6 +91,7 @@ services:
     container_name: bird_benchmark_container
     volumes:
       - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./bird_sound_dataset_processed:/app/bird_sound_dataset_processed
       - ./augmented_dataset:/app/augmented_dataset
       - ./benchmark:/app/benchmark
       - ./logs:/app/logs
@@ -117,6 +121,7 @@ services:
     container_name: bird_benchmark_quick_container
     volumes:
       - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./bird_sound_dataset_processed:/app/bird_sound_dataset_processed
       - ./augmented_dataset:/app/augmented_dataset
       - ./benchmark:/app/benchmark
       - ./logs:/app/logs
@@ -137,7 +142,8 @@ services:
     image: bird_classification_edge
     container_name: bird_benchmark_full_container
     volumes:
-      - ./bird_sound_dataset:/app/bird_sound_dataset
+      - ./bird_sound_dataset:/app/bird_sound_dataset 
+      - ./bird_sound_dataset_processed:/app/bird_sound_dataset_processed
       - ./augmented_dataset:/app/augmented_dataset
       - ./benchmark:/app/benchmark
       - ./logs:/app/logs

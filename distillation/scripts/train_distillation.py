@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf, open_dict
 from pathlib import Path
 import logging
 from sklearn.metrics import classification_report, confusion_matrix
@@ -107,21 +107,26 @@ class PreprocessedDistillationDataset:
         Returns:
             tuple: (audio_tensor, hard_label, soft_label_tensor)
         """
-        # Get preprocessed audio and metadata
+        # Get preprocessed audio and metadata from combined dataset
         if self.preprocessed_dataset.return_metadata:
-            audio, metadata = self.preprocessed_dataset[idx]
+            audio, class_idx, metadata = self.preprocessed_dataset[idx]
             original_filename = metadata.get('original_filename', '')
         else:
-            audio = self.preprocessed_dataset[idx]
+            audio, class_idx = self.preprocessed_dataset[idx]
             # Try to get filename from dataset internal data
             sample_data = self.preprocessed_dataset.samples[idx]
             original_filename = sample_data.get('original_filename', sample_data.get('filename', ''))
         
-        # Get hard label (class index)
-        hard_label = self.preprocessed_dataset.samples[idx]['class_idx']
+        # Use class_idx directly from the combined dataset (handles both bird and no_bird)
+        hard_label = class_idx
         
         # Get soft label
         soft_label = self._get_soft_label_for_file(original_filename)
+        
+        # Ensure consistent audio tensor shape (1D)
+        if audio.dim() > 1:
+            audio = audio.squeeze()  # Remove extra dimensions
+        audio = audio.view(-1)  # Force to 1D
         
         return audio, hard_label, soft_label
     
@@ -149,10 +154,23 @@ class PreprocessedDistillationDataset:
                 soft_label = self.soft_labels_data[matching_keys[0]]
                 logger.debug(f"Soft label found using partial match: {base_filename} -> {matching_keys[0]}")
             else:
-                # No soft label found, create uniform distribution
-                num_classes = self.soft_labels_metadata.get('num_classes', len(self.get_classes()))
-                soft_label = [1.0 / num_classes] * num_classes
-                logger.warning(f"No soft label found for {base_filename}, using uniform distribution")
+                # FIXED: Use consistent number of classes
+                # Get the expected number of classes from metadata, with fallback
+                expected_num_classes = self.soft_labels_metadata.get('num_classes')
+                if not expected_num_classes:
+                    # If metadata is missing, check the size of existing soft labels
+                    if self.soft_labels_data:
+                        # Get size from any existing soft label
+                        sample_key = next(iter(self.soft_labels_data))
+                        expected_num_classes = len(self.soft_labels_data[sample_key])
+                    else:
+                        # Last resort: use dataset classes + 1 for non-bird
+                        dataset_classes = self.preprocessed_dataset.class_to_idx if hasattr(self.preprocessed_dataset, 'class_to_idx') else {}
+                        expected_num_classes = len(dataset_classes) + 1  # +1 for non-bird
+                
+                # Create uniform distribution with correct size
+                soft_label = [1.0 / expected_num_classes] * expected_num_classes
+                logger.warning(f"No soft label found for {base_filename}, using uniform distribution with {expected_num_classes} classes")
         
         return torch.tensor(soft_label, dtype=torch.float32)
     
@@ -165,13 +183,25 @@ class PreprocessedDistillationDataset:
         }
     
     def get_classes(self):
-        """Get class names"""
-        # Try to get from soft labels metadata first
-        if 'class_names' in self.soft_labels_metadata:
-            return self.soft_labels_metadata['class_names']
+        """Get list of class names from the soft labels metadata."""
+        # The source of truth for classes should be the teacher's labels.
+        target_species = self.soft_labels_metadata.get('target_species')
+        num_classes = self.soft_labels_metadata.get('num_classes', 0)
         
-        # Fall back to preprocessed dataset classes
-        return self.preprocessed_dataset.classes
+        if not target_species or len(target_species) != num_classes:
+            print("Warning: 'target_species' in metadata doesn't match 'num_classes'. Falling back to base dataset classes.")
+            
+            # For preprocessed datasets, use idx_to_class mapping
+            if hasattr(self.preprocessed_dataset, 'idx_to_class'):
+                return [self.preprocessed_dataset.idx_to_class[i] for i in range(len(self.preprocessed_dataset.idx_to_class))]
+            # For other datasets, try class_to_idx
+            elif hasattr(self.preprocessed_dataset, 'class_to_idx'):
+                return list(self.preprocessed_dataset.class_to_idx.keys())
+            # Fallback to generic names
+            else:
+                return [f"Class_{i}" for i in range(num_classes)]
+            
+        return target_species
 
 def save_checkpoint(model, optimizer, epoch, val_loss, val_acc, filepath='checkpoint.pt'):
     torch.save({
@@ -198,16 +228,57 @@ def save_confusion_matrix(y_true, y_pred, class_names, png_path, csv_path):
     except Exception as e:
         logger.error(f"Failed to save confusion matrix CSV: {e}")
 
-    # Save PNG
-    plt.figure(figsize=(12, 10))
-    sns.heatmap(cm_df, annot=True, fmt='d', cmap='Blues')
-    plt.title('Confusion Matrix')
-    plt.ylabel('Actual')
-    plt.xlabel('Predicted')
+    # Save PNG with better formatting for many classes
+    num_classes = len(class_names)
+    
+    # Adaptive figure size based on number of classes
+    if num_classes > 50:
+        figsize = (20, 18)  # Large figure for 70+ classes
+        annot_fontsize = 6  # Small font for annotations
+        label_fontsize = 8  # Small font for labels
+        title_fontsize = 14
+    elif num_classes > 20:
+        figsize = (16, 14)
+        annot_fontsize = 8
+        label_fontsize = 10
+        title_fontsize = 16
+    else:
+        figsize = (12, 10)
+        annot_fontsize = 10
+        label_fontsize = 12
+        title_fontsize = 18
+    
+    plt.figure(figsize=figsize)
+    
+    # Create heatmap with conditional annotation
+    if num_classes > 50:
+        # For large matrices, only show annotations for non-zero values to reduce clutter
+        annot_array = np.where(cm > 0, cm, "")
+        sns.heatmap(cm_df, annot=annot_array, fmt='', cmap='Blues', 
+                   cbar_kws={'shrink': 0.8}, annot_kws={'size': annot_fontsize})
+    else:
+        # For smaller matrices, show all annotations
+        sns.heatmap(cm_df, annot=True, fmt='d', cmap='Blues',
+                   cbar_kws={'shrink': 0.8}, annot_kws={'size': annot_fontsize})
+    
+    plt.title('Confusion Matrix', fontsize=title_fontsize, pad=20)
+    plt.ylabel('Actual', fontsize=label_fontsize)
+    plt.xlabel('Predicted', fontsize=label_fontsize)
+    
+    # Rotate labels for better readability with many classes
+    if num_classes > 20:
+        plt.xticks(rotation=90, fontsize=8)
+        plt.yticks(rotation=0, fontsize=8)
+    else:
+        plt.xticks(rotation=45, fontsize=10)
+        plt.yticks(rotation=0, fontsize=10)
+    
     plt.tight_layout()
+    
     try:
-        plt.savefig(png_path)
+        plt.savefig(png_path, dpi=300, bbox_inches='tight')
         logger.info(f"Confusion matrix PNG saved to {png_path}")
+        logger.info(f"Matrix size: {num_classes}x{num_classes} classes")
     except Exception as e:
         logger.error(f"Failed to save confusion matrix PNG: {e}")
     finally:
@@ -292,19 +363,35 @@ class DistillationTrainer:
             else:
                 logger.info("Using Original Distillation Dataset (with runtime preprocessing)")
                 
-                # Create train loader
+                # Create train loader - pass training config for batch_size
+                train_config = self.config.dataset.copy()
+                if hasattr(self.config, 'training') and 'batch_size' in self.config.training:
+                    # Temporarily disable struct mode to allow adding batch_size
+                    with open_dict(train_config):
+                        train_config['batch_size'] = self.config.training.batch_size
+                    
                 self.train_loader, train_dataset = create_distillation_dataloader(
-                    self.config.dataset, self.soft_labels_path, split='train'
+                    train_config, self.soft_labels_path, split='train'
                 )
                 
-                # Create validation loader
+                # Create validation loader - pass training config for batch_size
+                val_config = self.config.dataset.copy()
+                if hasattr(self.config, 'training') and 'batch_size' in self.config.training:
+                    with open_dict(val_config):
+                        val_config['batch_size'] = self.config.training.batch_size
+                
                 self.val_loader, val_dataset = create_distillation_dataloader(
-                    self.config.dataset, self.soft_labels_path, split='val'
+                    val_config, self.soft_labels_path, split='val'
                 )
                 
-                # Create test loader
+                # Create test loader - pass training config for batch_size
+                test_config = self.config.dataset.copy()
+                if hasattr(self.config, 'training') and 'batch_size' in self.config.training:
+                    with open_dict(test_config):
+                        test_config['batch_size'] = self.config.training.batch_size
+                
                 self.test_loader, test_dataset = create_distillation_dataloader(
-                    self.config.dataset, self.soft_labels_path, split='test'
+                    test_config, self.soft_labels_path, split='test'
                 )
         
         # Log dataset info
@@ -314,12 +401,43 @@ class DistillationTrainer:
         
         # Get soft labels info and extract number of classes
         soft_info = train_dataset.get_soft_labels_info()
-        self.num_classes = soft_info['num_classes']
-        self.class_names = train_dataset.get_classes()
+        
+        # FIXED: Use dataset as source of truth, not soft labels
+        # Get actual classes from the dataset
+        dataset_classes = train_dataset.get_classes() if hasattr(train_dataset, 'get_classes') else []
+        dataset_num_classes = len(dataset_classes)
+        
+        # Check if dataset already includes non-bird class
+        dataset_already_has_non_bird = 'non-bird' in dataset_classes or 'no_bird' in dataset_classes
+        include_non_bird = self.config.dataset.get('include_non_bird_class', True)  # Default: include
+        
+        if dataset_already_has_non_bird:
+            # Dataset already includes non-bird class (like our CombinedPreprocessedDataset)
+            self.num_classes = dataset_num_classes
+            self.class_names = dataset_classes
+            logger.info(f"Dataset already includes non-bird class: {self.num_classes} total classes")
+        else:
+            # Check if we need to add non-bird class (explicitly configured)
+            if include_non_bird:
+                self.num_classes = dataset_num_classes + 1  # Add non-bird class
+                self.class_names = dataset_classes + ['non-bird']
+                logger.info(f"Including non-bird class: {dataset_num_classes} bird classes + 1 non-bird = {self.num_classes} total")
+            else:
+                self.num_classes = dataset_num_classes
+                self.class_names = dataset_classes
+                logger.info(f"Using only bird classes: {self.num_classes} total")
+        
+        # Verify soft labels compatibility
+        soft_num_classes = soft_info.get('num_classes', 0)
+        if soft_num_classes != self.num_classes:
+            logger.warning(f"Soft labels have {soft_num_classes} classes, but dataset configured for {self.num_classes} classes")
+            logger.warning("This may cause issues during training. Consider regenerating soft labels or adjusting configuration.")
         
         logger.info(f"Soft labels info: {soft_info}")
         logger.info(f"Number of classes: {self.num_classes}")
         logger.info(f"Class names: {self.class_names}")
+        logger.info(f"Final class verification: model will use {self.num_classes} classes")
+        logger.info(f"Source of truth: Dataset ({dataset_num_classes} classes) + config (include_non_bird={include_non_bird})")
         
         # Log dataset type for clarity
         if use_preprocessed_files:
@@ -335,6 +453,7 @@ class DistillationTrainer:
     def _create_preprocessed_distillation_dataloader(self, split='train'):
         """
         Create dataloader for preprocessed files with soft labels for distillation.
+        Automatically combines bird files (bird_sound_dataset_processed) and no_bird files (augmented_dataset/no_birds).
         
         Args:
             split: 'train', 'validation', or 'test'
@@ -343,9 +462,14 @@ class DistillationTrainer:
             tuple: (dataloader, dataset)
         """
         import sys
+        import os
+        import random
+        import torch
+        import numpy as np
+        from pathlib import Path
         sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
         from datasets.preprocessed_dataset import PreprocessedBirdDataset
-        from torch.utils.data import DataLoader
+        from torch.utils.data import DataLoader, ConcatDataset
         
         # Map split names
         subset_mapping = {
@@ -358,8 +482,8 @@ class DistillationTrainer:
         # Get configuration
         dataset_config = self.config.dataset
         
-        # Create preprocessed dataset
-        preprocessed_dataset = PreprocessedBirdDataset(
+        # 1. Create preprocessed bird dataset (classes 0-69)
+        bird_dataset = PreprocessedBirdDataset(
             root_dir=dataset_config.get('preprocessed_root_dir', dataset_config.get('root_dir')),
             allowed_classes=dataset_config.get('species_list', None),
             subset=subset,
@@ -370,9 +494,159 @@ class DistillationTrainer:
             return_metadata=True
         )
         
+        logger.info(f"Loaded bird dataset: {len(bird_dataset)} samples, {len(bird_dataset.class_to_idx)} classes")
+        
+        # 2. Create no_bird dataset from augmented_dataset/no_birds (class 70)
+        no_birds_dir = Path("augmented_dataset/no_birds")
+        no_bird_files = []
+        
+        if no_birds_dir.exists():
+            # Get all WAV files from no_birds directory
+            all_no_bird_files = [f for f in no_birds_dir.iterdir() if f.suffix.lower() == '.wav']
+            
+            # Split no_bird files using same logic as bird dataset
+            np.random.seed(dataset_config.get('split_seed', 42))
+            indices = np.arange(len(all_no_bird_files))
+            np.random.shuffle(indices)
+            
+            # Calculate split sizes
+            validation_split = dataset_config.get('validation_split', 0.15)
+            test_split = dataset_config.get('test_split', 0.15)
+            
+            n_files = len(all_no_bird_files)
+            test_size = int(n_files * test_split)
+            val_size = int(n_files * validation_split)
+            train_size = n_files - test_size - val_size
+            
+            # Split indices
+            if subset == "training":
+                selected_indices = indices[:train_size]
+            elif subset == "validation":
+                selected_indices = indices[train_size:train_size + val_size]
+            elif subset == "test":
+                selected_indices = indices[train_size + val_size:]
+            else:
+                selected_indices = indices  # fallback
+            
+            # Get selected files
+            no_bird_files = [all_no_bird_files[i] for i in selected_indices]
+            
+            logger.info(f"Loaded no_bird files: {len(no_bird_files)} samples for {subset}")
+        else:
+            logger.warning(f"No_birds directory not found: {no_birds_dir}")
+        
+        # 3. Create combined dataset class
+        class CombinedPreprocessedDataset:
+            def __init__(self, bird_dataset, no_bird_files):
+                self.bird_dataset = bird_dataset
+                self.no_bird_files = no_bird_files
+                self.no_bird_class_idx = 70  # Fixed class index for no_bird
+                
+                # Create combined class mapping (70 bird classes + 1 no_bird class)
+                self.class_to_idx = bird_dataset.class_to_idx.copy()
+                self.class_to_idx['no_bird'] = self.no_bird_class_idx
+                
+                self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
+                
+                # Copy attributes from bird dataset for compatibility
+                self.return_metadata = bird_dataset.return_metadata
+                
+            def __len__(self):
+                return len(self.bird_dataset) + len(self.no_bird_files)
+            
+            def __getitem__(self, idx):
+                if idx < len(self.bird_dataset):
+                    # Bird sample
+                    if self.bird_dataset.return_metadata:
+                        audio, class_idx, metadata = self.bird_dataset[idx]
+                        return audio, class_idx, metadata
+                    else:
+                        audio, class_idx = self.bird_dataset[idx]
+                        return audio, class_idx
+                else:
+                    # No_bird sample
+                    no_bird_idx = idx - len(self.bird_dataset)
+                    no_bird_file = self.no_bird_files[no_bird_idx]
+                    
+                    # Load no_bird audio file
+                    import torchaudio
+                    target_length = int(32000 * 3.0)  # 3 seconds at 32kHz
+                    try:
+                        audio, sr = torchaudio.load(str(no_bird_file))
+                        # Convert to mono if needed
+                        if audio.shape[0] > 1:
+                            audio = audio.mean(dim=0, keepdim=False)
+                        else:
+                            audio = audio.squeeze(0)
+                        
+                        # Ensure consistent shape and length
+                        audio = audio.squeeze()  # Remove any extra dimensions
+                        if len(audio) > target_length:
+                            audio = audio[:target_length]  # Truncate
+                        elif len(audio) < target_length:
+                            # Pad with zeros
+                            padding = target_length - len(audio)
+                            audio = torch.nn.functional.pad(audio, (0, padding))
+                        
+                        # Ensure 1D tensor
+                        audio = audio.view(-1)  # Force to 1D shape [96000]
+                            
+                    except Exception as e:
+                        logger.warning(f"Error loading {no_bird_file}: {e}")
+                        # Create silence as fallback
+                        audio = torch.zeros(target_length, dtype=torch.float32)
+                    
+                    if self.bird_dataset.return_metadata:
+                        metadata = {
+                            'original_filename': no_bird_file.name,
+                            'class_name': 'no_bird',
+                            'file_path': str(no_bird_file)
+                        }
+                        return audio, self.no_bird_class_idx, metadata
+                    else:
+                        return audio, self.no_bird_class_idx
+            
+            def get_classes(self):
+                """Return list of all class names including no_bird."""
+                # Get bird classes in order
+                bird_classes = [self.idx_to_class[i] for i in range(len(self.bird_dataset.class_to_idx))]
+                bird_classes.append('no_bird')  # Add no_bird as last class
+                return bird_classes
+            
+            def get_soft_labels_info(self):
+                """Return soft labels info for the combined dataset."""
+                return {
+                    'total_files_with_soft_labels': 0,  # Will be set by distillation wrapper
+                    'num_classes': 71,  # 70 bird + 1 no_bird
+                    'metadata': {'num_classes': 71}
+                }
+            
+            @property 
+            def samples(self):
+                """Provide samples list for compatibility."""
+                # Create samples list for bird dataset
+                bird_samples = []
+                if hasattr(self.bird_dataset, 'samples'):
+                    bird_samples = self.bird_dataset.samples
+                
+                # Add no_bird samples
+                no_bird_samples = []
+                for file_path in self.no_bird_files:
+                    no_bird_samples.append({
+                        'file_path': file_path,
+                        'class_name': 'no_bird',
+                        'class_idx': self.no_bird_class_idx,
+                        'original_filename': file_path.name
+                    })
+                
+                return bird_samples + no_bird_samples
+        
+        # Create combined dataset
+        combined_dataset = CombinedPreprocessedDataset(bird_dataset, no_bird_files)
+        
         # Create distillation wrapper that adds soft labels
         distillation_dataset = PreprocessedDistillationDataset(
-            preprocessed_dataset=preprocessed_dataset,
+            preprocessed_dataset=combined_dataset,
             soft_labels_path=self.soft_labels_path
         )
         
@@ -390,7 +664,12 @@ class DistillationTrainer:
             drop_last=(split == 'train')  # Drop last batch only for training
         )
         
-        logger.info(f"Created preprocessed distillation dataloader for {split}: {len(distillation_dataset)} samples")
+        logger.info(f"Created combined preprocessed distillation dataloader for {split}:")
+        logger.info(f"  Bird samples: {len(bird_dataset)}")
+        logger.info(f"  No_bird samples: {len(no_bird_files)}")
+        logger.info(f"  Total samples: {len(distillation_dataset)}")
+        logger.info(f"  Total classes: {len(combined_dataset.class_to_idx)}")
+        
         return dataloader, distillation_dataset
     
     def setup_model(self):
@@ -635,7 +914,7 @@ class DistillationTrainer:
             loss_config = self.config.get('loss', {})
             
             # Fast sampling parameters
-            max_samples = loss_config.get('weight_calculation_samples', 1000)  # Default: use only 1000 samples
+            max_samples = loss_config.get('weight_calculation_samples', 10000)  # !!! DA SISTEMARE: E' HARDCODED
             use_sampling = loss_config.get('use_fast_sampling', True)  # Enable fast sampling by default
             
             dataset_size = len(train_dataset)
@@ -659,7 +938,7 @@ class DistillationTrainer:
             
             for i in pbar:
                 try:
-                    _, hard_label, _ = train_dataset[i]
+                    _, hard_label, soft_label = train_dataset[i]
                     if isinstance(hard_label, torch.Tensor):
                         label = hard_label.item()
                     else:
@@ -677,21 +956,58 @@ class DistillationTrainer:
                     logger.debug(f"Failed to load sample {i}: {e}")
                     continue
             
+            # IMPORTANT: Also scan soft labels to find missing classes (like non-bird)
+            logger.info("Scanning soft labels to identify additional classes not in preprocessed dataset...")
+            try:
+                soft_labels_info = train_dataset.get_soft_labels_info()
+                total_expected_classes = soft_labels_info.get('num_classes', self.num_classes)
+                logger.info(f"Soft labels info retrieved: expected classes = {total_expected_classes}")
+                logger.info(f"Expected total classes: {total_expected_classes}, Found in dataset: {len(class_counts)}")
+            except Exception as e:
+                logger.error(f"Error getting soft labels info: {e}")
+                total_expected_classes = self.num_classes
+            
+            # Check if we found all expected classes
+            missing_classes = []
+            for expected_class_idx in range(total_expected_classes):
+                if expected_class_idx not in class_counts:
+                    missing_classes.append(expected_class_idx)
+            
+            logger.info(f"Missing classes analysis: Expected={total_expected_classes}, Found={list(class_counts.keys())}, Missing={missing_classes}")
+            
+            if missing_classes:
+                logger.info(f"Found {len(missing_classes)} missing classes in preprocessed dataset: {missing_classes}")
+                
+                # FIXED: Use simple, reliable estimates for missing classes
+                for cls_idx in missing_classes:
+                    if cls_idx == 70:  # Non-bird class
+                        # Based on user info: ~900 non-bird samples in the dataset
+                        estimated_count = 900
+                        logger.info(f"Using fixed estimate for non-bird class {cls_idx}: {estimated_count} samples")
+                    elif cls_idx == 44:  # Pernis apivorus (very rare bird)
+                        # Rare bird species - conservative estimate
+                        estimated_count = max(1, dataset_size // (total_expected_classes * 100))  # Very small
+                        logger.info(f"Using conservative estimate for rare bird class {cls_idx}: {estimated_count} samples")
+                    else:
+                        # Other missing classes - moderate estimate
+                        estimated_count = max(1, dataset_size // (total_expected_classes * 50))
+                        logger.info(f"Using moderate estimate for missing class {cls_idx}: {estimated_count} samples")
+                    
+                    class_counts[cls_idx] = estimated_count
+                
+                logger.info(f"Successfully estimated counts for missing classes with fixed values: {missing_classes}")
+                logger.info(f"Updated class_counts: {dict(sorted(class_counts.items()))}")
+            else:
+                logger.info("No missing classes detected - all expected classes found in dataset")
+            
             if successful_samples == 0:
                 logger.error("No samples could be loaded for class weight computation!")
                 # Return equal weights as fallback
-                num_classes = self.num_classes
+                num_classes = total_expected_classes
                 class_weights = [1.0] * num_classes
             else:
-                # Scale counts to represent full dataset if we used sampling
-                if use_sampling and samples_to_scan < dataset_size:
-                    scaling_factor = dataset_size / samples_to_scan
-                    for label in class_counts:
-                        class_counts[label] = int(class_counts[label] * scaling_factor)
-                    logger.info(f"Scaled sample counts by {scaling_factor:.2f} to estimate full dataset distribution")
-                
-                # Convert to ordered list - ENSURE WE HAVE ALL EXPECTED CLASSES
-                expected_num_classes = self.num_classes  # Use the known number of classes from config
+                # Convert to ordered list - USE THE TOTAL EXPECTED CLASSES
+                expected_num_classes = total_expected_classes  # Use the actual number from soft labels
                 max_class = max(max(class_counts.keys()) if class_counts else 0, expected_num_classes - 1)
                 class_counts_list = [class_counts.get(i, 0) for i in range(max_class + 1)]
                 
@@ -699,25 +1015,51 @@ class DistillationTrainer:
                 while len(class_counts_list) < expected_num_classes:
                     class_counts_list.append(0)  # Add missing classes with 0 count
                 
-                logger.info(f"Estimated class distribution: {class_counts_list}")
+                # FIXED: Handle scaling carefully - don't scale estimated classes twice
+                if use_sampling and samples_to_scan < dataset_size:
+                    scaling_factor = dataset_size / samples_to_scan
+                    scaled_class_counts = []
+                    
+                    for i, count in enumerate(class_counts_list):
+                        if i in missing_classes and count > 0:
+                            # Don't scale estimated classes - they're already at reasonable values
+                            scaled_class_counts.append(count)
+                            logger.debug(f"Class {i} using fixed estimate (no scaling): {count}")
+                        else:
+                            # Scale sampled classes
+                            scaled_count = int(count * scaling_factor)
+                            scaled_class_counts.append(scaled_count)
+                            
+                    logger.info(f"Applied selective scaling by {scaling_factor:.2f} (skipped fixed estimates)")
+                    logger.info(f"Estimated class distribution: {scaled_class_counts}")
+                else:
+                    scaled_class_counts = class_counts_list
+                    logger.info(f"Actual class distribution: {class_counts_list}")
                 
-                # Compute class weights using inverse frequency
-                total_samples = sum(class_counts_list)
-                num_classes = len(class_counts_list)
+                # Compute class weights using inverse frequency - FIXED CALCULATION
+                # Use the actual dataset size, not the scaled total
+                total_samples_actual = dataset_size  # Use real dataset size
+                num_classes = len(scaled_class_counts)
                 
                 # Handle missing classes with smart fallback
-                min_count_threshold = max(1, total_samples // (num_classes * 50))  # Conservative minimum
+                min_count_threshold = max(1, total_samples_actual // (num_classes * 100))  # More conservative minimum
                 class_weights = []
-                for i, count in enumerate(class_counts_list):
+                for i, count in enumerate(scaled_class_counts):
                     if count == 0:
-                        # For missing classes, use a moderate weight (assume rare but present)
-                        # This gives them importance without dominating training
-                        effective_count = min_count_threshold * 2  # Assume they're rare
-                        logger.warning(f"Class {i} not found in sample - assigning moderate weight")
+                        # For missing classes, assign moderate weight based on average rare class frequency
+                        # This avoids both zero division and extreme weights
+                        non_zero_counts = [c for c in scaled_class_counts if c > 0]
+                        if non_zero_counts:
+                            # Use smallest non-zero count as estimate for missing class
+                            effective_count = min(non_zero_counts)
+                        else:
+                            effective_count = total_samples_actual // (num_classes * 10)  # Very conservative fallback
+                        logger.warning(f"Class {i} not found in sample - estimating with count {effective_count}")
                     else:
                         effective_count = max(count, min_count_threshold)  # Avoid zero division
                     
-                    weight = total_samples / (num_classes * effective_count)
+                    # Standard inverse frequency weighting formula
+                    weight = total_samples_actual / (num_classes * effective_count)
                     class_weights.append(weight)
             
             # Apply scaling
@@ -732,7 +1074,8 @@ class DistillationTrainer:
                 import json
                 cache_data = {
                     'class_weights': class_weights,
-                    'class_distribution': class_counts_list if 'class_counts_list' in locals() else [],
+                    'class_distribution': scaled_class_counts if 'scaled_class_counts' in locals() else class_counts_list,
+                    'missing_classes_estimated': missing_classes if 'missing_classes' in locals() else [],
                     'samples_used': successful_samples,
                     'total_dataset_size': dataset_size,
                     'use_sampling': use_sampling,
