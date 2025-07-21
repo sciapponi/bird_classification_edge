@@ -1,0 +1,203 @@
+# Adaptive Focal Distillation Configuration
+# Best for highly imbalanced datasets where class distribution changes
+
+# Override experiment name
+experiment_name: bird_full_training_optimized_imbalanced
+
+# OTTIMIZZATO: Loss configuration per class imbalance estremo
+loss:
+  type: focal_distillation
+  gamma: 4.0              # AUMENTATO da 2.0: più focus su classi difficili
+  class_weights: auto
+  alpha_scaling: 3.0      # AUMENTATO da 1.0: più peso alle classi rare
+  adaptive: true          # NUOVO: adatta il loss durante training
+  
+distillation:
+  alpha: 0.4
+  temperature: 3.0
+  adaptive: true
+  adaptation_rate: 0.1
+  alpha_schedule: constant
+  confidence_threshold: 0.05
+  
+# OTTIMIZZATO: Training parameters per class imbalance
+training:
+  epochs: 40             # AUMENTATO da 150: più epoche per convergenza
+  batch_size: 128         # RIDOTTO da 512: per vedere più spesso classi rare
+  patience: 30            # RIDOTTO da 40: early stopping più aggressivo
+  min_delta: 0.0005       # RIDOTTO da 0.001: più sensibile ai miglioramenti
+  seed: 42
+  
+# OTTIMIZZATO: Model architecture più potente
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 128         # RADDOPPIATO da 64: più capacità
+  n_mel_bins: 128         # RADDOPPIATO da 64: più dettaglio spettrale
+  n_linear_filters: 128   # RADDOPPIATO da 64
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 1024            # RADDOPPIATO da 512: migliore risoluzione freq
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1         # AUMENTATO da 0.1: più regolarizzazione
+    
+# OTTIMIZZATO: Optimizer più aggressivo
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.002              # AUMENTATO da 0.001: learning rate più aggressivo
+  weight_decay: 0.02     # AUMENTATO da 0.01: più regolarizzazione
+  betas: [0.9, 0.999]
+  
+# OTTIMIZZATO: Scheduler più efficace per class imbalance
+scheduler:
+  _target_: torch.optim.lr_scheduler.OneCycleLR  # CAMBIATO da CosineAnnealingLR
+  max_lr: 0.01
+  pct_start: 0.3
+  anneal_strategy: cos
+  div_factor: 25
+  final_div_factor: 10000
+  
+dataset:
+  soft_labels_path: soft_labels_complete
+  main_data_dir: bird_sound_dataset_processed
+  process: false
+  preprocessed_root_dir: bird_sound_dataset_processed
+  
+  # NUOVO: Class balancing configuration
+  balanced_sampling: true     # Abilita weighted sampling
+  oversample_rare_classes: 2.0  # Oversampling per classi rare
+  
+  allowed_bird_classes:
+  - Accipiter_gentilis
+  - Aegithalos_caudatus
+  - Aegolius_funereus
+  - Apus_apus
+  - Ardea_cinerea
+  - Asio_otus
+  - Athene_noctua
+  - Bubo_bubo
+  - Buteo_buteo
+  - Caprimulgus_europaeus
+  - Carduelis_carduelis
+  - Certhia_brachydactyla
+  - Certhia_familiaris
+  - Chloris_chloris
+  - Coccothraustes_coccothraustes
+  - Columba_palumbus
+  - Corvus_corax
+  - Cuculus_canorus
+  - Curruca_communis
+  - Cyanistes_caeruleus
+  - Delichon_urbicum
+  - Dendrocopos_major
+  - Dryobates_minor
+  - Dryocopus_martius
+  - Emberiza_cia
+  - Emberiza_cirlus
+  - Erithacus_rubecula
+  - Falco_tinnunculus
+  - Ficedula_hypoleuca
+  - Fringilla_coelebs
+  - Garrulus_glandarius
+  - Hirundo_rustica
+  - Jynx_torquilla
+  - Lanius_collurio
+  - Lophophanes_cristatus
+  - Milvus_milvus
+  - Motacilla_alba
+  - Motacilla_cinerea
+  - Muscicapa_striata
+  - Oriolus_oriolus
+  - Otus_scops
+  - Parus_major
+  - Passer_montanus
+  - Periparus_ater
+  - Pernis_apivorus
+  - Phoenicurus_ochruros
+  - Phoenicurus_phoenicurus
+  - Phylloscopus_bonelli
+  - Phylloscopus_collybita
+  - Phylloscopus_sibilatrix
+  - Picus_canus
+  - Picus_viridis
+  - Poecile_montanus
+  - Poecile_palustris
+  - Prunella_modularis
+  - Pyrrhula_pyrrhula
+  - Regulus_ignicapilla
+  - Regulus_regulus
+  - Serinus_serinus
+  - Sitta_europaea
+  - Spinus_spinus
+  - Strix_aluco
+  - Sturnus_vulgaris
+  - Sylvia_atricapilla
+  - Troglodytes_troglodytes
+  - Turdus_merula
+  - Turdus_philomelos
+  - Turdus_pilaris
+  - Turdus_viscivorus
+  - Upupa_epops
+  
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  
+  # OTTIMIZZATO: Augmentation più aggressiva per classi rare
+  augmentation:
+    enabled: true
+    noise_level: 0.03        # TRIPLICATO da 0.01
+    time_mask_param: 50      # AUMENTATO da 30
+    freq_mask_param: 20      # RADDOPPIATO da 10
+    time_shift_limit: 0.2    # RADDOPPIATO da 0.1
+    speed_perturb_rate_min: 0.9   # Più aggressivo da 0.95
+    speed_perturb_rate_max: 1.1   # Più aggressivo da 1.05
+    
+    # NUOVO: Advanced augmentation techniques
+    adaptive_augmentation: true
+    rare_class_augmentation_factor: 3.0  # 3x più augmentation per classi rare
+    mixup_alpha: 0.4            # NUOVO: MixUp per generalizzazione
+    cutmix_alpha: 1.0           # NUOVO: CutMix
+    
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  esc50_dir: esc-50/ESC-50-master
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+  num_workers: 12
+  pin_memory: true
+  
+config_name: optimized_imbalanced_training
+
+# OTTIMIZZATO: Weight calculation più accurato
+weight_calculation_samples: 50000  # QUINTUPLICATO da 10000
+# NUOVO: Advanced class balancing strategies
+class_balancing:
+  technique: "weighted_sampling"  # weighted_sampling, focal_loss, both
+  focal_gamma_schedule: "adaptive"  # adaptive, constant, linear
+  rare_class_threshold: 1000      # Classi con < 1000 samples = "rare"
+  oversample_factor: 2.0          # 2x oversampling per classi rare
+  
+# NUOVO: Monitoring migliorato per class imbalance
+monitoring:
+  track_per_class_metrics: true
+  early_stop_metric: "macro_f1"  # Invece di accuracy totale
+  patience_metric: "val_loss"
+  log_confusion_matrix_every: 10  # Ogni 10 epoche
+  save_best_per_class: true      # Salva best model per macro-F1
+
+
+# Logging and checkpointing
+hydra:
+  run:
+    dir: ./logs/${experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: ${experiment_name} 

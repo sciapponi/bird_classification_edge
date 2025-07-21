@@ -653,16 +653,95 @@ class DistillationTrainer:
         # Create dataloader
         batch_size = dataset_config.get('batch_size', 32)
         num_workers = dataset_config.get('num_workers', 4)
-        shuffle = (split == 'train')
         
-        dataloader = DataLoader(
-            distillation_dataset,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            num_workers=num_workers,
-            pin_memory=torch.cuda.is_available(),
-            drop_last=(split == 'train')  # Drop last batch only for training
-        )
+        # Implement WeightedRandomSampler for class balancing (training only)
+        if split == 'train' and dataset_config.get('balanced_sampling', False):
+            logger.info("Setting up WeightedRandomSampler for class balancing...")
+            
+            # Calculate class distribution
+            class_counts = {}
+            total_samples = len(distillation_dataset)
+            
+            # Sample a subset for faster calculation if dataset is very large
+            sample_size = min(total_samples, 10000)
+            sample_indices = np.random.choice(total_samples, sample_size, replace=False)
+            
+            for i in sample_indices:
+                _, class_idx, _ = distillation_dataset[i]
+                if isinstance(class_idx, torch.Tensor):
+                    class_idx = class_idx.item()
+                class_counts[class_idx] = class_counts.get(class_idx, 0) + 1
+            
+            # Extrapolate to full dataset
+            scale_factor = total_samples / sample_size
+            for class_idx in class_counts:
+                class_counts[class_idx] = int(class_counts[class_idx] * scale_factor)
+            
+            logger.info(f"Estimated class distribution in {split} set:")
+            for class_idx, count in sorted(class_counts.items()):
+                class_name = combined_dataset.idx_to_class.get(class_idx, f"Class_{class_idx}")
+                logger.info(f"  {class_name}: {count} samples")
+            
+            # Calculate weights for each class (inverse frequency)
+            num_classes = len(class_counts)
+            class_weights = {}
+            
+            # Use effective number of samples for better balancing
+            beta = 0.9999  # Smoothing parameter
+            for class_idx, count in class_counts.items():
+                effective_num = (1.0 - beta**count) / (1.0 - beta)
+                class_weights[class_idx] = 1.0 / effective_num
+            
+            # Normalize weights
+            total_weight = sum(class_weights.values())
+            for class_idx in class_weights:
+                class_weights[class_idx] = class_weights[class_idx] / total_weight * num_classes
+            
+            # Create sample weights list for full dataset
+            sample_weights = []
+            for i in range(total_samples):
+                _, class_idx, _ = distillation_dataset[i]
+                if isinstance(class_idx, torch.Tensor):
+                    class_idx = class_idx.item()
+                sample_weights.append(class_weights.get(class_idx, 1.0))
+            
+            # Create WeightedRandomSampler
+            from torch.utils.data import WeightedRandomSampler
+            sampler = WeightedRandomSampler(
+                weights=sample_weights,
+                num_samples=total_samples,
+                replacement=True  # Allow repeated sampling to balance classes
+            )
+            
+            logger.info(f"Created WeightedRandomSampler with {len(sample_weights)} sample weights")
+            logger.info("Effective sample weights per class:")
+            for class_idx, weight in sorted(class_weights.items()):
+                class_name = combined_dataset.idx_to_class.get(class_idx, f"Class_{class_idx}")
+                logger.info(f"  {class_name}: weight={weight:.4f}")
+            
+            # Create dataloader with sampler
+            dataloader = DataLoader(
+                distillation_dataset,
+                batch_size=batch_size,
+                sampler=sampler,  # Use WeightedRandomSampler instead of shuffle
+                num_workers=num_workers,
+                pin_memory=torch.cuda.is_available(),
+                drop_last=True  # Drop last batch for training
+            )
+            
+            logger.info("✅ WeightedRandomSampler enabled - classes will be balanced automatically!")
+            
+        else:
+            # For validation/test or when balanced_sampling is disabled
+            shuffle = (split == 'train')
+            dataloader = DataLoader(
+                distillation_dataset,
+                batch_size=batch_size,
+                shuffle=shuffle,
+                num_workers=num_workers,
+                pin_memory=torch.cuda.is_available(),
+                drop_last=(split == 'train')
+            )
         
         logger.info(f"Created combined preprocessed distillation dataloader for {split}:")
         logger.info(f"  Bird samples: {len(bird_dataset)}")
@@ -914,7 +993,7 @@ class DistillationTrainer:
             loss_config = self.config.get('loss', {})
             
             # Fast sampling parameters
-            max_samples = loss_config.get('weight_calculation_samples', 10000)  # !!! DA SISTEMARE: E' HARDCODED
+            max_samples = loss_config.get('weight_calculation_samples', 50000)  # !!! DA SISTEMARE: E' HARDCODED
             use_sampling = loss_config.get('use_fast_sampling', True)  # Enable fast sampling by default
             
             dataset_size = len(train_dataset)
