@@ -416,6 +416,20 @@ class DifferentiableSpectrogram(nn.Module):
         self.register_buffer('f_min', torch.tensor(float(f_min)))
         self.register_buffer('f_max', torch.tensor(float(f_max)))
 
+        # Aggiungi cache per la filter bank
+        self._filter_bank_cache = None
+        self._cached_params = {}
+
+    def rebuild_filters(self):
+        """
+        Invalida la cache della filter bank, forzando il ricalcolo al prossimo forward pass.
+        Questo è il metodo da chiamare quando i parametri vengono modificati esternamente.
+        """
+        self._filter_bank_cache = None
+        self._cached_params = {}
+        if self.debug:
+            print("DEBUG Spec: Filter cache invalidato.")
+
 
     def _get_triangular_filter_centers(self, device):
         """
@@ -443,17 +457,10 @@ class DifferentiableSpectrogram(nn.Module):
             current_breakpoint = self.breakpoint 
             current_transition_width = self.transition_width
             
-            # Clamp del breakpoint per assicurare che rimanga all'interno di [f_min + epsilon, f_max - epsilon]
-            # per evitare problemi numerici e mantenere la validità fisica.
-            # Epsilon piccolo per evitare che f_range diventi zero.
-            epsilon = 1e-2 # Hz, per evitare che f_min == breakpoint o f_max == breakpoint
-            clamped_breakpoint = torch.clamp(current_breakpoint, 
-                                             self.f_min + epsilon, 
-                                             self.f_max - epsilon)
-
-            if self.debug and self.trainable_filterbank:
-                 if not torch.allclose(current_breakpoint, clamped_breakpoint):
-                     print(f"DEBUG Spec: Breakpoint clamped from {current_breakpoint.item():.2f} to {clamped_breakpoint.item():.2f}")
+            # Allow breakpoint to go to any value - no artificial constraints
+            # The system can naturally find the optimal breakpoint, even if very low
+            # Low breakpoint values (near 0) simply mean "prefer linear representation"
+            clamped_breakpoint = current_breakpoint  # No clamping - let the gradients decide!
 
             log_part = self.f_min * (self.f_max / self.f_min) ** x
             linear_part = self.f_min + x * (self.f_max - self.f_min)
@@ -574,38 +581,61 @@ class DifferentiableSpectrogram(nn.Module):
 
     def _get_current_filter_bank(self, device):
         """
-        Restituisce la filter bank corrente in base a spec_type e parametri.
+        Restituisce la filter bank corrente, usando una cache per efficienza.
+        La cache viene invalidata se i parametri apprendibili cambiano.
         """
+        # Controlla se i parametri sono cambiati (per invalidare la cache)
+        params_have_changed = False
+        if self.spec_type == "combined_log_linear":
+            current_params = {
+                'breakpoint': self.breakpoint.item(),
+                'transition_width': self.transition_width.item()
+            }
+            if not self._cached_params or self._cached_params != current_params:
+                params_have_changed = True
+                self._cached_params = current_params
+
+        if self._filter_bank_cache is not None and not params_have_changed:
+            return self._filter_bank_cache.to(device)
+
+        # Se non in cache o parametri cambiati, ricalcola
+        if self.debug and params_have_changed:
+            print(f"DEBUG Spec: Ricalcolo filter bank. Breakpoint: {self.breakpoint.item():.2f}, TW: {self.transition_width.item():.2f}")
+
+        # Ricalcola la filter bank in base al tipo
         if self.spec_type == "mel":
             # Usa la filter bank Mel standard da torchaudio
-            # Questa non è apprendibile rispetto a breakpoint/transition_width
-            # ma f_min, f_max, n_filters sono usati.
             fb = F.melscale_fbanks(
                 n_freqs=self.n_fft // 2 + 1,
-                f_min=self.f_min.item(), # Usa .item() per ottenere float Python
+                f_min=self.f_min.item(),
                 f_max=self.f_max.item(),
                 n_mels=self.n_filters,
                 sample_rate=self.sr,
-                norm='slaney', # Opzionale: 'slaney' o None
-                mel_scale='htk'  # o 'slaney'
+                norm='slaney',
+                mel_scale='htk'
             ).to(device)
             # melscale_fbanks può restituire [n_freqs, n_mels], vogliamo [n_mels, n_freqs]
-            if fb.shape[0] != self.n_filters :
+            if fb.shape[0] != self.n_filters:
                 fb = fb.T
-            return fb
+            self._filter_bank_cache = fb
 
         elif self.spec_type == "linear_stft":
-            # Per STFT lineare, non c'è una filter bank da applicare qui.
-            # Il risultato dell'STFT viene usato direttamente (o convertito in dB).
-            # Quindi questa funzione restituirebbe None o un segnaposto.
-            # Il forward gestirà questo caso.
-            return None
+            # Per STFT lineare, non c'è una filter bank; il risultato dell'STFT viene usato direttamente.
+            self._filter_bank_cache = None
             
-        else: # "linear_triangular" o "combined_log_linear"
+        elif self.spec_type in ["linear_triangular", "combined_log_linear"]:
+            # Entrambi questi tipi generano filtri triangolari basati su frequenze centrali.
             center_freqs = self._get_triangular_filter_centers(device=device)
-            if center_freqs is None: # Dovrebbe accadere solo se c'è un errore di logica
-                raise ValueError("Center frequencies could not be computed.")
-            return self._generate_triangular_filter_bank_from_centers(center_freqs, device=device)
+            if center_freqs is None:
+                raise ValueError(f"Center frequencies could not be computed for spec_type: {self.spec_type}")
+            
+            filter_bank = self._generate_triangular_filter_bank_from_centers(center_freqs, device=device)
+            self._filter_bank_cache = filter_bank
+        
+        else:
+            raise ValueError(f"Unsupported spec_type for filter bank generation: {self.spec_type}")
+
+        return self._filter_bank_cache
 
 
     def forward(self, waveform):

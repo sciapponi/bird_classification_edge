@@ -68,6 +68,9 @@ class Improved_Phi_GRU_ATT(nn.Module):
         self.differentiable_spec = None
         self.combined_log_linear_spec = None
 
+        # Aggiungi un metodo per aggiornare i filtri in modo esplicito
+        self.update_filters()
+
         if self.spectrogram_type == "mel":
             self.mel_transform = torchaudio.transforms.MelSpectrogram(
                 sample_rate=self.sample_rate,
@@ -137,6 +140,43 @@ class Improved_Phi_GRU_ATT(nn.Module):
         self.projection = nn.Linear(self.hidden_dim, self.hidden_dim)
         self.keyword_attention = AttentionLayer(self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim, num_classes)
+
+    def update_filters(self):
+        """
+        Forza l'aggiornamento (o la creazione) del modulo dello spettrogramma 
+        basato sui parametri correnti del modello (es. breakpoint).
+        """
+        if self.spectrogram_type in ["combined_log_linear", "fully_learnable"]:
+            spectrogram_config = {
+                'spectrogram_type': self.spectrogram_type,
+                'sample_rate': self.sample_rate,
+                'n_linear_filters': self.n_linear_filters,
+                'f_min': self.f_min,
+                'f_max': self.f_max,
+                'n_fft': self.n_fft,
+                'hop_length': self.hop_length,
+                'initial_breakpoint': self.breakpoint,
+                'initial_transition_width': self.transition_width,
+                'trainable_filterbank': True, # Assicurati che sia True
+                'debug': False
+            }
+            
+            # Se il modulo esiste già, aggiorna i suoi parametri interni.
+            # Altrimenti, crealo.
+            if self.combined_log_linear_spec is None:
+                self.combined_log_linear_spec = create_spectrogram_module(spectrogram_config)
+            else:
+                # Se i parametri sono learnable, vengono aggiornati dal gradiente.
+                # Se sono fissi ma devono essere cambiati (es. in _test_filter_candidates),
+                # la modifica diretta di `self.model.combined_log_linear_spec.breakpoint`
+                # è sufficiente, ma dobbiamo assicurarci che il ricalcolo della filterbank
+                # avvenga. Aggiungiamo un metodo a DifferentiableSpectrogram.
+                if hasattr(self.combined_log_linear_spec, 'rebuild_filters'):
+                    self.combined_log_linear_spec.rebuild_filters()
+                else:
+                    # Fallback se il metodo non esiste: ricreare il modulo
+                    # (meno efficiente ma garantisce il funzionamento)
+                    self.combined_log_linear_spec = create_spectrogram_module(spectrogram_config)
 
     def forward(self, x):
             if x.dim() == 2:

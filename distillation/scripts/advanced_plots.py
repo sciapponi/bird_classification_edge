@@ -63,7 +63,39 @@ class DistillationAnalyzer:
         
         with open(log_file, 'r') as f:
             for line in f:
-                if "Epoch" in line and "[Train]" in line and "Avg Loss:" in line:
+                # New format: "Epoch 1/5 | Duration: 812.33s | Train Loss: 0.4459, Train Acc: 30.65% | Val Loss: 0.3213, Val Acc: 50.94% | LR: 0.001000"
+                if "Epoch" in line and "Train Loss:" in line and "Val Loss:" in line and "Duration:" in line:
+                    try:
+                        # Extract epoch number
+                        epoch_part = line.split("Epoch")[1].split("|")[0].strip()
+                        epoch = int(epoch_part.split("/")[0])
+                        
+                        # Extract train loss and accuracy
+                        train_loss_part = line.split("Train Loss:")[1].split(",")[0].strip()
+                        train_loss = float(train_loss_part)
+                        
+                        train_acc_part = line.split("Train Acc:")[1].split("%")[0].strip()
+                        train_acc = float(train_acc_part)
+                        
+                        # Extract validation loss and accuracy
+                        val_loss_part = line.split("Val Loss:")[1].split(",")[0].strip()
+                        val_loss = float(val_loss_part)
+                        
+                        val_acc_part = line.split("Val Acc:")[1].split("%")[0].strip()
+                        val_acc = float(val_acc_part)
+                        
+                        epochs.append(epoch)
+                        train_losses.append(train_loss)
+                        train_accs.append(train_acc)
+                        val_losses.append(val_loss)
+                        val_accs.append(val_acc)
+                        
+                    except (ValueError, IndexError) as e:
+                        print(f"⚠️ Could not parse line: {line.strip()}, error: {e}")
+                        continue
+                        
+                # Legacy format support for backward compatibility
+                elif "Epoch" in line and "[Train]" in line and "Avg Loss:" in line:
                     # Format: "2025-06-17 09:42:25,024 - [INFO] - Epoch 1 [Train] Avg Loss: 1.1127, Avg Acc: 42.7605"
                     parts = line.split()
                     epoch_idx = parts.index("Epoch") + 1
@@ -99,6 +131,14 @@ class DistillationAnalyzer:
         }
         
         print(f"✅ Parsed training log: {len(epochs)} epochs")
+        if len(epochs) > 0:
+            print(f"   Epochs: {epochs}")
+            print(f"   Train losses: {train_losses}")
+            print(f"   Val losses: {val_losses}")
+            print(f"   Train accs: {train_accs}")
+            print(f"   Val accs: {val_accs}")
+        else:
+            print("⚠️ No training data was parsed from the log")
     
     def plot_filter_evolution(self, save_path: Optional[str] = None):
         """Plot comprehensive filter parameter evolution analysis."""
@@ -107,7 +147,7 @@ class DistillationAnalyzer:
             return
             
         fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-        fig.suptitle('🎛️ Differentiable Filter Evolution Analysis', fontsize=16)
+        fig.suptitle('Differentiable Filter Evolution Analysis', fontsize=16)
         
         df = self.data['filter_params']
         epochs = df['epoch'].values
@@ -224,7 +264,7 @@ class DistillationAnalyzer:
             return
             
         fig, axes = plt.subplots(2, 3, figsize=(18, 12))
-        fig.suptitle('📊 Training Dynamics Deep Analysis', fontsize=16)
+        fig.suptitle('Training Dynamics Deep Analysis', fontsize=16)
         
         training = self.data['training']
         epochs = np.array(training['epochs'])
@@ -394,13 +434,19 @@ class DistillationAnalyzer:
         generated_plots = []
         for filename, plot_func in plots:
             try:
+                print(f"🎨 Generating {filename}...")
                 save_path = output_dir / filename
                 fig = plot_func(save_path)
                 if fig is not None:
                     plt.close(fig)
                     generated_plots.append(save_path)
+                    print(f"✅ Successfully generated {filename}")
+                else:
+                    print(f"⚠️ {filename}: plot function returned None")
             except Exception as e:
                 print(f"❌ Error generating {filename}: {e}")
+                import traceback
+                traceback.print_exc()
         
         print(f"✅ Generated {len(generated_plots)} advanced plots")
         return generated_plots

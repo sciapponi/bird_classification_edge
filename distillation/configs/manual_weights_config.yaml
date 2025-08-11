@@ -64,13 +64,22 @@ optimizer:
   lr: 0.001
   weight_decay: 0.01
 
-# Standard scheduler
+# Standard scheduler (for main model)
 scheduler:
   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
   mode: 'min'
   factor: 0.5
   patience: 6
   min_lr: 1e-6
+
+# Filter scheduler (separate scheduler for filter parameters)
+# Using CosineAnnealingLR for filters with separate schedule
+filter_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 50                      # Separate annealing schedule for filters
+  eta_min: 5e-7                  # Minimum learning rate for filters
+# Alternative: Set to null to disable scheduler for filters (constant LR)
+# filter_scheduler: null
 
 # Dataset configuration matching the manual weights order
 dataset:

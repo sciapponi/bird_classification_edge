@@ -65,11 +65,27 @@ optimizer:
   betas: [0.9, 0.999]
   eps: 1e-8
 
-# Cosine annealing scheduler for adaptive learning
+# Cosine annealing scheduler for adaptive learning (for main model)
 scheduler:
   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
   T_max: 75                     # Number of epochs (matches training.epochs)
   eta_min: 5e-7                 # Minimum learning rate
+
+# Filter scheduler (separate scheduler for filter parameters)
+# Using CosineAnnealingLR for filters with separate schedule
+filter_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 75                      # Separate annealing schedule for filters (matches training.epochs)
+  eta_min: 5e-7                  # Minimum learning rate for filters
+# Alternative: Set to null to disable scheduler for filters (constant LR)
+# filter_scheduler: null          
+# Alternative: Use ReduceLROnPlateau for more conservative updates
+# filter_scheduler:
+#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   mode: 'min'
+#   factor: 0.8                 # More conservative reduction
+#   patience: 15                # Longer patience for filter parameters
+#   min_lr: 1e-5
 
 # Dataset configuration - SMALL TEST DATASET
 dataset:

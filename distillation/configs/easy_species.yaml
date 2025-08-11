@@ -2,15 +2,16 @@
 # Standalone configuration with all required parameters
 
 # Override experiment name
-experiment_name: "bird_full_training_fulldataset"
+experiment_name: "easy_species_full_dataset"
 
 # Loss function configuration
 loss:
   type: "focal_distillation"          # Options: "distillation", "focal", "focal_distillation"
-  gamma: 2.0                    # Focal loss gamma parameter (only used for focal loss types)
+  gamma: 4.0                    # Focal loss gamma parameter (only used for focal loss types)
   class_weights: auto           # Options: null, "auto", or list of per-class weights
-  alpha_scaling: 1.0            # Scaling factor for automatic class weights
-
+  alpha_scaling: 3.0            # Scaling factor for automatic class weights
+  auto_weights_sample_size: 5000 # NEW: Number of samples to check for auto weights
+  adaptive: true
 # Distillation-specific parameters
 distillation:
   # Distillation loss parameters
@@ -30,9 +31,9 @@ distillation:
 
 # Training parameters (adjusted for distillation)
 training:
-  epochs: 50            # Full training with extract_calls
+  epochs: 150           # AUMENTATO - Alternating richiede più epochs
   batch_size: 64               # Can be larger since we're not running teacher online
-  patience: 40                  # Much longer patience to reach 100 epochs
+  patience: 35                  # AUMENTATO - Patience maggiore per alternating
   min_delta: 0.001             # More sensitive to small improvements
   seed: 42
 
@@ -43,8 +44,8 @@ model:
   n_mel_bins: 64
   n_linear_filters: 64
   trainable_filterbank: true
-  initial_breakpoint: 4000.0
-  initial_transition_width: 100.0
+  initial_breakpoint: 8000.0 # STRESS TEST: Partenza neutra e alta per forzare una scelta.
+  initial_transition_width: 200.0 # STRESS TEST: Valore di partenza neutro.
   n_fft: 512 
   hop_length: 320
   matchbox:
@@ -68,14 +69,14 @@ optimizer:
 #  min_lr: 1e-6
 scheduler:
   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  T_max: 75                     # Number of epochs (matches training.epochs)
+  T_max: 100                     
   eta_min: 5e-7                 # Minimum learning rate
 
 # Filter scheduler (separate scheduler for filter parameters)
 # Using CosineAnnealingLR for filters with separate schedule
 filter_scheduler:
   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  T_max: 75                      # Separate annealing schedule for filters (matches training.epochs)
+  T_max: 100                     # Separate annealing schedule for filters
   eta_min: 5e-7                  # Minimum learning rate for filters
 # Alternative: Set to null to disable scheduler for filters (constant LR)
 # filter_scheduler: null          
@@ -88,30 +89,64 @@ filter_scheduler:
 #   min_lr: 1e-5
 
 # Filter-specific learning rate control (OTTIMIZZATO)
-breakpoint_lr_multiplier: 10.0         # LR aggressivo per breakpoint (permette cambiamenti rapidi di centinaia di Hz)
-transition_width_lr_multiplier: 3.0    # LR moderato per transition_width (permette adattamento efficace)
+breakpoint_lr_multiplier: 5.0          # STRATEGIA: LR più alto per contrastare la spinta verso il basso del joint training.
+transition_width_lr_multiplier: 2.0    # STRATEGIA: LR moderato per la transizione.
+
+# NUOVO: Filter exploration parameters per evitare getting stuck
+filter_exploration:
+  enable_noise: false                    # STRESS TEST: Disabilitato per osservare l'overshooting puro.
+  noise_std: 0.05                     
+  enable_oscillation: false              # STRESS TEST: Disabilitato per osservare l'overshooting puro.
+  oscillation_amplitude: 25.0          
+  oscillation_period: 5                
+  enable_momentum_reset: true          
+  momentum_reset_period: 10             # STRATEGIA: Reset ogni 10 epochs invece di 5
+
+# NUOVO: Filter regularization per evitare valori estremi
+filter_regularization:
+  enable_range_penalty: true           # ATTIVATO - Penalizza valori troppo estremi
+  sensible_breakpoint_min: 20.0        # RIDOTTO - Breakpoint "sensato" minimo (Hz) - più permissivo
+  sensible_breakpoint_max: 32000.0      # Breakpoint "sensato" massimo (Hz)
+  range_penalty_weight: 0.01           # AUMENTATO - Peso della penalizzazione (più forte)
+  enable_stability_bonus: false         # ATTIVATO - Bonus per stabilità
+  stability_window: 5                  # Finestra per calcolare stabilità (epochs)
+  stability_bonus_weight: 0.01         # Peso del bonus di stabilità
+
+# NUOVO: Alternating optimization settings
+alternating_optimization:
+  enabled: true
+  main_opt_epochs: 4       # STRATEGIA: Ripristinato a 4 per applicare solo la strategia del LR.
+  filter_opt_epochs: 1     # STRATEGIA: 1 epoca di ottimizzazione del filtro ogni 2 di training principale.
+  initial_joint_epochs: 5
+  final_joint_epochs: 20
+  validation_feedback: true
+  filter_candidates_test: 5
+  search_range_factor: 0.1
 
 # Dataset parameters
 dataset:
-  soft_labels_path: "soft_labels_complete"  # Path to soft labels (can be overridden)
+  soft_labels_path: soft_labels_complete  # Path to soft labels (can be overridden)
   main_data_dir: bird_sound_dataset_processed
   
   # NEW: Control preprocessing behavior
-  process: true                         # Set to false to use preprocessed files (no runtime preprocessing)
+  process: false                         # Set to false to use preprocessed files (no runtime preprocessing)
   preprocessed_root_dir: "bird_sound_dataset_processed"  # Directory with preprocessed files (used when process=false)
+  
+  # Control whether to include no_bird class
+  use_no_bird_class: true               # If true, includes no_bird class; if false, only bird species
+  
   # Explicitly define the classes to match the teacher model's output
   allowed_bird_classes:
-    - Corvus_corax
-    - Falco_tinnunculus
-    - Otus_scops
-    - Hirundo_rustica
-    - Phylloscopus_collybita
+
     - Ardea_cinerea
+   - Corvus_corax
+    - Falco_tinnunculus
+    - Hirundo_rustica
+    - Otus_scops
+    - Phylloscopus_collybita
     - Picus_canus
     - Strix_aluco
-  
-
-  # Include non-bird samples for 5-class classification
+  # no-bird class is auto-added
   load_pregenerated_no_birds: true
   pregenerated_no_birds_dir: augmented_dataset/no_birds
   num_no_bird_samples: 836      # Use all non-bird samples
@@ -135,6 +170,11 @@ dataset:
   
   # Dynamic balancing for non-bird class
   esc50_dir: "esc-50/ESC-50-master"
+  # BALANCING: weighted sampling per gestire imbalance
+  balanced_sampling: false     # Abilita weighted sampling
+  oversample_rare_classes: 2.0  # Oversampling per classi rare
+  num_workers: 0
+  pin_memory: true
   val_split: 0.15
   test_split: 0.15
   seed: 42

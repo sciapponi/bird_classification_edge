@@ -1,0 +1,145 @@
+# Adaptive Focal Distillation Configuration
+# Best for highly imbalanced datasets where class distribution changes
+
+defaults:
+  - distillation_config
+  - _self_
+
+# Override experiment name
+experiment_name: bird_full_training_optimized_imbalanced_easy_species
+
+# OTTIMIZZATO: Loss configuration per class imbalance estremo
+loss:
+  type: focal_distillation
+  gamma: 4.0              # AUMENTATO da 2.0: più focus su classi difficili
+  class_weights: auto
+  alpha_scaling: 3.0      # AUMENTATO da 1.0: più peso alle classi rare
+  adaptive: true          # NUOVO: adatta il loss durante training
+  
+distillation:
+  alpha: 0.4
+  temperature: 3.0              
+  adaptive: true               
+  adaptation_rate: 0.1          
+  alpha_schedule: constant    
+  confidence_threshold: 0.05    
+
+# Training parameters
+training:
+  epochs: 100            
+  batch_size: 128               
+  patience: 40                  
+  min_delta: 0.0005             
+  seed: 42
+
+# Model parameters
+model:
+  spectrogram_type: combined_log_linear
+  hidden_dim: 128
+  n_mel_bins: 128
+  n_linear_filters: 128
+  trainable_filterbank: true
+  initial_breakpoint: 4000.0
+  initial_transition_width: 100.0
+  n_fft: 512 
+  hop_length: 320
+  matchbox:
+    base_filters: 32
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+
+# Optimizer
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.001                    
+  weight_decay: 0.01
+
+# Learning rate scheduler (for main model)
+scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 100                     
+  eta_min: 5e-7                 
+
+# Filter scheduler (separate scheduler for filter parameters)
+# Using CosineAnnealingLR for filters with separate schedule
+filter_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 100                     # Separate annealing schedule for filters
+  eta_min: 5e-7                  # Minimum learning rate for filters
+# Alternative: Set to null to disable scheduler for filters (constant LR)
+# filter_scheduler: null          
+# Alternative: Use ReduceLROnPlateau for more conservative updates
+# filter_scheduler:
+#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   mode: 'min'
+#   factor: 0.8                 # More conservative reduction
+#   patience: 15                # Longer patience for filter parameters
+#   min_lr: 1e-5                 
+
+# Dataset parameters - OVERRIDE BASE CONFIG  
+dataset:
+  soft_labels_path: soft_labels_complete
+  main_data_dir: bird_sound_dataset_processed
+  process: false                         
+  preprocessed_root_dir: bird_sound_dataset_processed
+  
+  # AUGMENTED: Configurazione per evitare di rimanere senza campioni di validation
+  validation_split: 0.15
+  test_split: 0.15
+  seed: 42
+  
+  # Lista delle 8 classi specifiche per questo training
+  allowed_bird_classes:
+    - Corvus_corax
+    - Falco_tinnunculus
+    - Otus_scops
+    - Hirundo_rustica
+    - Phylloscopus_collybita
+    - Ardea_cinerea
+    - Picus_canus
+    - Strix_aluco
+  
+  load_pregenerated_no_birds: true
+  pregenerated_no_birds_dir: augmented_dataset/no_birds
+  num_no_bird_samples: 836
+  
+  # AGGIUNTA: augmentation settings
+  augmentation:
+    enabled: true
+    noise_level: 0.01
+    time_mask_param: 30
+    freq_mask_param: 10
+    time_shift_limit: 0.1
+    speed_perturb_rate_min: 0.95
+    speed_perturb_rate_max: 1.05
+  
+  # Audio processing parameters
+  sample_rate: 32000
+  clip_duration: 3.0
+  lowcut: 150.0
+  highcut: 16000.0
+  extract_calls: false
+  
+  # ESC-50 directory for no_bird sounds
+  esc50_dir: esc-50/ESC-50-master
+  
+  # BALANCING: weighted sampling per gestire imbalance
+  balanced_sampling: true     # Abilita weighted sampling
+  oversample_rare_classes: 2.0  # Oversampling per classi rare
+  num_workers: 12
+  pin_memory: true
+
+# Weight calculation configuration
+weight_calculation_samples: 10000
+
+# Hydra logging configuration - RIPRISTINATO
+hydra:
+  run:
+    dir: ./logs/${experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    name: ${experiment_name}
+  job_logging:
+    root:
+      level: INFO
+      handlers: [console, file] 

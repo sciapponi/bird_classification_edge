@@ -10,6 +10,94 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from datasets.dataset_factory import create_combined_dataset
 
+class FilteredDistillationDataset:
+    """
+    Dataset wrapper that filters and remaps classes for both hard and soft labels.
+    This allows training on a subset of classes with proper index remapping.
+    """
+    
+    def __init__(self, base_distillation_dataset, class_mapping, target_classes, target_soft_labels_info):
+        """
+        Initialize filtered distillation dataset.
+        
+        Args:
+            base_distillation_dataset: The underlying DistillationBirdSoundDataset
+            class_mapping: Dict mapping original class indices to new filtered indices
+            target_classes: List of target class names (filtered)
+            target_soft_labels_info: Info about the filtered soft labels
+        """
+        self.base_dataset = base_distillation_dataset
+        self.class_mapping = class_mapping  # {original_idx: new_idx}
+        self.target_classes = target_classes
+        self.target_soft_labels_info = target_soft_labels_info
+        self.num_classes = len(target_classes)
+        
+        # Create reverse mapping for filtering soft labels
+        self.soft_label_indices = list(class_mapping.keys())  # Original indices to keep
+        
+        print(f"FilteredDistillationDataset initialized:")
+        print(f"  Base dataset samples: {len(self.base_dataset)}")
+        print(f"  Filtered to {self.num_classes} classes")
+        print(f"  Class mapping: {self.class_mapping}")
+        print(f"  Soft label indices to keep: {self.soft_label_indices}")
+    
+    def __len__(self):
+        return len(self.base_dataset)
+    
+    def __getitem__(self, idx):
+        """
+        Get item with filtered and remapped hard and soft labels.
+        
+        Returns:
+            tuple: (audio_tensor, remapped_hard_label, filtered_soft_label_tensor)
+        """
+        # Get base item
+        audio, original_hard_label, original_soft_label = self.base_dataset[idx]
+        
+        # Check if this sample's class is in our filtered classes
+        if isinstance(original_hard_label, torch.Tensor):
+            original_hard_label = original_hard_label.item()
+        
+        if original_hard_label not in self.class_mapping:
+            # This sample's class is not in our filtered set
+            # This should be rare if the underlying dataset is properly constructed
+            # but can happen with certain dataset configurations
+            print(f"Warning: Sample {idx} has class {original_hard_label} not in filtered classes")
+            print(f"Available class mapping: {self.class_mapping}")
+            # Return a "skip" marker that can be handled by the training loop
+            return None
+        else:
+            # Remap the hard label
+            remapped_hard_label = self.class_mapping[original_hard_label]
+        
+        # Filter and normalize soft labels
+        if isinstance(original_soft_label, torch.Tensor):
+            original_soft_label = original_soft_label.numpy()
+        
+        # Extract only the soft label values for our target classes
+        filtered_soft_label = original_soft_label[self.soft_label_indices]
+        
+        # Renormalize soft labels to sum to 1
+        soft_label_sum = np.sum(filtered_soft_label)
+        if soft_label_sum > 0:
+            filtered_soft_label = filtered_soft_label / soft_label_sum
+        else:
+            # If all are zero, use uniform distribution
+            filtered_soft_label = np.ones(len(filtered_soft_label)) / len(filtered_soft_label)
+        
+        filtered_soft_label_tensor = torch.from_numpy(filtered_soft_label.astype(np.float32))
+        
+        return audio, torch.tensor(remapped_hard_label, dtype=torch.long), filtered_soft_label_tensor
+    
+    def get_soft_labels_info(self):
+        """Get information about filtered soft labels"""
+        return self.target_soft_labels_info
+    
+    def get_classes(self):
+        """Get list of filtered class names"""
+        return self.target_classes
+
+
 class DistillationBirdSoundDataset:
     """
     Dataset wrapper that combines dataset_factory functionality with soft labels

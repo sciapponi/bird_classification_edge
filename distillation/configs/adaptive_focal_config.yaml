@@ -59,7 +59,7 @@ optimizer:
   betas: [0.9, 0.999]
   eps: 1e-8
 
-# More conservative scheduler for adaptive learning
+# More conservative scheduler for adaptive learning (for main model)
 scheduler:
   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
   mode: 'min'
@@ -67,6 +67,15 @@ scheduler:
   patience: 7                   # Medium patience
   min_lr: 5e-7
   cooldown: 3                   # Cooldown period after reduction
+
+# Filter scheduler (separate scheduler for filter parameters)
+# Using CosineAnnealingLR for filters with separate schedule
+filter_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 50                      # Separate annealing schedule for filters  
+  eta_min: 5e-7                  # Minimum learning rate for filters
+# Alternative: Set to null to disable scheduler for filters (constant LR)
+# filter_scheduler: null
 
 # Dataset configuration - full imbalanced dataset
 dataset:

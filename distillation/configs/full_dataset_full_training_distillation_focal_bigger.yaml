@@ -52,7 +52,7 @@ optimizer:
   weight_decay: 0.02     # AUMENTATO da 0.01: più regolarizzazione
   betas: [0.9, 0.999]
   
-# OTTIMIZZATO: Scheduler più efficace per class imbalance
+# OTTIMIZZATO: Scheduler più efficace per class imbalance (for main model)
 scheduler:
   _target_: torch.optim.lr_scheduler.OneCycleLR  # CAMBIATO da CosineAnnealingLR
   max_lr: 0.01
@@ -60,6 +60,15 @@ scheduler:
   anneal_strategy: cos
   div_factor: 25
   final_div_factor: 10000
+
+# Filter scheduler (separate scheduler for filter parameters)
+# Using CosineAnnealingLR for filters with separate schedule
+filter_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 100                     # Separate annealing schedule for filters
+  eta_min: 5e-7                  # Minimum learning rate for filters
+# Alternative: Set to null to disable scheduler for filters (constant LR)
+# filter_scheduler: null
   
 dataset:
   soft_labels_path: soft_labels_complete

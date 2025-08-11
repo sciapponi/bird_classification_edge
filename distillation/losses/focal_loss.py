@@ -60,16 +60,20 @@ class FocalLoss(nn.Module):
         p_t = torch.exp(-ce_loss)
         
         # Handle alpha weighting
-        if isinstance(self.alpha, (list, tuple)):
-            # Per-class alpha weights - fix indexing issue
-            alpha_tensor = torch.tensor(self.alpha, device=logits.device, dtype=torch.float32)
-            # Use gather to properly index with target tensor
+        if isinstance(self.alpha, (list, tuple, torch.Tensor)):
+            # Per-class alpha weights
+            if isinstance(self.alpha, (list, tuple)):
+                alpha_tensor = torch.tensor(self.alpha, device=logits.device, dtype=torch.float32)
+            else:
+                alpha_tensor = self.alpha.to(logits.device)
+            
+            # Use gather to select the correct alpha for each sample in the batch
             alpha_t = alpha_tensor.gather(0, targets.long())
         else:
-            # Single alpha value
+            # Single scalar alpha
             alpha_t = self.alpha
         
-        # Compute focal weight: alpha * (1-p_t)^gamma
+        # Compute focal weight: alpha_t * (1-p_t)^gamma
         focal_weight = alpha_t * (1 - p_t) ** self.gamma
         
         # Apply focal weight
